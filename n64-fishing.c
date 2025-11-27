@@ -18,6 +18,8 @@ float timer;
 ==============================*/
 void minigame_init()
 {
+    display_init(RESOLUTION_320x240, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE);
+
     timer = 4.0f;
 }
 
@@ -46,7 +48,9 @@ void minigame_fixedloop(float deltatime)
 ==============================*/
 void minigame_loop(float deltatime)
 {
+    rdpq_attach(display_get(), NULL);
 
+	rdpq_detach_show();
 }
 
 /*==============================
@@ -55,5 +59,5 @@ void minigame_loop(float deltatime)
 ==============================*/
 void minigame_cleanup()
 {
-
+	display_close();
 }
