@@ -20,8 +20,6 @@ T3DVec3 playerPos;
 T3DVec3 camPos;
 T3DVec3 camTarget;
 
-float timer;
-
 /*==============================
     minigame_init
     The minigame initialization function
@@ -48,8 +46,6 @@ void minigame_init()
         t3d_model_draw(model);
         t3d_matrix_pop(1);
     dplPlayer = rspq_block_end();
-
-    timer = 4.0f;
 }
 
 /*==============================
@@ -61,12 +57,37 @@ void minigame_init()
 ==============================*/
 void minigame_fixedloop(float deltatime)
 {
-    timer -= deltatime;
+    
+}
 
-    fprintf(stderr, "Time left %f\n", timer);
+void read_inputs(float deltaTime, joypad_port_t port)
+{
+    joypad_inputs_t joypad = joypad_get_inputs(port);
+    joypad_buttons_t btn = joypad_get_buttons_pressed(port);
 
-    if (timer <= 0.0f) {
-        minigame_end();
+    if (btn.start)
+    {
+        fprintf(stderr, "Start pressed\n");
+    }
+
+    if (btn.a)
+    {
+        fprintf(stderr, "A pressed\n");
+    }
+
+    if (btn.b)
+    {
+        fprintf(stderr, "B pressed\n");
+    }
+
+    if (joypad.stick_x > 0.0f || joypad.stick_x < 0.0f)
+    {
+        fprintf(stderr, "Joypad X: %f\n", (float)joypad.stick_x);
+    }
+
+    if (joypad.stick_y > 0.0f || joypad.stick_y < 0.0f)
+    {
+        fprintf(stderr, "Joypad Y: %f\n", (float)joypad.stick_y);
     }
 }
 
@@ -81,6 +102,8 @@ void minigame_loop(float deltatime)
     t3d_viewport_look_at(&viewport, &camPos, &camTarget, &(T3DVec3){{0,1,0}});
 
     // ===== Player Loop ===== //
+    read_inputs(deltatime, core_get_playercontroller(0));
+
     // Update player matrix
     t3d_mat4fp_from_srt_euler(modelMatFP,
         (float[3]){0.375f, 0.375f, 0.375f},
