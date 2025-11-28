@@ -20,6 +20,9 @@ T3DVec3 playerPos;
 T3DVec3 camPos;
 T3DVec3 camTarget;
 
+float speed;
+T3DVec3 newDir;
+
 /*==============================
     minigame_init
     The minigame initialization function
@@ -39,6 +42,8 @@ void minigame_init()
 
     // Player Init
     playerPos = (T3DVec3){{-50, 0.5f, 0}};
+    speed = 0.0f;
+    newDir = (T3DVec3){{0, 0, 0}};
 
     modelMatFP = malloc_uncached(sizeof(T3DMat4FP));
     rspq_block_begin();
@@ -57,7 +62,8 @@ void minigame_init()
 ==============================*/
 void minigame_fixedloop(float deltatime)
 {
-    
+    playerPos.v[0] += newDir.v[0] * speed;
+    playerPos.v[2] += newDir.v[2] * speed;
 }
 
 void read_inputs(float deltaTime, joypad_port_t port)
@@ -89,6 +95,10 @@ void read_inputs(float deltaTime, joypad_port_t port)
     {
         fprintf(stderr, "Joypad Y: %f\n", (float)joypad.stick_y);
     }
+
+    newDir.v[0] = (float)joypad.stick_x * 0.05f;
+    newDir.v[2] = -(float)joypad.stick_y * 0.05f;
+    speed = sqrtf(t3d_vec3_len2(&newDir));
 }
 
 /*==============================
@@ -133,9 +143,9 @@ void minigame_cleanup()
     // Player cleanup
     rspq_block_free(dplPlayer);
     free_uncached(modelMatFP);
-
-
     t3d_model_free(model);
+
+    // Display cleanup
     t3d_destroy();
 	display_close();
 }
