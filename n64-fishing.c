@@ -20,6 +20,7 @@ T3DVec3 playerPos;
 T3DVec3 camPos;
 T3DVec3 camTarget;
 
+float curSpeed;
 float speed;
 T3DVec3 newDir;
 
@@ -42,6 +43,7 @@ void minigame_init()
 
     // Player Init
     playerPos = (T3DVec3){{-50, 0.5f, 0}};
+    curSpeed = 0.0f;
     speed = 0.0f;
     newDir = (T3DVec3){{0, 0, 0}};
 
@@ -62,8 +64,9 @@ void minigame_init()
 ==============================*/
 void minigame_fixedloop(float deltatime)
 {
-    playerPos.v[0] += newDir.v[0] * speed;
-    playerPos.v[2] += newDir.v[2] * speed;
+    curSpeed = t3d_lerp(curSpeed, speed * 0.3f, 0.15f);
+    playerPos.v[0] += newDir.v[0] * curSpeed;
+    playerPos.v[2] += newDir.v[2] * curSpeed;
 }
 
 void read_inputs(float deltaTime, joypad_port_t port)
@@ -116,7 +119,7 @@ void minigame_loop(float deltatime)
 
     // Update player matrix
     t3d_mat4fp_from_srt_euler(modelMatFP,
-        (float[3]){0.375f, 0.375f, 0.375f},
+        (float[3]){0.125f, 0.125f, 0.125f},
         (float[3]){0.0f, 0.0f, 0},
         playerPos.v
     );
