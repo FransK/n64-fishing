@@ -5,6 +5,9 @@ Scene::Scene()
     viewport = t3d_viewport_create();
     cam.pos = (T3DVec3){{0, 125.0f, 100.0f}};
     cam.target = (T3DVec3){{0, 0, 0}};
+
+    lightDirVec = (T3DVec3){{1.0f, 1.0f, 1.0f}};
+    t3d_vec3_norm(&lightDirVec);
 }
 
 void Scene::read_inputs(PlyNum plyNum)
@@ -42,6 +45,10 @@ void Scene::update(float deltaTime)
 
     t3d_screen_clear_color(RGBA32(224, 180, 96, 0xFF));
     t3d_screen_clear_depth();
+
+    t3d_light_set_ambient(FranSoft::colorAmbient);
+    t3d_light_set_directional(0, FranSoft::colorDir, &lightDirVec);
+    t3d_light_set_count(1);
 
     player.draw();
 
