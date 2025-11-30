@@ -25,6 +25,7 @@ Player::~Player()
 
 void Player::update_fixed(float deltaTime, InputState input)
 {
+    t3d_vec3_norm(input.move);
     playerPos.v[0] += input.move.v[0] * speed;
     playerPos.v[2] += input.move.v[2] * speed;
 }
