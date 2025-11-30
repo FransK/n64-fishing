@@ -5,7 +5,7 @@ Player::Player()
     model = t3d_model_load("rom:/n64-fishing/player.t3dm");
 
     playerPos = (T3DVec3){{-50, 0.5f, 0}};
-    speed = 0.0f;
+    speed = 3.0f;
 
     modelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
     rspq_block_begin();
@@ -25,9 +25,8 @@ Player::~Player()
 
 void Player::update_fixed(float deltaTime, InputState input)
 {
-    speed = t3d_lerp(speed, input.speed * 0.3f, 0.15f);
-    playerPos.v[0] += input.newDir.v[0] * speed;
-    playerPos.v[2] += input.newDir.v[2] * speed;
+    playerPos.v[0] += input.move.v[0] * speed;
+    playerPos.v[2] += input.move.v[2] * speed;
 }
 
 void Player::update(float deltaTime)

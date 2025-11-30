@@ -13,6 +13,7 @@ extern "C"
 
 struct InputState
 {
-    T3DVec3 newDir{};
-    float speed{};
+    T3DVec3 move{};
+    bool fish{};
+    bool attack{};
 };

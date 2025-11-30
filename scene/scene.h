@@ -13,7 +13,7 @@ private:
     Player player{};
     InputState inputState{};
 
-    void read_inputs(float deltaTime, joypad_port_t port);
+    void read_inputs(PlyNum plyNum);
 
 public:
     void update_fixed(float deltaTime);
