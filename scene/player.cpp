@@ -1,4 +1,5 @@
 #include "player.h"
+#include "fish.h"
 
 Player::Player()
 {
@@ -23,20 +24,47 @@ Player::~Player()
     t3d_model_free(model);
 }
 
-void Player::update_fixed(float deltaTime, InputState input)
+void Player::update_fixed(InputState input)
 {
-    t3d_vec3_norm(input.move);
-    playerPos.v[0] += input.move.v[0] * speed;
-    playerPos.v[2] += input.move.v[2] * speed;
-}
+    if (!isFishing())
+    {
+        t3d_vec3_norm(input.move);
+        playerPos.v[0] += input.move.v[0] * speed;
+        playerPos.v[2] += input.move.v[2] * speed;
+    }
 
-void Player::update(float deltaTime)
-{
-    // Update player matrix
+    // Update player matrix for drawing
     t3d_mat4fp_from_srt_euler(modelMatFP,
                               (float[3]){0.125f, 0.125f, 0.125f},
                               (float[3]){0.0f, 0.0f, 0},
                               playerPos.v);
+}
+
+void Player::update(float deltaTime, InputState input)
+{
+    if (isFishing())
+    {
+        fishingTimer -= deltaTime;
+
+        if (input.fish)
+        {
+            if (isCatchable())
+            {
+                fishCaught++;
+                fprintf(stderr, "Caught fish: %i\n", fishCaught);
+            }
+            else
+            {
+                fprintf(stderr, "Missed a fish!\n");
+            }
+            fishingTimer = 0.0f;
+        }
+        fprintf(stderr, "Fishing Timer: %f\n", fishingTimer);
+    }
+    else if (input.fish)
+    {
+        fishingTimer = Fish::get_new_timer();
+    }
 }
 
 void Player::draw()

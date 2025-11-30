@@ -14,10 +14,10 @@ void Scene::read_inputs(PlyNum plyNum)
 {
     joypad_port_t port = core_get_playercontroller(plyNum);
     auto btn = joypad_get_buttons_pressed(port);
-    auto stick = joypad_get_inputs(port);
+    auto inputs = joypad_get_inputs(port);
 
     inputState = {
-        .move = {{(float)stick.stick_x, 0, -(float)stick.stick_y}},
+        .move = {{(float)inputs.stick_x, 0, -(float)inputs.stick_y}},
         .fish = btn.a != 0,
         .attack = btn.b != 0};
 
@@ -27,7 +27,7 @@ void Scene::read_inputs(PlyNum plyNum)
 
 void Scene::update_fixed(float deltaTime)
 {
-    player.update_fixed(deltaTime, inputState);
+    player.update_fixed(inputState);
 }
 
 void Scene::update(float deltaTime)
@@ -36,7 +36,7 @@ void Scene::update(float deltaTime)
 
     read_inputs(PlyNum::PLAYER_1);
 
-    player.update(deltaTime);
+    player.update(deltaTime, inputState);
 
     // ======== Draw (3D) ======== //
     rdpq_attach(display_get(), display_get_zbuf());

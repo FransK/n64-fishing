@@ -12,10 +12,14 @@ private:
     T3DVec3 playerPos{};
 
     float speed{};
+    float fishingTimer{};
+    int fishCaught{};
 
 public:
-    void update_fixed(float deltaTime, InputState input);
-    void update(float deltaTime);
+    [[nodiscard]] bool isFishing() { return fishingTimer > 0.0f; };
+    [[nodiscard]] bool isCatchable() { return fishingTimer < 1.0f && fishingTimer > 0.0f; };
+    void update_fixed(InputState input);
+    void update(float deltaTime, InputState input);
     void draw();
 
     Player();
