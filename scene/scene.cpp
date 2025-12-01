@@ -32,25 +32,37 @@ void Scene::update_fixed(float deltaTime)
 
 void Scene::update(float deltaTime)
 {
+    // === Set Camera === //
     cam.update(viewport);
 
+    // === Process Inputs === //
     read_inputs(PlyNum::PLAYER_1);
 
     player.update(deltaTime, inputState);
 
-    // ======== Draw (3D) ======== //
+    // ======== Attach RDP ======== //
     rdpq_attach(display_get(), display_get_zbuf());
-    t3d_frame_start();
     t3d_viewport_attach(&viewport);
 
-    t3d_screen_clear_color(RGBA32(224, 180, 96, 0xFF));
+    // === Draw Background === //
+    rdpq_set_mode_fill({(uint8_t)(0x80),
+                        (uint8_t)(0xb8),
+                        (uint8_t)(0xd8),
+                        0xFF});
+    rdpq_fill_rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    // === Draw 3D === //
+    t3d_frame_start();
+
     t3d_screen_clear_depth();
 
     t3d_light_set_ambient(FranSoft::colorAmbient);
     t3d_light_set_directional(0, FranSoft::colorDir, &lightDirVec);
     t3d_light_set_count(1);
 
+    // === Draw players === //
     player.draw();
 
+    // === Detach and show === //
     rdpq_detach_show();
 }

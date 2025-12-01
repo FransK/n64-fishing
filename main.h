@@ -11,6 +11,9 @@ extern "C"
 #include "../../minigame.h"
 }
 
+constexpr uint32_t SCREEN_WIDTH = 320;
+constexpr uint32_t SCREEN_HEIGHT = 240;
+
 struct InputState
 {
     T3DVec3 move{};
