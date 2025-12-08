@@ -32,17 +32,19 @@ void Scene::update_fixed(float deltaTime)
 
 void Scene::update(float deltaTime)
 {
+    // ======== Attach RDP ======== //
+    rdpq_attach(display_get(), display_get_zbuf());
+
     // === Set Camera === //
     cam.update(viewport);
+
+    // === Draw viewport === //
+    t3d_viewport_attach(&viewport);
 
     // === Process Inputs === //
     read_inputs(PlyNum::PLAYER_1);
 
     player.update(deltaTime, inputState);
-
-    // ======== Attach RDP ======== //
-    rdpq_attach(display_get(), display_get_zbuf());
-    t3d_viewport_attach(&viewport);
 
     // === Draw Background === //
     rdpq_set_mode_fill({(uint8_t)(0x80),
@@ -61,7 +63,7 @@ void Scene::update(float deltaTime)
     t3d_light_set_count(1);
 
     // === Draw players === //
-    player.draw();
+    player.draw(viewport, cam.pos);
 
     // === Detach and show === //
     rdpq_detach_show();
