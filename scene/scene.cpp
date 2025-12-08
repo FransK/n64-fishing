@@ -2,12 +2,12 @@
 
 Scene::Scene()
 {
-    viewport = t3d_viewport_create();
-    cam.pos = (T3DVec3){{0, 125.0f, 100.0f}};
-    cam.target = (T3DVec3){{0, 0, 0}};
+    mViewport = t3d_viewport_create();
+    mCamera.position = (T3DVec3){{0, 125.0f, 100.0f}};
+    mCamera.target = (T3DVec3){{0, 0, 0}};
 
-    lightDirVec = (T3DVec3){{1.0f, 1.0f, 1.0f}};
-    t3d_vec3_norm(&lightDirVec);
+    mLightDirVec = (T3DVec3){{1.0f, 1.0f, 1.0f}};
+    t3d_vec3_norm(&mLightDirVec);
 }
 
 void Scene::read_inputs(PlyNum plyNum)
@@ -16,18 +16,18 @@ void Scene::read_inputs(PlyNum plyNum)
     auto btn = joypad_get_buttons_pressed(port);
     auto inputs = joypad_get_inputs(port);
 
-    inputState = {
+    mInputState = {
         .move = {{(float)inputs.stick_x, 0, -(float)inputs.stick_y}},
         .fish = btn.a != 0,
         .attack = btn.b != 0};
 
-    inputState.move.v[0] = fminf(fmaxf(inputState.move.v[0], -1.0f), 1.0f);
-    inputState.move.v[2] = fminf(fmaxf(inputState.move.v[2], -1.0f), 1.0f);
+    mInputState.move.v[0] = fminf(fmaxf(mInputState.move.v[0], -1.0f), 1.0f);
+    mInputState.move.v[2] = fminf(fmaxf(mInputState.move.v[2], -1.0f), 1.0f);
 }
 
 void Scene::update_fixed(float deltaTime)
 {
-    player.update_fixed(inputState);
+    mPlayer.update_fixed(mInputState);
 }
 
 void Scene::update(float deltaTime)
@@ -36,15 +36,15 @@ void Scene::update(float deltaTime)
     rdpq_attach(display_get(), display_get_zbuf());
 
     // === Set Camera === //
-    cam.update(viewport);
+    mCamera.update(mViewport);
 
     // === Draw viewport === //
-    t3d_viewport_attach(&viewport);
+    t3d_viewport_attach(&mViewport);
 
     // === Process Inputs === //
     read_inputs(PlyNum::PLAYER_1);
 
-    player.update(deltaTime, inputState);
+    mPlayer.update(deltaTime, mInputState);
 
     // === Draw Background === //
     rdpq_set_mode_fill({(uint8_t)(0x80),
@@ -59,11 +59,11 @@ void Scene::update(float deltaTime)
     t3d_screen_clear_depth();
 
     t3d_light_set_ambient(FranSoft::colorAmbient);
-    t3d_light_set_directional(0, FranSoft::colorDir, &lightDirVec);
+    t3d_light_set_directional(0, FranSoft::colorDir, &mLightDirVec);
     t3d_light_set_count(1);
 
     // === Draw players === //
-    player.draw(viewport, cam.pos);
+    mPlayer.draw(mViewport, mCamera.position);
 
     // === Detach and show === //
     rdpq_detach_show();

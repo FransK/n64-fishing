@@ -5,7 +5,7 @@
 
 struct Camera
 {
-    T3DVec3 pos{};
+    T3DVec3 position{};
     T3DVec3 target{};
 
     void update(T3DViewport &viewport);

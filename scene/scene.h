@@ -14,11 +14,11 @@ namespace FranSoft
 class Scene
 {
 private:
-    T3DViewport viewport{};
-    Camera cam{};
-    T3DVec3 lightDirVec{};
-    Player player{};
-    InputState inputState{};
+    T3DViewport mViewport{};
+    Camera mCamera{};
+    T3DVec3 mLightDirVec{};
+    Player mPlayer{};
+    InputState mInputState{};
 
     void read_inputs(PlyNum plyNum);
 
