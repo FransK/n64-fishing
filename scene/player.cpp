@@ -3,77 +3,77 @@
 
 Player::Player()
 {
-    model = t3d_model_load("rom:/n64-fishing/player.t3dm");
+    mModel = t3d_model_load("rom:/n64-fishing/player.t3dm");
 
-    fontBillboard = rdpq_font_load("rom:/squarewave.font64");
-    rdpq_text_register_font(FONT_BILLBOARD, fontBillboard);
+    mFontBillboard = rdpq_font_load("rom:/squarewave.font64");
+    rdpq_text_register_font(FONT_BILLBOARD, mFontBillboard);
 
-    playerPos = (T3DVec3){{-50, 0.5f, 0}};
-    speed = 3.0f;
+    mPosition = (T3DVec3){{-50, 0.5f, 0}};
+    mSpeed = 3.0f;
 
-    modelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
+    mModelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
 
     rspq_block_begin();
-    t3d_matrix_push(modelMatFP);
-    t3d_model_draw(model);
+    t3d_matrix_push(mModelMatFP);
+    t3d_model_draw(mModel);
     t3d_matrix_pop(1);
-    dplPlayer = rspq_block_end();
+    mDplPlayer = rspq_block_end();
 }
 
 Player::~Player()
 {
     // Player cleanup
-    rspq_block_free(dplPlayer);
-    free_uncached(modelMatFP);
-    t3d_model_free(model);
+    rspq_block_free(mDplPlayer);
+    free_uncached(mModelMatFP);
+    t3d_model_free(mModel);
 }
 
 void Player::update_fixed(InputState input)
 {
-    if (!isFishing())
+    if (!is_fishing())
     {
         t3d_vec3_norm(input.move);
-        playerPos.v[0] += input.move.v[0] * speed;
-        playerPos.v[2] += input.move.v[2] * speed;
+        mPosition.v[0] += input.move.v[0] * mSpeed;
+        mPosition.v[2] += input.move.v[2] * mSpeed;
     }
 
     // Update player matrix for drawing
-    t3d_mat4fp_from_srt_euler(modelMatFP,
+    t3d_mat4fp_from_srt_euler(mModelMatFP,
                               (float[3]){0.125f, 0.125f, 0.125f},
                               (float[3]){0.0f, 0.0f, 0},
-                              playerPos.v);
+                              mPosition.v);
 }
 
 void Player::update(float deltaTime, InputState input)
 {
-    if (isFishing())
+    if (is_fishing())
     {
-        fishingTimer -= deltaTime;
+        mFishingTimer -= deltaTime;
 
         if (input.fish)
         {
-            if (isCatchable())
+            if (is_catchable())
             {
-                fishCaught++;
-                fprintf(stderr, "Caught fish: %i\n", fishCaught);
+                mFishCaught++;
+                fprintf(stderr, "Caught fish: %i\n", mFishCaught);
             }
             else
             {
                 fprintf(stderr, "Missed a fish!\n");
             }
-            fishingTimer = 0.0f;
+            mFishingTimer = 0.0f;
         }
-        fprintf(stderr, "Fishing Timer: %f\n", fishingTimer);
+        fprintf(stderr, "Fishing Timer: %f\n", mFishingTimer);
     }
     else if (input.fish)
     {
-        fishingTimer = Fish::get_new_timer();
+        mFishingTimer = Fish::get_new_timer();
     }
 }
 
 void Player::draw(T3DViewport &viewport, const T3DVec3 &camPos) const
 {
-    rspq_block_run(dplPlayer);
+    rspq_block_run(mDplPlayer);
     draw_billboard(viewport, camPos);
 }
 
@@ -84,9 +84,9 @@ void Player::draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const
 
     // Screen position
     T3DVec3 worldPos = (T3DVec3){{
-        playerPos.v[0] + localPos.v[0] * 0.125f,
-        playerPos.v[1] + localPos.v[1] * 0.125f,
-        playerPos.v[2] + localPos.v[2] * 0.125f,
+        mPosition.v[0] + localPos.v[0] * 0.125f,
+        mPosition.v[1] + localPos.v[1] * 0.125f,
+        mPosition.v[2] + localPos.v[2] * 0.125f,
     }};
 
     T3DVec3 screenPos;
@@ -96,5 +96,5 @@ void Player::draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const
     int y = floorf(screenPos.v[1]);
 
     const rdpq_textparms_t param{};
-    rdpq_text_printf(&param, FONT_BILLBOARD, x, y, "%d", fishCaught);
+    rdpq_text_printf(&param, FONT_BILLBOARD, x, y, "%d", mFishCaught);
 }

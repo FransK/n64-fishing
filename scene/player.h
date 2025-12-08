@@ -12,22 +12,21 @@ namespace
 class Player
 {
 private:
-    T3DModel *model{};
-    T3DMat4FP *modelMatFP{};
-    rspq_block_t *dplPlayer{};
-    rdpq_font_t *fontBillboard;
+    T3DModel *mModel{};
+    T3DMat4FP *mModelMatFP{};
+    rspq_block_t *mDplPlayer{};
+    rdpq_font_t *mFontBillboard{};
 
-    T3DVec3 playerPos{};
-
-    float speed{};
-    float fishingTimer{};
-    int fishCaught{};
+    T3DVec3 mPosition{};
+    float mSpeed{};
+    float mFishingTimer{};
+    int mFishCaught{};
 
     void draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const;
 
 public:
-    [[nodiscard]] bool isFishing() { return fishingTimer > 0.0f; };
-    [[nodiscard]] bool isCatchable() { return fishingTimer < 1.0f && fishingTimer > 0.0f; };
+    [[nodiscard]] bool is_fishing() { return mFishingTimer > 0.0f; };
+    [[nodiscard]] bool is_catchable() { return mFishingTimer < 1.0f && mFishingTimer > 0.0f; };
     void update_fixed(InputState input);
     void update(float deltaTime, InputState input);
     void draw(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
