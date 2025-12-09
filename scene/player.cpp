@@ -5,10 +5,6 @@ Player::Player()
 {
     mModel = t3d_model_load("rom:/n64-fishing/player.t3dm");
 
-    mFontBillboard = rdpq_font_load("rom:/squarewave.font64");
-    rdpq_text_register_font(FONT_BILLBOARD, mFontBillboard);
-
-    mPosition = (T3DVec3){{-50, 0.5f, 0}};
     mSpeed = 3.0f;
 
     mModelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
@@ -28,8 +24,20 @@ Player::~Player()
     t3d_model_free(mModel);
 }
 
+void Player::init(int playerNumber, T3DVec3 position, float rotation, color_t color)
+{
+    assert(playerNumber >= 0 && playerNumber < MAXPLAYERS);
+
+    mPlayerNumber = playerNumber;
+    mColor = color;
+    mPosition = position;
+    mRotationY = rotation;
+}
+
 void Player::update_fixed(InputState input)
 {
+    assert(mPlayerNumber != -1 && "Player needs to be initialized before update.");
+
     if (!is_fishing())
     {
         t3d_vec3_norm(input.move);
@@ -46,6 +54,8 @@ void Player::update_fixed(InputState input)
 
 void Player::update(float deltaTime, InputState input)
 {
+    assert(mPlayerNumber != -1 && "Player needs to be initialized before update.");
+
     if (is_fishing())
     {
         mFishingTimer -= deltaTime;

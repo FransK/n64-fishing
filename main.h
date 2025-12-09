@@ -14,6 +14,8 @@ extern "C"
 constexpr uint32_t SCREEN_WIDTH = 320;
 constexpr uint32_t SCREEN_HEIGHT = 240;
 
+constexpr int FONT_BILLBOARD = 1;
+
 struct InputState
 {
     T3DVec3 move{};

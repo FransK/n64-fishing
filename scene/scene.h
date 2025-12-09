@@ -9,16 +9,26 @@ namespace FranSoft
 {
     constexpr uint8_t colorAmbient[4] = {0xAA, 0xAA, 0xAA, 0xFF};
     constexpr uint8_t colorDir[4] = {0xFF, 0xAA, 0xAA, 0xFF};
+
+    constexpr color_t colors[] = {
+        PLAYERCOLOR_1,
+        PLAYERCOLOR_2,
+        PLAYERCOLOR_3,
+        PLAYERCOLOR_4,
+    };
 }
 
 class Scene
 {
 private:
+    Player mPlayers[MAXPLAYERS];
+    InputState mInputState[MAXPLAYERS];
+
+    rdpq_font_t *mFontBillboard{};
+
     T3DViewport mViewport{};
     Camera mCamera{};
     T3DVec3 mLightDirVec{};
-    Player mPlayer{};
-    InputState mInputState{};
 
     void read_inputs(PlyNum plyNum);
 
@@ -27,5 +37,5 @@ public:
     void update(float deltaTime);
 
     Scene();
-    ~Scene() = default;
+    ~Scene();
 };
