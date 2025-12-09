@@ -23,8 +23,6 @@ private:
     int mPlayerNumber{-1}; // -1 = uninitialized
     color_t mColor{};
 
-    void draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const;
-
 public:
     [[nodiscard]] bool is_fishing() { return mFishingTimer > 0.0f; };
     [[nodiscard]] bool is_catchable() { return mFishingTimer < 1.0f && mFishingTimer > 0.0f; };
@@ -32,6 +30,7 @@ public:
     void update_fixed(InputState input);
     void update(float deltaTime, InputState input);
     void draw(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
+    void draw_billboard(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
 
     Player();
     ~Player();

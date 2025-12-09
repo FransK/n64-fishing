@@ -11,6 +11,7 @@ Player::Player()
 
     rspq_block_begin();
     t3d_matrix_push(mModelMatFP);
+    // rdpq_set_prim_color(mColor); Need to check model to see why this isn't working
     t3d_model_draw(mModel);
     t3d_matrix_pop(1);
     mDplPlayer = rspq_block_end();
@@ -48,7 +49,7 @@ void Player::update_fixed(InputState input)
     // Update player matrix for drawing
     t3d_mat4fp_from_srt_euler(mModelMatFP,
                               (float[3]){0.125f, 0.125f, 0.125f},
-                              (float[3]){0.0f, 0.0f, 0},
+                              (float[3]){0.0f, -mRotationY, 0},
                               mPosition.v);
 }
 
@@ -84,7 +85,6 @@ void Player::update(float deltaTime, InputState input)
 void Player::draw(T3DViewport &viewport, const T3DVec3 &camPos) const
 {
     rspq_block_run(mDplPlayer);
-    draw_billboard(viewport, camPos);
 }
 
 void Player::draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const

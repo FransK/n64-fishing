@@ -13,7 +13,7 @@ Scene::Scene()
     mLightDirVec = (T3DVec3){{1.0f, 1.0f, 1.0f}};
     t3d_vec3_norm(&mLightDirVec);
 
-    // ==== Initialize the players ==== //
+    // === Initialize the players === //
     T3DVec3 startPositions[] = {
         (T3DVec3){{-100, 0.15f, 0}},
         (T3DVec3){{0, 0.15f, -100}},
@@ -64,7 +64,7 @@ void Scene::update_fixed(float deltaTime)
 
 void Scene::update(float deltaTime)
 {
-    // ======== Attach RDP ======== //
+    // === Attach RDP === //
     rdpq_attach(display_get(), display_get_zbuf());
 
     // === Set Camera === //
@@ -96,10 +96,16 @@ void Scene::update(float deltaTime)
     t3d_light_set_directional(0, FranSoft::colorDir, &mLightDirVec);
     t3d_light_set_count(1);
 
-    // === Draw players === //
+    // === Draw players (3D Pass) === //
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
         mPlayers[i].draw(mViewport, mCamera.position);
+    }
+
+    // === Draw billboards (2D Pass) === //
+    for (size_t i = 0; i < MAXPLAYERS; i++)
+    {
+        mPlayers[i].draw_billboard(mViewport, mCamera.position);
     }
 
     // === Detach and show === //
