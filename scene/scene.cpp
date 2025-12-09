@@ -52,6 +52,39 @@ void Scene::read_inputs(PlyNum plyNum)
 
     mInputState[plyNum].move.v[0] = fminf(fmaxf(mInputState[plyNum].move.v[0], -1.0f), 1.0f);
     mInputState[plyNum].move.v[2] = fminf(fmaxf(mInputState[plyNum].move.v[2], -1.0f), 1.0f);
+
+    if (mInputState[plyNum].attack)
+    {
+        process_attacks(plyNum);
+    }
+}
+
+void Scene::process_attacks(PlyNum attacker)
+{
+    for (size_t i = 0; i < MAXPLAYERS; i++)
+    {
+        if (attacker == i)
+        {
+            continue;
+        }
+
+        float attack_pos[2];
+        mPlayers[attacker].get_attack_direction(attack_pos);
+
+        float pos_diff[] = {
+            mPlayers[i].get_position().v[0] - attack_pos[0],
+            mPlayers[i].get_position().v[2] - attack_pos[1],
+        };
+
+        float distance = sqrtf(pos_diff[0] * pos_diff[0] + pos_diff[1] * pos_diff[1]);
+
+        fprintf(stderr, "Player %d attacking. Distance to %d: %f\n", attacker, i, distance);
+
+        if (distance < (ATTACK_RADIUS + HITBOX_RADIUS))
+        {
+            mPlayers[i].shove(pos_diff);
+        }
+    }
 }
 
 void Scene::update_fixed(float deltaTime)

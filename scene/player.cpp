@@ -108,3 +108,22 @@ void Player::draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const
     const rdpq_textparms_t param{};
     rdpq_text_printf(&param, FONT_BILLBOARD, x, y, "%d", mFishCaught);
 }
+
+void Player::get_attack_direction(float (&attack_dir)[2]) const
+{
+    float s, c;
+    fm_sincosf(mRotationY, &s, &c);
+    attack_dir[0] = mPosition.v[0] + s * ATTACK_OFFSET;
+    attack_dir[1] = mPosition.v[2] + c * ATTACK_OFFSET;
+}
+
+const T3DVec3 &Player::get_position() const
+{
+    return mPosition;
+}
+
+void Player::shove(float (&direction)[2])
+{
+    mPosition.v[0] += direction[0] * mSpeed * 2.0;
+    mPosition.v[2] += direction[1] * mSpeed * 2.0;
+}

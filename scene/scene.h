@@ -31,6 +31,7 @@ private:
     T3DVec3 mLightDirVec{};
 
     void read_inputs(PlyNum plyNum);
+    void process_attacks(PlyNum attacker);
 
 public:
     void update_fixed(float deltaTime);

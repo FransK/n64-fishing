@@ -8,6 +8,10 @@ namespace
     constexpr float BILLBOARD_YOFFSET = 350.0f;
 }
 
+constexpr float HITBOX_RADIUS = 10.f;
+constexpr float ATTACK_OFFSET = 10.f;
+constexpr float ATTACK_RADIUS = 5.f;
+
 class Player
 {
 private:
@@ -31,6 +35,11 @@ public:
     void update(float deltaTime, InputState input);
     void draw(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
     void draw_billboard(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
+
+    void get_attack_direction(float (&attack_dir)[2]) const;
+    const T3DVec3 &get_position() const;
+
+    void shove(float (&direction)[2]);
 
     Player();
     ~Player();
