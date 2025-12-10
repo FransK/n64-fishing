@@ -5,8 +5,6 @@ Player::Player()
 {
     mModel = t3d_model_load("rom:/n64-fishing/player.t3dm");
 
-    mSpeed = 3.0f;
-
     mModelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
 
     rspq_block_begin();
@@ -110,12 +108,12 @@ void Player::draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const
     rdpq_text_printf(&param, FONT_BILLBOARD, x, y, "%d", mFishCaught);
 }
 
-void Player::get_attack_direction(float (&attack_dir)[2]) const
+void Player::get_attack_position(fm_vec2_t &attack_pos) const
 {
     float s, c;
     fm_sincosf(mRotationY, &s, &c);
-    attack_dir[0] = mPosition.v[0] + s * ATTACK_OFFSET;
-    attack_dir[1] = mPosition.v[2] + c * ATTACK_OFFSET;
+    attack_pos.v[0] = mPosition.v[0] + s * ATTACK_OFFSET;
+    attack_pos.v[1] = mPosition.v[2] + c * ATTACK_OFFSET;
 }
 
 const T3DVec3 &Player::get_position() const
@@ -123,8 +121,10 @@ const T3DVec3 &Player::get_position() const
     return mPosition;
 }
 
-void Player::shove(float (&direction)[2])
+void Player::shove(const float &direction)
 {
-    mPosition.v[0] += direction[0] * mSpeed * 2.0;
-    mPosition.v[2] += direction[1] * mSpeed * 2.0;
+    float s, c;
+    fm_sincosf(direction, &s, &c);
+    mPosition.v[0] += s * SHOVE_DIST;
+    mPosition.v[2] += c * SHOVE_DIST;
 }

@@ -10,7 +10,10 @@ namespace
 
 constexpr float HITBOX_RADIUS = 10.f;
 constexpr float ATTACK_OFFSET = 10.f;
-constexpr float ATTACK_RADIUS = 5.f;
+constexpr float ATTACK_RADIUS = 10.f;
+
+constexpr float BASE_SPEED = 3.f;
+constexpr float SHOVE_DIST = 7.f;
 
 class Player
 {
@@ -21,7 +24,7 @@ private:
 
     T3DVec3 mPosition{};
     float mRotationY{};
-    float mSpeed{};
+    float mSpeed{BASE_SPEED};
     float mFishingTimer{};
     int mFishCaught{};
     int mPlayerNumber{-1}; // -1 = uninitialized
@@ -36,10 +39,10 @@ public:
     void draw(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
     void draw_billboard(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
 
-    void get_attack_direction(float (&attack_dir)[2]) const;
+    void get_attack_position(fm_vec2_t &attack_pos) const;
     const T3DVec3 &get_position() const;
 
-    void shove(float (&direction)[2]);
+    void shove(const float &direction);
 
     Player();
     ~Player();

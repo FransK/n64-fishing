@@ -68,21 +68,22 @@ void Scene::process_attacks(PlyNum attacker)
             continue;
         }
 
-        float attack_pos[2];
-        mPlayers[attacker].get_attack_direction(attack_pos);
+        fm_vec2_t attack_pos{};
+        mPlayers[attacker].get_attack_position(attack_pos);
 
         float pos_diff[] = {
-            mPlayers[i].get_position().v[0] - attack_pos[0],
-            mPlayers[i].get_position().v[2] - attack_pos[1],
+            mPlayers[i].get_position().v[0] - attack_pos.v[0],
+            mPlayers[i].get_position().v[2] - attack_pos.v[1],
         };
 
-        float distance = sqrtf(pos_diff[0] * pos_diff[0] + pos_diff[1] * pos_diff[1]);
+        float square_distance = pos_diff[0] * pos_diff[0] + pos_diff[1] * pos_diff[1];
 
-        fprintf(stderr, "Player %d attacking. Distance to %d: %f\n", attacker, i, distance);
+        fprintf(stderr, "Player %d attacking. Distance to %d: %f\n", attacker, i, square_distance);
 
-        if (distance < (ATTACK_RADIUS + HITBOX_RADIUS))
+        if (square_distance < powf((ATTACK_RADIUS + HITBOX_RADIUS), 2))
         {
-            mPlayers[i].shove(pos_diff);
+            float direction = atan2f(pos_diff[0], pos_diff[1]);
+            mPlayers[i].shove(direction);
         }
     }
 }
