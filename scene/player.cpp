@@ -44,7 +44,7 @@ void Player::update_fixed(InputState input)
         t3d_vec3_norm(input.move);
         mPosition.v[0] += input.move.v[0] * mSpeed;
         mPosition.v[2] += input.move.v[2] * mSpeed;
-        mRotationY = atan2f(mPosition.v[0], mPosition.v[2]);
+        mRotationY = atan2f(input.move.v[0], input.move.v[2]);
     }
 
     // Update player matrix for drawing
