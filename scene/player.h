@@ -3,10 +3,7 @@
 #include <t3d/t3dmodel.h>
 #include "../main.h"
 
-namespace
-{
-    constexpr float BILLBOARD_YOFFSET = 350.0f;
-}
+constexpr float BILLBOARD_YOFFSET = 350.0f;
 
 constexpr float HITBOX_RADIUS = 10.f;
 constexpr float ATTACK_OFFSET = 10.f;
