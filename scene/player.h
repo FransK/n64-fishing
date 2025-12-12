@@ -11,6 +11,8 @@ constexpr float ATTACK_RADIUS = 10.f;
 
 constexpr float BASE_SPEED = 3.f;
 constexpr float SHOVE_DIST = 7.f;
+constexpr float MIN_MOVE_INPUT = 8.f;
+constexpr float ROTATION_INPUT = 26.f;
 
 class Player
 {

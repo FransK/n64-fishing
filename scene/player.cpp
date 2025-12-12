@@ -37,12 +37,21 @@ void Player::update_fixed(InputState input)
 {
     assert(mPlayerNumber != -1 && "Player needs to be initialized before update.");
 
-    if (!is_fishing())
+    // Movement
+    // Resting thumb on stick doesn't do anything
+    // Lightly pressing rotates character
+    // Pushing on stick moves character
+    if (!is_fishing() &&
+        (abs(input.move.v[0]) > MIN_MOVE_INPUT || abs(input.move.v[2]) > MIN_MOVE_INPUT))
     {
-        t3d_vec3_norm(input.move);
-        mPosition.v[0] += input.move.v[0] * mSpeed;
-        mPosition.v[2] += input.move.v[2] * mSpeed;
         mRotationY = atan2f(input.move.v[0], input.move.v[2]);
+
+        if (abs(input.move.v[0]) > ROTATION_INPUT || abs(input.move.v[2]) > ROTATION_INPUT)
+        {
+            t3d_vec3_norm(input.move);
+            mPosition.v[0] += input.move.v[0] * mSpeed;
+            mPosition.v[2] += input.move.v[2] * mSpeed;
+        }
     }
 
     // Update player matrix for drawing

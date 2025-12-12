@@ -50,9 +50,6 @@ void Scene::read_inputs(PlyNum plyNum)
         .fish = btn.a != 0,
         .attack = btn.b != 0};
 
-    mInputState[plyNum].move.v[0] = fminf(fmaxf(mInputState[plyNum].move.v[0], -1.0f), 1.0f);
-    mInputState[plyNum].move.v[2] = fminf(fmaxf(mInputState[plyNum].move.v[2], -1.0f), 1.0f);
-
     if (mInputState[plyNum].attack)
     {
         process_attacks(plyNum);
