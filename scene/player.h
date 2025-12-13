@@ -33,8 +33,8 @@ private:
     bool mIsHuman{};
 
 public:
-    [[nodiscard]] bool is_fishing() { return mFishingTimer > 0.0f; };
-    [[nodiscard]] bool is_catchable() { return mFishingTimer < CATCH_TIMER && mFishingTimer > 0.0f; };
+    [[nodiscard]] bool is_fishing() const { return mFishingTimer > 0.0f; };
+    [[nodiscard]] bool is_catchable() const { return mFishingTimer < CATCH_TIMER && mFishingTimer > 0.0f; };
     void init(int playerNumber, T3DVec3 position, float rotation, color_t color, bool isHuman);
     void update_fixed(InputState input);
     void update(float deltaTime, InputState input);

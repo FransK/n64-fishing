@@ -1,5 +1,6 @@
 #include "player.h"
 #include "fish.h"
+#include <string>
 
 Player::Player()
 {
@@ -92,7 +93,7 @@ void Player::update(float deltaTime, InputState input)
             if (is_catchable())
             {
                 float catchModifier = 10 * (CATCH_TIMER - mFishingTimer) / CATCH_TIMER;
-                if (rand() % 11 < catchModifier)
+                if (rand() % 1000 < catchModifier)
                 {
                     mFishCaught++;
                     mFishingTimer = 0.0f;
@@ -100,9 +101,16 @@ void Player::update(float deltaTime, InputState input)
             }
         }
     }
-    else if (input.fish || (!mIsHuman && core_get_aidifficulty() == DIFF_EASY))
+    else if (input.fish)
     {
         mFishingTimer = Fish::get_new_timer();
+    }
+    else if (!mIsHuman)
+    {
+        if (rand() % 1000 < (20 * core_get_aidifficulty() + 20))
+        {
+            mFishingTimer = Fish::get_new_timer();
+        }
     }
 }
 
@@ -130,7 +138,8 @@ void Player::draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const
     int y = floorf(screenPos.v[1]);
 
     const rdpq_textparms_t param{};
-    rdpq_text_printf(&param, FONT_BILLBOARD, x, y, "%d", mFishCaught);
+    std::string mBillboardText = is_fishing() ? is_catchable() ? "HOOKED!" : "Fishing..." : std::to_string(mFishCaught);
+    rdpq_text_printf(&param, FONT_BILLBOARD, x, y, "%s", mBillboardText.c_str());
 }
 
 void Player::get_attack_position(fm_vec2_t &attack_pos) const
