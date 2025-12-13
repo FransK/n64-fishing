@@ -23,7 +23,7 @@ Player::~Player()
     t3d_model_free(mModel);
 }
 
-void Player::init(int playerNumber, T3DVec3 position, float rotation, color_t color)
+void Player::init(int playerNumber, T3DVec3 position, float rotation, color_t color, bool is_human)
 {
     assert(playerNumber >= 0 && playerNumber < MAXPLAYERS);
 
@@ -31,6 +31,7 @@ void Player::init(int playerNumber, T3DVec3 position, float rotation, color_t co
     mColor = color;
     mPosition = position;
     mRotationY = rotation;
+    mIsHuman = is_human;
 }
 
 void Player::update_fixed(InputState input)
@@ -69,22 +70,37 @@ void Player::update(float deltaTime, InputState input)
     {
         mFishingTimer -= deltaTime;
 
-        if (input.fish)
+        if (mIsHuman)
         {
+            if (input.fish)
+            {
+                if (is_catchable())
+                {
+                    mFishCaught++;
+                    fprintf(stderr, "Caught fish: %i\n", mFishCaught);
+                }
+                else
+                {
+                    fprintf(stderr, "Missed a fish!\n");
+                }
+                mFishingTimer = 0.0f;
+            }
+        }
+        else
+        {
+            // AI fishing
             if (is_catchable())
             {
-                mFishCaught++;
-                fprintf(stderr, "Caught fish: %i\n", mFishCaught);
+                float catchModifier = 10 * (CATCH_TIMER - mFishingTimer) / CATCH_TIMER;
+                if (rand() % 11 < catchModifier)
+                {
+                    mFishCaught++;
+                    mFishingTimer = 0.0f;
+                }
             }
-            else
-            {
-                fprintf(stderr, "Missed a fish!\n");
-            }
-            mFishingTimer = 0.0f;
         }
-        fprintf(stderr, "Fishing Timer: %f\n", mFishingTimer);
     }
-    else if (input.fish)
+    else if (input.fish || (!mIsHuman && core_get_aidifficulty() == DIFF_EASY))
     {
         mFishingTimer = Fish::get_new_timer();
     }
@@ -136,4 +152,6 @@ void Player::shove(const float &direction)
     fm_sincosf(direction, &s, &c);
     mPosition.v[0] += s * SHOVE_DIST;
     mPosition.v[2] += c * SHOVE_DIST;
+
+    mFishingTimer = 0.0f;
 }

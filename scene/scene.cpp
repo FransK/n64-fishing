@@ -29,7 +29,7 @@ Scene::Scene()
 
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        mPlayers[i].init(i, startPositions[i], startRotations[i], FranSoft::colors[i]);
+        mPlayers[i].init(i, startPositions[i], startRotations[i], FranSoft::colors[i], i < core_get_playercount());
     }
 }
 
@@ -105,7 +105,12 @@ void Scene::update(float deltaTime)
     t3d_viewport_attach(&mViewport);
 
     // === Process Inputs === //
-    read_inputs(PlyNum::PLAYER_1);
+    for (size_t i = 0; i < core_get_playercount(); i++)
+    {
+        read_inputs((PlyNum)i);
+    }
+
+    // === Update Players === //
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
         mPlayers[i].update(deltaTime, mInputState[i]);

@@ -14,6 +14,8 @@ constexpr float SHOVE_DIST = 7.f;
 constexpr float MIN_MOVE_INPUT = 8.f;
 constexpr float ROTATION_INPUT = 26.f;
 
+constexpr float CATCH_TIMER = 1.f;
+
 class Player
 {
 private:
@@ -28,11 +30,12 @@ private:
     int mFishCaught{};
     int mPlayerNumber{-1}; // -1 = uninitialized
     color_t mColor{};
+    bool mIsHuman{};
 
 public:
     [[nodiscard]] bool is_fishing() { return mFishingTimer > 0.0f; };
-    [[nodiscard]] bool is_catchable() { return mFishingTimer < 1.0f && mFishingTimer > 0.0f; };
-    void init(int playerNumber, T3DVec3 position, float rotation, color_t color);
+    [[nodiscard]] bool is_catchable() { return mFishingTimer < CATCH_TIMER && mFishingTimer > 0.0f; };
+    void init(int playerNumber, T3DVec3 position, float rotation, color_t color, bool isHuman);
     void update_fixed(InputState input);
     void update(float deltaTime, InputState input);
     void draw(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
