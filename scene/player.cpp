@@ -56,6 +56,16 @@ void Player::update_fixed(InputState input)
         }
     }
 
+    // Restrict movement to playing surface
+    if (mPosition.v[0] < -BOX_SIZE)
+        mPosition.v[0] = -BOX_SIZE;
+    if (mPosition.v[0] > BOX_SIZE)
+        mPosition.v[0] = BOX_SIZE;
+    if (mPosition.v[2] < -BOX_SIZE)
+        mPosition.v[2] = -BOX_SIZE;
+    if (mPosition.v[2] > BOX_SIZE)
+        mPosition.v[2] = BOX_SIZE;
+
     // Update player matrix for drawing
     t3d_mat4fp_from_srt_euler(mModelMatFP,
                               (float[3]){0.125f, 0.125f, 0.125f},

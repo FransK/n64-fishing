@@ -3,6 +3,8 @@
 #include <t3d/t3dmodel.h>
 #include "../main.h"
 
+constexpr float BOX_SIZE = 140.f; // TODO: Doesn't make sense in here...
+
 constexpr float BILLBOARD_YOFFSET = 350.0f;
 
 constexpr float HITBOX_RADIUS = 10.f;
