@@ -5,26 +5,39 @@
 #include "camera.h"
 #include "player.h"
 
-namespace FranSoft
-{
-    constexpr uint8_t colorAmbient[4] = {0xAA, 0xAA, 0xAA, 0xFF};
-    constexpr uint8_t colorDir[4] = {0xFF, 0xAA, 0xAA, 0xFF};
+constexpr float INTRO_TIME = 3.f;
+constexpr float GAME_TIME = 15.f;
+constexpr float GAME_OVER_TIME = 5.f;
 
-    constexpr color_t colors[] = {
-        PLAYERCOLOR_1,
-        PLAYERCOLOR_2,
-        PLAYERCOLOR_3,
-        PLAYERCOLOR_4,
-    };
-}
+constexpr uint8_t COLOR_AMBIENT[4] = {0xAA, 0xAA, 0xAA, 0xFF};
+constexpr uint8_t COLOR_DIR[4] = {0xFF, 0xAA, 0xAA, 0xFF};
+
+constexpr color_t COLORS[] = {
+    PLAYERCOLOR_1,
+    PLAYERCOLOR_2,
+    PLAYERCOLOR_3,
+    PLAYERCOLOR_4,
+};
 
 class Scene
 {
 private:
-    Player mPlayers[MAXPLAYERS];
-    InputState mInputState[MAXPLAYERS];
+    enum class State : uint8_t
+    {
+        INTRO = 0,
+        GAME,
+        GAME_OVER
+    } mState{};
+
+    float mStateTime{};
+
+    Player mPlayers[MAXPLAYERS]{};
+    InputState mInputState[MAXPLAYERS]{};
+    uint8_t mWinners[MAXPLAYERS]{0};
+    uint8_t mCurrTopScore{0};
 
     rdpq_font_t *mFontBillboard{};
+    rdpq_font_t *mFontText{};
 
     T3DViewport mViewport{};
     Camera mCamera{};

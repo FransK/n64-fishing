@@ -3,7 +3,7 @@
 #include <t3d/t3dmodel.h>
 #include "../main.h"
 
-constexpr float BOX_SIZE = 140.f; // TODO: Doesn't make sense in here...
+constexpr float BOX_SIZE = 100.f; // TODO: Doesn't make sense in here...
 
 constexpr float BILLBOARD_YOFFSET = 350.0f;
 
@@ -29,8 +29,8 @@ private:
     float mRotationY{};
     float mSpeed{BASE_SPEED};
     float mFishingTimer{};
-    int mFishCaught{};
-    int mPlayerNumber{-1}; // -1 = uninitialized
+    int8_t mFishCaught{};
+    int8_t mPlayerNumber{-1}; // -1 = uninitialized
     color_t mColor{};
     bool mIsHuman{};
 
@@ -44,6 +44,7 @@ public:
     void draw_billboard(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
 
     void get_attack_position(fm_vec2_t &attack_pos) const;
+    [[nodiscard]] uint8_t get_fish_caught() const;
     const T3DVec3 &get_position() const;
 
     void shove(const float &direction);

@@ -1,9 +1,13 @@
+#include <algorithm>
+#include <string>
 #include "scene.h"
 
 Scene::Scene()
 {
     mFontBillboard = rdpq_font_load("rom:/squarewave.font64");
     rdpq_text_register_font(FONT_BILLBOARD, mFontBillboard);
+    mFontText = rdpq_font_load("rom:/squarewave.font64");
+    rdpq_text_register_font(FONT_TEXT, mFontText);
 
     // === Setup viewport and lighting ==== //
     mViewport = t3d_viewport_create();
@@ -29,12 +33,17 @@ Scene::Scene()
 
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        mPlayers[i].init(i, startPositions[i], startRotations[i], FranSoft::colors[i], i < core_get_playercount());
+        mPlayers[i].init(i, startPositions[i], startRotations[i], COLORS[i], i < core_get_playercount());
     }
+
+    mState = State::INTRO;
+    mStateTime = INTRO_TIME;
 }
 
 Scene::~Scene()
 {
+    rdpq_text_unregister_font(FONT_TEXT);
+    rdpq_font_free(mFontText);
     rdpq_text_unregister_font(FONT_BILLBOARD);
     rdpq_font_free(mFontBillboard);
 }
@@ -87,9 +96,45 @@ void Scene::process_attacks(PlyNum attacker)
 
 void Scene::update_fixed(float deltaTime)
 {
+    // === Update State === //
+    mStateTime -= deltaTime;
+    switch (mState)
+    {
+    case State::INTRO:
+        if (mStateTime <= 0)
+        {
+            mState = State::GAME;
+            mStateTime = GAME_TIME;
+        }
+        return;
+    case State::GAME:
+        if (mStateTime <= 0)
+        {
+            mState = State::GAME_OVER;
+            mStateTime = GAME_OVER_TIME;
+        }
+        break;
+    case State::GAME_OVER:
+        if (mStateTime <= 0)
+        {
+            minigame_end();
+        }
+        return;
+    default:
+        return;
+    }
+
+    // === Update Fixed Players === //
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
         mPlayers[i].update_fixed(mInputState[i]);
+    }
+
+    // === Keep Track of Leader === //
+    mCurrTopScore = 0;
+    for (auto &p : mPlayers)
+    {
+        mCurrTopScore = std::max(mCurrTopScore, p.get_fish_caught());
     }
 }
 
@@ -101,7 +146,7 @@ void Scene::update(float deltaTime)
     // === Set Camera === //
     mCamera.update(mViewport);
 
-    // === Draw viewport === //
+    // === Draw Viewport === //
     t3d_viewport_attach(&mViewport);
 
     // === Process Inputs === //
@@ -111,9 +156,12 @@ void Scene::update(float deltaTime)
     }
 
     // === Update Players === //
-    for (size_t i = 0; i < MAXPLAYERS; i++)
+    if (mState == State::GAME)
     {
-        mPlayers[i].update(deltaTime, mInputState[i]);
+        for (size_t i = 0; i < MAXPLAYERS; i++)
+        {
+            mPlayers[i].update(deltaTime, mInputState[i]);
+        }
     }
 
     // === Draw Background === //
@@ -128,8 +176,8 @@ void Scene::update(float deltaTime)
 
     t3d_screen_clear_depth();
 
-    t3d_light_set_ambient(FranSoft::colorAmbient);
-    t3d_light_set_directional(0, FranSoft::colorDir, &mLightDirVec);
+    t3d_light_set_ambient(COLOR_AMBIENT);
+    t3d_light_set_directional(0, COLOR_DIR, &mLightDirVec);
     t3d_light_set_count(1);
 
     // === Draw players (3D Pass) === //
@@ -142,6 +190,40 @@ void Scene::update(float deltaTime)
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
         mPlayers[i].draw_billboard(mViewport, mCamera.position);
+    }
+
+    // === Draw UI === //
+    const rdpq_textparms_t center_text_h{
+        .width = (int16_t)display_get_width(),
+        .align = ALIGN_CENTER,
+    };
+    rdpq_text_printf(&center_text_h, FONT_TEXT, 0, TIMER_Y, "%d", (int)ceilf(mStateTime));
+
+    const rdpq_textparms_t score_param{};
+    for (int i = 0; i < MAXPLAYERS; i++)
+    {
+        rdpq_text_printf(&score_param, FONT_TEXT, SCORE_X + i * SCORE_X_SPACING, SCORE_Y, "%d", mPlayers[i].get_fish_caught());
+    }
+
+    if (mState == State::GAME_OVER)
+    {
+        const rdpq_textparms_t center_text_hv{
+            .width = (int16_t)display_get_width(),
+            .height = (int16_t)display_get_height(),
+            .align = ALIGN_CENTER,
+            .valign = VALIGN_CENTER,
+        };
+        std::string message{};
+        for (int i = 0; i < MAXPLAYERS; i++)
+        {
+            mWinners[i] = mPlayers[i].get_fish_caught() >= mCurrTopScore;
+            if (mWinners[i])
+            {
+                core_set_winner((PlyNum)i);
+                message += ("Player " + std::to_string(i + 1) + " wins!\n");
+            }
+        }
+        rdpq_text_printf(&center_text_hv, FONT_TEXT, 0, 0, message.c_str());
     }
 
     // === Detach and show === //

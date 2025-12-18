@@ -33,6 +33,11 @@ void Player::init(int playerNumber, T3DVec3 position, float rotation, color_t co
     mPosition = position;
     mRotationY = rotation;
     mIsHuman = is_human;
+
+    t3d_mat4fp_from_srt_euler(mModelMatFP,
+                              (float[3]){0.125f, 0.125f, 0.125f},
+                              (float[3]){0.0f, -mRotationY, 0},
+                              mPosition.v);
 }
 
 void Player::update_fixed(InputState input)
@@ -131,6 +136,11 @@ void Player::draw(T3DViewport &viewport, const T3DVec3 &camPos) const
 
 void Player::draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const
 {
+    if (!is_fishing())
+    {
+        return;
+    }
+
     // World position
     T3DVec3 localPos = (T3DVec3){{0.0f, BILLBOARD_YOFFSET, 0.0f}};
 
@@ -148,7 +158,7 @@ void Player::draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const
     int y = floorf(screenPos.v[1]);
 
     const rdpq_textparms_t param{};
-    std::string mBillboardText = is_fishing() ? is_catchable() ? "HOOKED!" : "Fishing..." : std::to_string(mFishCaught);
+    std::string mBillboardText = is_catchable() ? "HOOKED!" : "Fishing...";
     rdpq_text_printf(&param, FONT_BILLBOARD, x, y, "%s", mBillboardText.c_str());
 }
 
@@ -158,6 +168,11 @@ void Player::get_attack_position(fm_vec2_t &attack_pos) const
     fm_sincosf(mRotationY, &s, &c);
     attack_pos.v[0] = mPosition.v[0] + s * ATTACK_OFFSET;
     attack_pos.v[1] = mPosition.v[2] + c * ATTACK_OFFSET;
+}
+
+uint8_t Player::get_fish_caught() const
+{
+    return mFishCaught;
 }
 
 const T3DVec3 &Player::get_position() const
