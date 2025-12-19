@@ -4,10 +4,27 @@
 
 Player::Player()
 {
+    // Model Credits: Quaternius (CC0) https://quaternius.com/
     mModel = t3d_model_load("rom:/n64-fishing/player2.t3dm");
     mSkeleton = t3d_skeleton_create(mModel);
+
     mAnimIdle = t3d_anim_create(mModel, "Idle");
     t3d_anim_attach(&mAnimIdle, &mSkeleton);
+
+    mAnimRun = t3d_anim_create(mModel, "Run");
+    t3d_anim_attach(&mAnimRun, &mSkeleton);
+    t3d_anim_set_playing(&mAnimRun, false);
+
+    mAnimPunch = t3d_anim_create(mModel, "Punch");
+    t3d_anim_attach(&mAnimPunch, &mSkeleton);
+    t3d_anim_set_looping(&mAnimPunch, false);
+    t3d_anim_set_playing(&mAnimPunch, false);
+    t3d_anim_set_speed(&mAnimPunch, 3.0);
+
+    mAnimReceiveHit = t3d_anim_create(mModel, "RecieveHit");
+    t3d_anim_attach(&mAnimReceiveHit, &mSkeleton);
+    t3d_anim_set_looping(&mAnimReceiveHit, false);
+    t3d_anim_set_playing(&mAnimReceiveHit, false);
 
     mModelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
 }
@@ -18,10 +35,21 @@ Player::~Player()
     rspq_block_free(mDplPlayer);
 
     t3d_anim_destroy(&mAnimIdle);
+    t3d_anim_destroy(&mAnimRun);
+    t3d_anim_destroy(&mAnimPunch);
+    t3d_anim_destroy(&mAnimReceiveHit);
     t3d_skeleton_destroy(&mSkeleton);
 
     free_uncached(mModelMatFP);
     t3d_model_free(mModel);
+}
+
+void Player::play_animation(Anim anim)
+{
+    t3d_anim_set_playing(&mAnimIdle, anim == Anim::IDLE);
+    t3d_anim_set_playing(&mAnimRun, anim == Anim::RUN);
+    t3d_anim_set_playing(&mAnimPunch, anim == Anim::SHOVE);
+    t3d_anim_set_playing(&mAnimReceiveHit, anim == Anim::RECEIVE_SHOVE);
 }
 
 void Player::init(int playerNumber, T3DVec3 position, float rotation, color_t color, bool is_human)
@@ -51,6 +79,15 @@ void Player::update_fixed(float deltaTime, InputState input)
 {
     assert(mPlayerNumber != -1 && "Player needs to be initialized before update.");
 
+    // If currently playing an animation, continue playing
+    if (mAnimTimer >= 0)
+    {
+        mAnimTimer -= deltaTime;
+        return;
+    }
+
+    play_animation(Anim::IDLE);
+
     // Movement
     // Resting thumb on stick doesn't do anything
     // Lightly pressing rotates character
@@ -65,6 +102,8 @@ void Player::update_fixed(float deltaTime, InputState input)
             t3d_vec3_norm(input.move);
             mPosition.v[0] += input.move.v[0] * mSpeed;
             mPosition.v[2] += input.move.v[2] * mSpeed;
+
+            play_animation(Anim::RUN);
         }
     }
 
@@ -131,6 +170,10 @@ void Player::update(float deltaTime, InputState input, bool updateAI = true)
 
     // Update model and animation for drawing
     t3d_anim_update(&mAnimIdle, deltaTime);
+    t3d_anim_update(&mAnimRun, deltaTime);
+    t3d_anim_update(&mAnimPunch, deltaTime);
+    t3d_anim_update(&mAnimReceiveHit, deltaTime);
+
     t3d_skeleton_update(&mSkeleton);
     t3d_mat4fp_from_srt_euler(mModelMatFP,
                               (float[3]){0.125f, 0.125f, 0.125f},
@@ -189,7 +232,13 @@ const T3DVec3 &Player::get_position() const
     return mPosition;
 }
 
-void Player::shove(const float &direction)
+void Player::shove()
+{
+    play_animation(Anim::SHOVE);
+    mAnimTimer = SHOVE_TIME;
+}
+
+void Player::receive_shove(const float &direction)
 {
     float s, c;
     fm_sincosf(direction, &s, &c);
@@ -197,4 +246,7 @@ void Player::shove(const float &direction)
     mPosition.v[2] += c * SHOVE_DIST;
 
     mFishingTimer = 0.0f;
+
+    play_animation(Anim::RECEIVE_SHOVE);
+    mAnimTimer = RECEIVE_SHOVE_TIME;
 }

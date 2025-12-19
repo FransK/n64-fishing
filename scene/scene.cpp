@@ -11,18 +11,18 @@ Scene::Scene()
 
     // === Setup viewport and lighting ==== //
     mViewport = t3d_viewport_create();
-    mCamera.position = (T3DVec3){{0, 125.0f, 100.0f}};
-    mCamera.target = (T3DVec3){{0, 0, 40}};
+    mCamera.position = (T3DVec3){{0, 100.0f, 75.0f}};
+    mCamera.target = (T3DVec3){{0, 0, 30}};
 
     mLightDirVec = (T3DVec3){{1.0f, 1.0f, 1.0f}};
     t3d_vec3_norm(&mLightDirVec);
 
     // === Initialize the players === //
     T3DVec3 startPositions[] = {
-        (T3DVec3){{-100, 0.15f, 0}},
-        (T3DVec3){{0, 0.15f, -100}},
-        (T3DVec3){{100, 0.15f, 0}},
-        (T3DVec3){{0, 0.15f, 100}},
+        (T3DVec3){{-75, 0.15f, 0}},
+        (T3DVec3){{0, 0.15f, -75}},
+        (T3DVec3){{75, 0.15f, 0}},
+        (T3DVec3){{0, 0.15f, 75}},
     };
 
     float startRotations[] = {
@@ -67,10 +67,16 @@ void Scene::read_inputs(PlyNum plyNum)
 
 void Scene::process_attacks(PlyNum attacker)
 {
+    if (!mPlayers[attacker].can_attack())
+    {
+        return;
+    }
+
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
         if (attacker == i)
         {
+            mPlayers[i].shove();
             continue;
         }
 
@@ -89,7 +95,7 @@ void Scene::process_attacks(PlyNum attacker)
         if (square_distance < powf((ATTACK_RADIUS + HITBOX_RADIUS), 2))
         {
             float direction = atan2f(pos_diff[0], pos_diff[1]);
-            mPlayers[i].shove(direction);
+            mPlayers[i].receive_shove(direction);
         }
     }
 }
