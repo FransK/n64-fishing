@@ -1,6 +1,8 @@
 #pragma once
 
+#include <t3d/t3danim.h>
 #include <t3d/t3dmodel.h>
+#include <t3d/t3dskeleton.h>
 #include "../main.h"
 
 constexpr float BOX_SIZE = 100.f; // TODO: Doesn't make sense in here...
@@ -24,6 +26,9 @@ private:
     T3DModel *mModel{};
     T3DMat4FP *mModelMatFP{};
     rspq_block_t *mDplPlayer{};
+
+    T3DAnim mAnimIdle{};
+    T3DSkeleton mSkeleton{};
 
     T3DVec3 mPosition{};
     float mRotationY{};

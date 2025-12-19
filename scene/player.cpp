@@ -4,22 +4,22 @@
 
 Player::Player()
 {
-    mModel = t3d_model_load("rom:/n64-fishing/player.t3dm");
+    mModel = t3d_model_load("rom:/n64-fishing/player2.t3dm");
+    mSkeleton = t3d_skeleton_create(mModel);
+    mAnimIdle = t3d_anim_create(mModel, "Idle");
+    t3d_anim_attach(&mAnimIdle, &mSkeleton);
 
     mModelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
-
-    rspq_block_begin();
-    t3d_matrix_push(mModelMatFP);
-    // rdpq_set_prim_color(mColor); Need to check model to see why this isn't working
-    t3d_model_draw(mModel);
-    t3d_matrix_pop(1);
-    mDplPlayer = rspq_block_end();
 }
 
 Player::~Player()
 {
     // Player cleanup
     rspq_block_free(mDplPlayer);
+
+    t3d_anim_destroy(&mAnimIdle);
+    t3d_skeleton_destroy(&mSkeleton);
+
     free_uncached(mModelMatFP);
     t3d_model_free(mModel);
 }
@@ -33,6 +33,13 @@ void Player::init(int playerNumber, T3DVec3 position, float rotation, color_t co
     mPosition = position;
     mRotationY = rotation;
     mIsHuman = is_human;
+
+    rspq_block_begin();
+    t3d_matrix_push(mModelMatFP);
+    rdpq_set_prim_color(mColor);
+    t3d_model_draw_skinned(mModel, &mSkeleton);
+    t3d_matrix_pop(1);
+    mDplPlayer = rspq_block_end();
 
     t3d_mat4fp_from_srt_euler(mModelMatFP,
                               (float[3]){0.125f, 0.125f, 0.125f},
@@ -71,6 +78,7 @@ void Player::update_fixed(InputState input)
     if (mPosition.v[2] > BOX_SIZE)
         mPosition.v[2] = BOX_SIZE;
 
+    t3d_skeleton_update(&mSkeleton);
     // Update player matrix for drawing
     t3d_mat4fp_from_srt_euler(mModelMatFP,
                               (float[3]){0.125f, 0.125f, 0.125f},
@@ -127,6 +135,8 @@ void Player::update(float deltaTime, InputState input)
             mFishingTimer = Fish::get_new_timer();
         }
     }
+
+    t3d_anim_update(&mAnimIdle, deltaTime);
 }
 
 void Player::draw(T3DViewport &viewport, const T3DVec3 &camPos) const
