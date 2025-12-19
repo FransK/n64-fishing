@@ -106,7 +106,7 @@ void Scene::update_fixed(float deltaTime)
             mState = State::GAME;
             mStateTime = GAME_TIME;
         }
-        return;
+        break;
     case State::GAME:
         if (mStateTime <= 0)
         {
@@ -127,7 +127,7 @@ void Scene::update_fixed(float deltaTime)
     // === Update Fixed Players === //
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        mPlayers[i].update_fixed(mInputState[i]);
+        mPlayers[i].update_fixed(deltaTime, mInputState[i]);
     }
 
     // === Keep Track of Leader === //
@@ -150,18 +150,18 @@ void Scene::update(float deltaTime)
     t3d_viewport_attach(&mViewport);
 
     // === Process Inputs === //
-    for (size_t i = 0; i < core_get_playercount(); i++)
+    if (mState == State::GAME)
     {
-        read_inputs((PlyNum)i);
+        for (size_t i = 0; i < core_get_playercount(); i++)
+        {
+            read_inputs((PlyNum)i);
+        }
     }
 
     // === Update Players === //
-    if (mState == State::GAME)
+    for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        for (size_t i = 0; i < MAXPLAYERS; i++)
-        {
-            mPlayers[i].update(deltaTime, mInputState[i]);
-        }
+        mPlayers[i].update(deltaTime, mInputState[i], mState == State::GAME);
     }
 
     // === Draw Background === //

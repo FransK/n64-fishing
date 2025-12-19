@@ -47,7 +47,7 @@ void Player::init(int playerNumber, T3DVec3 position, float rotation, color_t co
                               mPosition.v);
 }
 
-void Player::update_fixed(InputState input)
+void Player::update_fixed(float deltaTime, InputState input)
 {
     assert(mPlayerNumber != -1 && "Player needs to be initialized before update.");
 
@@ -77,16 +77,9 @@ void Player::update_fixed(InputState input)
         mPosition.v[2] = -BOX_SIZE;
     if (mPosition.v[2] > BOX_SIZE)
         mPosition.v[2] = BOX_SIZE;
-
-    t3d_skeleton_update(&mSkeleton);
-    // Update player matrix for drawing
-    t3d_mat4fp_from_srt_euler(mModelMatFP,
-                              (float[3]){0.125f, 0.125f, 0.125f},
-                              (float[3]){0.0f, -mRotationY, 0},
-                              mPosition.v);
 }
 
-void Player::update(float deltaTime, InputState input)
+void Player::update(float deltaTime, InputState input, bool updateAI = true)
 {
     assert(mPlayerNumber != -1 && "Player needs to be initialized before update.");
 
@@ -128,7 +121,7 @@ void Player::update(float deltaTime, InputState input)
     {
         mFishingTimer = Fish::get_new_timer();
     }
-    else if (!mIsHuman)
+    else if (!mIsHuman && updateAI)
     {
         if (rand() % 1000 < (20 * core_get_aidifficulty() + 20))
         {
@@ -136,7 +129,13 @@ void Player::update(float deltaTime, InputState input)
         }
     }
 
+    // Update model and animation for drawing
     t3d_anim_update(&mAnimIdle, deltaTime);
+    t3d_skeleton_update(&mSkeleton);
+    t3d_mat4fp_from_srt_euler(mModelMatFP,
+                              (float[3]){0.125f, 0.125f, 0.125f},
+                              (float[3]){0.0f, -mRotationY, 0},
+                              mPosition.v);
 }
 
 void Player::draw(T3DViewport &viewport, const T3DVec3 &camPos) const
