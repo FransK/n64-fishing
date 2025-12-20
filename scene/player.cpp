@@ -108,14 +108,19 @@ void Player::update_fixed(float deltaTime, InputState input)
     }
 
     // Restrict movement to playing surface
-    if (mPosition.v[0] < -BOX_SIZE)
-        mPosition.v[0] = -BOX_SIZE;
-    if (mPosition.v[0] > BOX_SIZE)
-        mPosition.v[0] = BOX_SIZE;
-    if (mPosition.v[2] < -BOX_SIZE)
-        mPosition.v[2] = -BOX_SIZE;
-    if (mPosition.v[2] > BOX_SIZE)
-        mPosition.v[2] = BOX_SIZE;
+    constrain_position();
+}
+
+void Player::constrain_position()
+{
+    float squared_position = mPosition.v[0] * mPosition.v[0] + mPosition.v[2] * mPosition.v[2];
+
+    if (squared_position > PLAYING_R2)
+    {
+        float angle = atan2f(mPosition.v[0], mPosition.v[2]);
+        mPosition.v[0] = PLAYING_R * sinf(angle);
+        mPosition.v[2] = PLAYING_R * cosf(angle);
+    }
 }
 
 void Player::update(float deltaTime, InputState input, bool updateAI = true)

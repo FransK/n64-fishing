@@ -5,7 +5,8 @@
 #include <t3d/t3dskeleton.h>
 #include "../main.h"
 
-constexpr float BOX_SIZE = 80.f; // TODO: Doesn't make sense in here...
+constexpr float PLAYING_R = 60.f; // TODO: Doesn't make sense in here...
+constexpr float PLAYING_R2 = PLAYING_R * PLAYING_R;
 
 constexpr float BILLBOARD_YOFFSET = 200.f;
 
@@ -54,6 +55,7 @@ private:
     color_t mColor{};
     bool mIsHuman{};
 
+    void constrain_position();
     void play_animation(Anim anim);
 
 public:

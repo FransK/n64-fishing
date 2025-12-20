@@ -19,10 +19,10 @@ Scene::Scene()
 
     // === Initialize the players === //
     T3DVec3 startPositions[] = {
-        (T3DVec3){{-75, 0.15f, 0}},
-        (T3DVec3){{0, 0.15f, -75}},
-        (T3DVec3){{75, 0.15f, 0}},
-        (T3DVec3){{0, 0.15f, 75}},
+        (T3DVec3){{-55, 0.15f, 0}},
+        (T3DVec3){{0, 0.15f, -55}},
+        (T3DVec3){{55, 0.15f, 0}},
+        (T3DVec3){{0, 0.15f, 55}},
     };
 
     float startRotations[] = {
@@ -89,8 +89,6 @@ void Scene::process_attacks(PlyNum attacker)
         };
 
         float square_distance = pos_diff[0] * pos_diff[0] + pos_diff[1] * pos_diff[1];
-
-        fprintf(stderr, "Player %d attacking. Distance to %d: %f\n", attacker, i, square_distance);
 
         if (square_distance < powf((ATTACK_RADIUS + HITBOX_RADIUS), 2))
         {
