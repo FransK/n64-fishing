@@ -4,7 +4,7 @@
 
 Scene::Scene()
 {
-    mPlayerModel = t3d_model_load("rom:/n64-fishing/player2.t3dm");
+    mPlayerModel = t3d_model_load("rom:/n64-fishing/player3.t3dm");
     mMapModel = t3d_model_load("rom:/n64-fishing/map.t3dm");
 
     mMapMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
