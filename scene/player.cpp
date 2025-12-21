@@ -2,10 +2,10 @@
 #include "fish.h"
 #include <string>
 
-Player::Player()
+Player::Player(T3DModel *model)
 {
     // Model Credits: Quaternius (CC0) https://quaternius.com/
-    mModel = t3d_model_load("rom:/n64-fishing/player2.t3dm");
+    mModel = model;
     mSkeleton = t3d_skeleton_create(mModel);
 
     mAnimIdle = t3d_anim_create(mModel, "Idle");
@@ -44,7 +44,6 @@ Player::~Player()
     t3d_skeleton_destroy(&mSkeleton);
 
     free_uncached(mModelMatFP);
-    t3d_model_free(mModel);
 }
 
 void Player::play_animation(Anim anim)

@@ -76,6 +76,6 @@ public:
     void shove();
     void receive_shove(const float &direction);
 
-    Player();
+    Player(T3DModel *model);
     ~Player();
 };

@@ -31,7 +31,12 @@ private:
 
     float mStateTime{};
 
-    Player mPlayers[MAXPLAYERS]{};
+    T3DModel *mPlayerModel{};
+    T3DModel *mMapModel{};
+    T3DMat4FP *mMapMatFP{};
+    rspq_block_t *mDplMap{};
+
+    Player *mPlayers[MAXPLAYERS]{};
     InputState mInputState[MAXPLAYERS]{};
     uint8_t mWinners[MAXPLAYERS]{0};
     uint8_t mCurrTopScore{0};

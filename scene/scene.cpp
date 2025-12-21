@@ -4,6 +4,18 @@
 
 Scene::Scene()
 {
+    mPlayerModel = t3d_model_load("rom:/n64-fishing/player2.t3dm");
+    mMapModel = t3d_model_load("rom:/n64-fishing/map.t3dm");
+
+    mMapMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
+    t3d_mat4fp_from_srt_euler(mMapMatFP, (float[3]){0.13f, 0.13f, 0.13f}, (float[3]){0, 0, 0}, (float[3]){0, 0, 0});
+
+    rspq_block_begin();
+    t3d_matrix_push(mMapMatFP);
+    t3d_model_draw(mMapModel);
+    t3d_matrix_pop(1);
+    mDplMap = rspq_block_end();
+
     mFontBillboard = rdpq_font_load("rom:/squarewave.font64");
     rdpq_text_register_font(FONT_BILLBOARD, mFontBillboard);
     mFontText = rdpq_font_load("rom:/squarewave.font64");
@@ -40,7 +52,8 @@ Scene::Scene()
 
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        mPlayers[i].init(i, startPositions[i], startRotations[i], COLORS[i], i < core_get_playercount());
+        mPlayers[i] = new Player(mPlayerModel);
+        mPlayers[i]->init(i, startPositions[i], startRotations[i], COLORS[i], i < core_get_playercount());
     }
 
     mState = State::INTRO;
@@ -49,10 +62,23 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+    rspq_block_free(mDplMap);
+
+    t3d_model_free(mPlayerModel);
+    t3d_model_free(mMapModel);
+
+    free_uncached(mMapMatFP);
+
     rdpq_text_unregister_font(FONT_TEXT);
     rdpq_font_free(mFontText);
     rdpq_text_unregister_font(FONT_BILLBOARD);
     rdpq_font_free(mFontBillboard);
+
+    for (size_t i = 0; i < MAXPLAYERS; i++)
+    {
+        delete mPlayers[i];
+        mPlayers[i] = nullptr;
+    }
 }
 
 void Scene::read_inputs(PlyNum plyNum)
@@ -74,7 +100,7 @@ void Scene::read_inputs(PlyNum plyNum)
 
 void Scene::process_attacks(PlyNum attacker)
 {
-    if (!mPlayers[attacker].can_attack())
+    if (!mPlayers[attacker]->can_attack())
     {
         return;
     }
@@ -83,16 +109,16 @@ void Scene::process_attacks(PlyNum attacker)
     {
         if (attacker == i)
         {
-            mPlayers[i].shove();
+            mPlayers[i]->shove();
             continue;
         }
 
         fm_vec2_t attack_pos{};
-        mPlayers[attacker].get_attack_position(attack_pos);
+        mPlayers[attacker]->get_attack_position(attack_pos);
 
         float pos_diff[] = {
-            mPlayers[i].get_position().v[0] - attack_pos.v[0],
-            mPlayers[i].get_position().v[2] - attack_pos.v[1],
+            mPlayers[i]->get_position().v[0] - attack_pos.v[0],
+            mPlayers[i]->get_position().v[2] - attack_pos.v[1],
         };
 
         float square_distance = pos_diff[0] * pos_diff[0] + pos_diff[1] * pos_diff[1];
@@ -100,7 +126,7 @@ void Scene::process_attacks(PlyNum attacker)
         if (square_distance < powf((ATTACK_RADIUS + HITBOX_RADIUS), 2))
         {
             float direction = atan2f(pos_diff[0], pos_diff[1]);
-            mPlayers[i].receive_shove(direction);
+            mPlayers[i]->receive_shove(direction);
         }
     }
 }
@@ -138,14 +164,14 @@ void Scene::update_fixed(float deltaTime)
     // === Update Fixed Players === //
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        mPlayers[i].update_fixed(deltaTime, mInputState[i]);
+        mPlayers[i]->update_fixed(deltaTime, mInputState[i]);
     }
 
     // === Keep Track of Leader === //
     mCurrTopScore = 0;
     for (auto &p : mPlayers)
     {
-        mCurrTopScore = std::max(mCurrTopScore, p.get_fish_caught());
+        mCurrTopScore = std::max(mCurrTopScore, p->get_fish_caught());
     }
 }
 
@@ -172,7 +198,7 @@ void Scene::update(float deltaTime)
     // === Update Players === //
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        mPlayers[i].update(deltaTime, mInputState[i], mState == State::GAME);
+        mPlayers[i]->update(deltaTime, mInputState[i], mState == State::GAME);
     }
 
     // === Draw Background === //
@@ -191,16 +217,18 @@ void Scene::update(float deltaTime)
     t3d_light_set_directional(0, COLOR_DIR, &mLightDirVec);
     t3d_light_set_count(1);
 
+    rspq_block_run(mDplMap);
+
     // === Draw players (3D Pass) === //
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        mPlayers[i].draw(mViewport, mCamera.position);
+        mPlayers[i]->draw(mViewport, mCamera.position);
     }
 
     // === Draw billboards (2D Pass) === //
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        mPlayers[i].draw_billboard(mViewport, mCamera.position);
+        mPlayers[i]->draw_billboard(mViewport, mCamera.position);
     }
 
     // === Draw UI === //
@@ -215,7 +243,7 @@ void Scene::update(float deltaTime)
     {
         const rdpq_textparms_t score_params{
             .style_id = (int16_t)i};
-        rdpq_text_printf(&score_params, FONT_TEXT, SCORE_X + i * SCORE_X_SPACING, SCORE_Y, "%d", mPlayers[i].get_fish_caught());
+        rdpq_text_printf(&score_params, FONT_TEXT, SCORE_X + i * SCORE_X_SPACING, SCORE_Y, "%d", mPlayers[i]->get_fish_caught());
     }
 
     if (mState == State::GAME_OVER)
@@ -229,7 +257,7 @@ void Scene::update(float deltaTime)
         std::string message{};
         for (int i = 0; i < MAXPLAYERS; i++)
         {
-            mWinners[i] = mPlayers[i].get_fish_caught() >= mCurrTopScore;
+            mWinners[i] = mPlayers[i]->get_fish_caught() >= mCurrTopScore;
             if (mWinners[i])
             {
                 core_set_winner((PlyNum)i);
