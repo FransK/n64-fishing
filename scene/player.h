@@ -51,6 +51,7 @@ private:
     float mSpeed{BASE_SPEED};
     float mFishingTimer{};
     float mAnimTimer{};
+    float mAiDelayTimer{};
     int8_t mFishCaught{};
     int8_t mPlayerNumber{-1};
     color_t mColor{};

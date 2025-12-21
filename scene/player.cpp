@@ -174,6 +174,7 @@ void Player::update(float deltaTime, InputState input, bool updateAI = true)
                 {
                     mFishCaught++;
                     mFishingTimer = 0.0f;
+                    mAiDelayTimer = (2 - core_get_aidifficulty()) * 5 + rand() % ((3 - core_get_aidifficulty()) * 3);
                 }
             }
         }
@@ -184,7 +185,11 @@ void Player::update(float deltaTime, InputState input, bool updateAI = true)
     }
     else if (!mIsHuman && updateAI)
     {
-        if (rand() % 1000 < (20 * core_get_aidifficulty() + 20))
+        if (mAiDelayTimer > 0.0f)
+        {
+            mAiDelayTimer -= deltaTime;
+        }
+        else
         {
             mFishingTimer = Fish::get_new_timer();
         }
