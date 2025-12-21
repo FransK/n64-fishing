@@ -8,6 +8,13 @@ Scene::Scene()
     rdpq_text_register_font(FONT_BILLBOARD, mFontBillboard);
     mFontText = rdpq_font_load("rom:/squarewave.font64");
     rdpq_text_register_font(FONT_TEXT, mFontText);
+    for (size_t i = 0; i < MAXPLAYERS; i++)
+    {
+        const rdpq_fontstyle_t style{.color = COLORS[i]};
+        rdpq_font_style(mFontText, i, &style);
+    }
+    const rdpq_fontstyle_t countdown_style{.color = RGBA32(255, 255, 255, 255)};
+    rdpq_font_style(mFontText, 4, &countdown_style);
 
     // === Setup viewport and lighting ==== //
     mViewport = t3d_viewport_create();
@@ -198,15 +205,17 @@ void Scene::update(float deltaTime)
 
     // === Draw UI === //
     const rdpq_textparms_t center_text_h{
+        .style_id = 4,
         .width = (int16_t)display_get_width(),
         .align = ALIGN_CENTER,
     };
     rdpq_text_printf(&center_text_h, FONT_TEXT, 0, TIMER_Y, "%d", (int)ceilf(mStateTime));
 
-    const rdpq_textparms_t score_param{};
     for (int i = 0; i < MAXPLAYERS; i++)
     {
-        rdpq_text_printf(&score_param, FONT_TEXT, SCORE_X + i * SCORE_X_SPACING, SCORE_Y, "%d", mPlayers[i].get_fish_caught());
+        const rdpq_textparms_t score_params{
+            .style_id = (int16_t)i};
+        rdpq_text_printf(&score_params, FONT_TEXT, SCORE_X + i * SCORE_X_SPACING, SCORE_Y, "%d", mPlayers[i].get_fish_caught());
     }
 
     if (mState == State::GAME_OVER)

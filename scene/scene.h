@@ -6,7 +6,7 @@
 #include "player.h"
 
 constexpr float INTRO_TIME = 3.f;
-constexpr float GAME_TIME = 15.f;
+constexpr float GAME_TIME = 30.f;
 constexpr float GAME_OVER_TIME = 5.f;
 
 constexpr uint8_t COLOR_AMBIENT[4] = {0xAA, 0xAA, 0xAA, 0xFF};
