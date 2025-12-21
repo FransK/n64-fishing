@@ -43,6 +43,7 @@ private:
     T3DAnim mAnimPunch{};
     T3DAnim mAnimReceiveHit{};
     T3DAnim mAnimRun{};
+    T3DAnim *mActiveAnim{};
     T3DSkeleton mSkeleton{};
 
     T3DVec3 mPosition{};

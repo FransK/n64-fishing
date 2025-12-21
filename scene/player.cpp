@@ -26,6 +26,7 @@ Player::Player()
     t3d_anim_set_looping(&mAnimReceiveHit, false);
     t3d_anim_set_playing(&mAnimReceiveHit, false);
 
+    mActiveAnim = &mAnimIdle;
     mModelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
 }
 
@@ -33,6 +34,8 @@ Player::~Player()
 {
     // Player cleanup
     rspq_block_free(mDplPlayer);
+
+    mActiveAnim = nullptr;
 
     t3d_anim_destroy(&mAnimIdle);
     t3d_anim_destroy(&mAnimRun);
@@ -50,6 +53,22 @@ void Player::play_animation(Anim anim)
     t3d_anim_set_playing(&mAnimRun, anim == Anim::RUN);
     t3d_anim_set_playing(&mAnimPunch, anim == Anim::SHOVE);
     t3d_anim_set_playing(&mAnimReceiveHit, anim == Anim::RECEIVE_SHOVE);
+
+    switch (anim)
+    {
+    case Anim::IDLE:
+        mActiveAnim = &mAnimIdle;
+        return;
+    case Anim::RUN:
+        mActiveAnim = &mAnimRun;
+        return;
+    case Anim::SHOVE:
+        mActiveAnim = &mAnimPunch;
+        return;
+    case Anim::RECEIVE_SHOVE:
+        mActiveAnim = &mAnimReceiveHit;
+        return;
+    }
 }
 
 void Player::init(int playerNumber, T3DVec3 position, float rotation, color_t color, bool is_human)
@@ -152,8 +171,7 @@ void Player::update(float deltaTime, InputState input, bool updateAI = true)
             // AI fishing
             if (is_catchable())
             {
-                float catchModifier = 10 * (CATCH_TIMER - mFishingTimer) / CATCH_TIMER;
-                if (rand() % 1000 < catchModifier)
+                if (mFishingTimer <= 0.1f)
                 {
                     mFishCaught++;
                     mFishingTimer = 0.0f;
@@ -174,11 +192,7 @@ void Player::update(float deltaTime, InputState input, bool updateAI = true)
     }
 
     // Update model and animation for drawing
-    t3d_anim_update(&mAnimIdle, deltaTime);
-    t3d_anim_update(&mAnimRun, deltaTime);
-    t3d_anim_update(&mAnimPunch, deltaTime);
-    t3d_anim_update(&mAnimReceiveHit, deltaTime);
-
+    t3d_anim_update(mActiveAnim, deltaTime);
     t3d_skeleton_update(&mSkeleton);
     t3d_mat4fp_from_srt_euler(mModelMatFP,
                               (float[3]){0.125f, 0.125f, 0.125f},
