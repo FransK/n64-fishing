@@ -280,6 +280,7 @@ void Scene::update(float deltaTime)
     if (mState == State::GAME_OVER)
     {
         const rdpq_textparms_t center_text_hv{
+            .style_id = 4,
             .width = (int16_t)display_get_width(),
             .height = (int16_t)display_get_height(),
             .align = ALIGN_CENTER,
