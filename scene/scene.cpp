@@ -248,12 +248,13 @@ void Scene::update(float deltaTime)
     t3d_light_set_directional(0, COLOR_DIR, &mLightDirVec);
     t3d_light_set_count(1);
 
+    uint32_t vertices = mMapModel->totalVertCount;
     rspq_block_run(mDplMap);
 
     // === Draw players (3D Pass) === //
     for (size_t i = 0; i < MAXPLAYERS; i++)
     {
-        mPlayers[i]->draw(mViewport, mCamera.position);
+        vertices += mPlayers[i]->draw(mViewport, mCamera.position);
     }
 
     // === Draw billboards (2D Pass) === //
@@ -302,7 +303,7 @@ void Scene::update(float deltaTime)
     // Debug UI
     if (debugOverlay)
     {
-        debugOvl.draw(*this, deltaTime);
+        debugOvl.draw(*this, vertices, deltaTime);
         Debug::draw((uint16_t *)mCurrentFB->buffer);
 
         // Debug::printStart();

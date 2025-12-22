@@ -30,7 +30,7 @@ namespace
     bool actorDebug = false;
 }
 
-void Debug::Overlay::draw(Scene &scene, float deltaTime)
+void Debug::Overlay::draw(Scene &scene, uint32_t vertCount, float deltaTime)
 {
     // auto collScene = scene.getCollScene();
     uint64_t newTicksSelf = get_ticks();
@@ -136,6 +136,7 @@ void Debug::Overlay::draw(Scene &scene, float deltaTime)
     posX = 24 + barWidth - 50;
     // posX = Debug::printf(posX, posY, "A:%d/%d", scene.activeActorCount, scene.drawActorCount) + 8;
     // posX = Debug::printf(posX, posY, "T:%d", triCount) + 8;
+    posX = Debug::printf(posX, posY, "V:%d", vertCount) + 8;
     Debug::printf(posX, posY, "H:%d", heap_stats.used / 1024);
 
     posX = 24;
@@ -180,7 +181,7 @@ void Debug::Overlay::draw(Scene &scene, float deltaTime)
     // Performance graph
     // float timeCollBVH = usToWidth(TICKS_TO_US(collScene.ticksBVH));
     // float timeColl = usToWidth(TICKS_TO_US(collScene.ticks - collScene.ticksBVH));
-    // float timeActorUpdate = usToWidth(TICKS_TO_US(scene.ticksActorUpdate));
+    float timeActorUpdate = usToWidth(TICKS_TO_US(scene.ticksActorUpdate));
     // float timeCull = usToWidth(TICKS_TO_US(scene.getAudio().ticks));
     float timeSelf = usToWidth(TICKS_TO_US(ticksSelf));
 
@@ -195,9 +196,9 @@ void Debug::Overlay::draw(Scene &scene, float deltaTime)
     // rdpq_set_fill_color(COLOR_COLL);
     // rdpq_fill_rectangle(posX, posY, posX + timeColl, posY + barHeight);
     // posX += timeColl;
-    // rdpq_set_fill_color(COLOR_ACTOR_UPDATE);
-    // rdpq_fill_rectangle(posX, posY, posX + timeActorUpdate, posY + barHeight);
-    // posX += timeActorUpdate;
+    rdpq_set_fill_color(COLOR_ACTOR_UPDATE);
+    rdpq_fill_rectangle(posX, posY, posX + timeActorUpdate, posY + barHeight);
+    posX += timeActorUpdate;
     // rdpq_set_fill_color(COLOR_CULL);
     // rdpq_fill_rectangle(posX, posY, posX + timeCull, posY + barHeight);
     // posX += timeCull;

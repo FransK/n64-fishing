@@ -67,7 +67,7 @@ public:
     void init(int playerNumber, T3DVec3 position, float rotation, color_t color, bool isHuman);
     void update_fixed(float deltaTime, InputState input);
     void update(float deltaTime, InputState input, bool updateAI);
-    void draw(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
+    uint32_t draw(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
     void draw_billboard(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
 
     void get_attack_position(fm_vec2_t &attack_pos) const;

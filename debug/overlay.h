@@ -31,6 +31,6 @@ namespace Debug
         Menu menu{};
 
     public:
-        void draw(Scene &scene, float deltaTime);
+        void draw(Scene &scene, uint32_t vertCount, float deltaTime);
     };
 }

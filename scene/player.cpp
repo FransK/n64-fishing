@@ -204,9 +204,10 @@ void Player::update(float deltaTime, InputState input, bool updateAI = true)
                               mPosition.v);
 }
 
-void Player::draw(T3DViewport &viewport, const T3DVec3 &camPos) const
+uint32_t Player::draw(T3DViewport &viewport, const T3DVec3 &camPos) const
 {
     rspq_block_run(mDplPlayer);
+    return mModel->totalVertCount;
 }
 
 void Player::draw_billboard(T3DViewport &viewport, const T3DVec3 &camPos) const
