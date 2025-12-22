@@ -2,6 +2,7 @@
 
 #include <t3d/t3d.h>
 #include "../main.h"
+#include "../debug/overlay.h"
 #include "camera.h"
 #include "player.h"
 
@@ -32,6 +33,9 @@ private:
     float mStateTime{};
 
     T3DModel *mPlayerModel{};
+
+    surface_t *mCurrentFB{};
+    surface_t *mLastFB{};
     T3DModel *mMapModel{};
     T3DMat4FP *mMapMatFP{};
     rspq_block_t *mDplMap{};
@@ -48,10 +52,14 @@ private:
     Camera mCamera{};
     T3DVec3 mLightDirVec{};
 
+    Debug::Overlay debugOvl{};
+
     void read_inputs(PlyNum plyNum);
     void process_attacks(PlyNum attacker);
 
 public:
+    long ticksActorUpdate{0};
+
     void update_fixed(float deltaTime);
     void update(float deltaTime);
 

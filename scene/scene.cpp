@@ -1,11 +1,19 @@
 #include <algorithm>
 #include <string>
 #include "scene.h"
+#include "../debug/debugDraw.h"
+#include "../debug/overlay.h"
+#include "timer.h"
+
+bool showFPS = false;
+bool debugOverlay = false;
 
 Scene::Scene()
 {
     mPlayerModel = t3d_model_load("rom:/n64-fishing/player3.t3dm");
     mMapModel = t3d_model_load("rom:/n64-fishing/map.t3dm");
+
+    Debug::init();
 
     mMapMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
     t3d_mat4fp_from_srt_euler(mMapMatFP, (float[3]){0.13f, 0.13f, 0.13f}, (float[3]){0, 0, 0}, (float[3]){0, 0, 0});
@@ -58,6 +66,8 @@ Scene::Scene()
 
     mState = State::INTRO;
     mStateTime = INTRO_TIME;
+
+    timer_init();
 }
 
 Scene::~Scene()
@@ -79,6 +89,8 @@ Scene::~Scene()
         delete mPlayers[i];
         mPlayers[i] = nullptr;
     }
+
+    timer_close();
 }
 
 void Scene::read_inputs(PlyNum plyNum)
@@ -177,8 +189,25 @@ void Scene::update_fixed(float deltaTime)
 
 void Scene::update(float deltaTime)
 {
+    // === Debug Controls === //
+    {
+        auto ctrl = core_get_playercontroller(PLAYER_1);
+        auto btn = joypad_get_buttons_pressed(ctrl);
+        auto held = joypad_get_buttons_held(ctrl);
+
+        if (held.z)
+        {
+            if (btn.d_up)
+                debugOverlay = !debugOverlay;
+            if (btn.d_down)
+                showFPS = !showFPS;
+        }
+    }
+
     // === Attach RDP === //
-    rdpq_attach(display_get(), display_get_zbuf());
+    mLastFB = mCurrentFB;
+    mCurrentFB = display_get();
+    rdpq_attach(mCurrentFB, display_get_zbuf());
 
     // === Set Camera === //
     mCamera.update(mViewport);
@@ -187,6 +216,7 @@ void Scene::update(float deltaTime)
     t3d_viewport_attach(&mViewport);
 
     // === Process Inputs === //
+    ticksActorUpdate = get_ticks();
     if (mState == State::GAME)
     {
         for (size_t i = 0; i < core_get_playercount(); i++)
@@ -200,6 +230,7 @@ void Scene::update(float deltaTime)
     {
         mPlayers[i]->update(deltaTime, mInputState[i], mState == State::GAME);
     }
+    ticksActorUpdate = get_ticks() - ticksActorUpdate;
 
     // === Draw Background === //
     rdpq_set_mode_fill({(uint8_t)(0x80),
@@ -265,6 +296,24 @@ void Scene::update(float deltaTime)
             }
         }
         rdpq_text_printf(&center_text_hv, FONT_TEXT, 0, 0, message.c_str());
+    }
+
+    // Debug UI
+    if (debugOverlay)
+    {
+        debugOvl.draw(*this, deltaTime);
+        Debug::draw((uint16_t *)mCurrentFB->buffer);
+
+        // Debug::printStart();
+        // for (auto &ai : playerAI)
+        // {
+        //     ai.debugDraw();
+        // }
+    }
+    else if (showFPS)
+    {
+        Debug::printStart();
+        Debug::printf(24, 220, "FPS %.2f", display_get_fps());
     }
 
     // === Detach and show === //

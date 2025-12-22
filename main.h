@@ -11,6 +11,8 @@ extern "C"
 #include "../../minigame.h"
 }
 
+#define FS_BASE_PATH "rom:/n64-fishing/"
+
 constexpr uint32_t SCREEN_WIDTH = 320;
 constexpr uint32_t SCREEN_HEIGHT = 240;
 constexpr uint32_t TIMER_Y = 210;
