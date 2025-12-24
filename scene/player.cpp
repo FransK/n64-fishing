@@ -4,6 +4,8 @@
 
 Player::Player(T3DModel *model)
 {
+    // TODO: Collider initialization
+
     // Model Credits: Quaternius (CC0) https://quaternius.com/
     mModel = model;
     mSkeleton = t3d_skeleton_create(mModel);

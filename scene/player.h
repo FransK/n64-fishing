@@ -4,6 +4,7 @@
 #include <t3d/t3dmodel.h>
 #include <t3d/t3dskeleton.h>
 #include "../main.h"
+#include "../collision/collider.h"
 
 constexpr float PLAYING_R = 60.f; // TODO: Doesn't make sense in here...
 constexpr float PLAYING_R2 = PLAYING_R * PLAYING_R;
@@ -38,6 +39,8 @@ private:
     T3DModel *mModel{};
     T3DMat4FP *mModelMatFP{};
     rspq_block_t *mDplPlayer{};
+
+    Collision::Collider mCollider{};
 
     T3DAnim mAnimIdle{};
     T3DAnim mAnimPunch{};
