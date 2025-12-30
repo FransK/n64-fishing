@@ -7,10 +7,15 @@
 #include <vector>
 #include <functional>
 
-class Scene;
+namespace Fishing
+{
+    class Scene;
+}
 
 namespace Debug
 {
+    using FishingScene = ::Fishing::Scene;
+
     class Overlay
     {
     private:
@@ -31,6 +36,6 @@ namespace Debug
         Menu menu{};
 
     public:
-        void draw(Scene &scene, uint32_t vertCount, float deltaTime);
+        void draw(FishingScene &scene, uint32_t vertCount, float deltaTime);
     };
 }

@@ -6,7 +6,7 @@
 #include "debugDraw.h"
 #include "../scene/scene.h"
 
-namespace
+namespace Debug
 {
     constexpr float barWidth = 200.0f;
     constexpr float barHeight = 3.0f;
@@ -30,9 +30,9 @@ namespace
     bool actorDebug = false;
 }
 
-void Debug::Overlay::draw(Scene &scene, uint32_t vertCount, float deltaTime)
+void Debug::Overlay::draw(FishingScene &scene, uint32_t vertCount, float deltaTime)
 {
-    // auto collScene = scene.getCollScene();
+    auto collScene = scene.getCollScene();
     uint64_t newTicksSelf = get_ticks();
 
     auto btn = joypad_get_buttons_pressed(JOYPAD_PORT_1);
@@ -94,7 +94,7 @@ void Debug::Overlay::draw(Scene &scene, uint32_t vertCount, float deltaTime)
     // if (held.r)
     //     scene.getCamera().move({held.z ? 8.0f : 2.0f, 0.0f, 0.0f});
 
-    // collScene.debugDraw(showCollMesh, showCollSpheres);
+    collScene.debugDraw();
 
     /*auto navPt = scene.getNavPoints();
     for(const auto &point : navPt.points) {

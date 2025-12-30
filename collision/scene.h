@@ -12,8 +12,6 @@ namespace Collision
     private:
         std::vector<Collider *> colliders;
 
-        void updateCollider(Collider *object, float fixedTimeStep);
-
     public:
         Scene();
         ~Scene();
@@ -22,6 +20,6 @@ namespace Collision
         void remove(Collider *object);
 
         void update(float fixedTimeStep);
-        void debugDraw(bool showMesh, bool showSpheres);
+        void debugDraw();
     };
 }

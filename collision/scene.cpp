@@ -1,13 +1,9 @@
 #include "scene.h"
+#include "../debug/debugDraw.h"
 #include "../math/vector3.h"
 
 using namespace Collision;
 using namespace Math;
-
-void Scene::updateCollider(Collider *object, float fixedTimeStep)
-{
-    Vector3::addScaled(&object->position, &object->velocity, fixedTimeStep, &object->position);
-}
 
 Scene::Scene() {}
 Scene::~Scene() {}
@@ -33,12 +29,23 @@ void Scene::update(float fixedTimeStep)
     /* Integrate objects */
     for (auto *c : colliders)
     {
-        updateCollider(c, fixedTimeStep);
+        c->update(fixedTimeStep);
+        c->recalcBB();
     }
 
     /* Solve collisions */
 
     /* Clamp to world */
+    for (auto *c : colliders)
+    {
+        c->constrainPosition();
+    }
 }
 
-void Scene::debugDraw(bool showMesh, bool showSpheres) {}
+void Scene::debugDraw()
+{
+    for (auto *c : colliders)
+    {
+        Debug::drawBox(c->boundingBox);
+    }
+}

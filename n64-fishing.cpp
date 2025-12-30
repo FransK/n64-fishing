@@ -3,7 +3,7 @@
 
 namespace
 {
-    Scene *scene{};
+    Fishing::Scene *scene{};
 }
 
 extern "C"
@@ -26,7 +26,7 @@ extern "C"
         display_init(RESOLUTION_320x240, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE);
         t3d_init((T3DInitParams){});
 
-        scene = new Scene();
+        scene = new Fishing::Scene();
     }
 
     /*==============================

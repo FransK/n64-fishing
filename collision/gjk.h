@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "colliderTypeData.h"
 #include "../math/vector3.h"
 
 using namespace Math;
@@ -21,7 +22,7 @@ namespace Collision
 
     struct GJK
     {
-        typedef void (*MinkowskiSum)(void *data, Vector3 *direction, Vector3 *output);
+        typedef void (*MinkowskiSum)(ColliderTypeData *data, Vector3 *direction, Vector3 *output);
 
         int checkForOverlap(Simplex *simplex, void *objectA, MinkowskiSum objectASum, void *objectB, MinkowskiSum objectBSum, Vector3 *firstDirection);
     };

@@ -2,67 +2,76 @@
 
 #include <t3d/t3d.h>
 #include "../main.h"
+#include "../collision/scene.h"
 #include "../debug/overlay.h"
 #include "camera.h"
 #include "player.h"
 
-constexpr float INTRO_TIME = 3.f;
-constexpr float GAME_TIME = 30.f;
-constexpr float GAME_OVER_TIME = 5.f;
+using CollisionScene = ::Collision::Scene;
 
-constexpr uint8_t COLOR_AMBIENT[4] = {0xAA, 0xAA, 0xAA, 0xFF};
-constexpr uint8_t COLOR_DIR[4] = {0xFF, 0xAA, 0xAA, 0xFF};
-
-constexpr color_t COLORS[] = {
-    PLAYERCOLOR_1,
-    PLAYERCOLOR_2,
-    PLAYERCOLOR_3,
-    PLAYERCOLOR_4,
-};
-
-class Scene
+namespace Fishing
 {
-private:
-    enum class State : uint8_t
+    constexpr float INTRO_TIME = 3.f;
+    constexpr float GAME_TIME = 30.f;
+    constexpr float GAME_OVER_TIME = 5.f;
+
+    constexpr uint8_t COLOR_AMBIENT[4] = {0xAA, 0xAA, 0xAA, 0xFF};
+    constexpr uint8_t COLOR_DIR[4] = {0xFF, 0xAA, 0xAA, 0xFF};
+
+    constexpr color_t COLORS[] = {
+        PLAYERCOLOR_1,
+        PLAYERCOLOR_2,
+        PLAYERCOLOR_3,
+        PLAYERCOLOR_4,
+    };
+
+    class Scene
     {
-        INTRO = 0,
-        GAME,
-        GAME_OVER
-    } mState{};
+    private:
+        enum class State : uint8_t
+        {
+            INTRO = 0,
+            GAME,
+            GAME_OVER
+        } mState{};
 
-    float mStateTime{};
+        float mStateTime{};
 
-    T3DModel *mPlayerModel{};
+        CollisionScene mCollisionScene{};
 
-    surface_t *mCurrentFB{};
-    surface_t *mLastFB{};
-    T3DModel *mMapModel{};
-    T3DMat4FP *mMapMatFP{};
-    rspq_block_t *mDplMap{};
+        T3DModel *mPlayerModel{};
 
-    Player *mPlayers[MAXPLAYERS]{};
-    InputState mInputState[MAXPLAYERS]{};
-    uint8_t mWinners[MAXPLAYERS]{0};
-    uint8_t mCurrTopScore{0};
+        surface_t *mCurrentFB{};
+        surface_t *mLastFB{};
+        T3DModel *mMapModel{};
+        T3DMat4FP *mMapMatFP{};
+        rspq_block_t *mDplMap{};
 
-    rdpq_font_t *mFontBillboard{};
-    rdpq_font_t *mFontText{};
+        Player *mPlayers[MAXPLAYERS]{};
+        InputState mInputState[MAXPLAYERS]{};
+        uint8_t mWinners[MAXPLAYERS]{0};
+        uint8_t mCurrTopScore{0};
 
-    T3DViewport mViewport{};
-    Camera mCamera{};
-    T3DVec3 mLightDirVec{};
+        rdpq_font_t *mFontBillboard{};
+        rdpq_font_t *mFontText{};
 
-    Debug::Overlay debugOvl{};
+        T3DViewport mViewport{};
+        Camera mCamera{};
+        T3DVec3 mLightDirVec{};
 
-    void read_inputs(PlyNum plyNum);
-    void process_attacks(PlyNum attacker);
+        Debug::Overlay debugOvl{};
 
-public:
-    long ticksActorUpdate{0};
+        void read_inputs(PlyNum plyNum);
+        void process_attacks(PlyNum attacker);
 
-    void update_fixed(float deltaTime);
-    void update(float deltaTime);
+    public:
+        long ticksActorUpdate{0};
 
-    Scene();
-    ~Scene();
-};
+        const CollisionScene &getCollScene();
+        void update_fixed(float deltaTime);
+        void update(float deltaTime);
+
+        Scene();
+        ~Scene();
+    };
+}

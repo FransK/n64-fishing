@@ -1,9 +1,6 @@
-/**
- * @copyright 2024 - Max Bebök
- * @license MIT
- */
 #include "debugDraw.h"
 #include "../main.h"
+#include "../math/box3d.h"
 #include <t3d/t3d.h>
 #include <vector>
 
@@ -70,9 +67,28 @@ void Debug::drawLine(const T3DVec3 &a, const T3DVec3 &b, color_t color)
     lines.push_back({a, b, color_to_packed16(color)});
 }
 
+void Debug::drawBox(const Box3D &box)
+{
+    drawLine({box.min.x, box.min.y, box.min.z}, {box.min.x, box.min.y, box.max.z});
+    drawLine({box.min.x, box.min.y, box.min.z}, {box.min.x, box.max.y, box.min.z});
+    drawLine({box.min.x, box.min.y, box.min.z}, {box.max.x, box.min.y, box.min.z});
+
+    drawLine({box.min.x, box.max.y, box.min.z}, {box.max.x, box.max.y, box.min.z});
+    drawLine({box.min.x, box.max.y, box.min.z}, {box.min.x, box.max.y, box.max.z});
+
+    drawLine({box.max.x, box.min.y, box.max.z}, {box.max.x, box.min.y, box.min.z});
+    drawLine({box.max.x, box.min.y, box.max.z}, {box.min.x, box.min.y, box.max.z});
+
+    drawLine({box.max.x, box.min.y, box.min.z}, {box.max.x, box.max.y, box.min.z});
+    drawLine({box.min.x, box.min.y, box.max.z}, {box.min.x, box.max.y, box.max.z});
+
+    drawLine({box.max.x, box.max.y, box.max.z}, {box.max.x, box.max.y, box.min.z});
+    drawLine({box.max.x, box.max.y, box.max.z}, {box.max.x, box.min.y, box.max.z});
+    drawLine({box.max.x, box.max.y, box.max.z}, {box.min.x, box.max.y, box.max.z});
+}
+
 void Debug::drawSphere(const T3DVec3 &center, float radius, color_t color)
 {
-
     int steps = 12;
     float step = 2.0f * M_PI / steps;
     T3DVec3 last = center + T3DVec3{radius, 0, 0};
