@@ -1,6 +1,9 @@
 #include "scene.h"
+#include "colliderEdge.h"
 #include "../debug/debugDraw.h"
 #include "../math/vector3.h"
+#include <algorithm>
+#include <vector>
 
 using namespace Collision;
 using namespace Math;
@@ -34,21 +37,7 @@ void Scene::update(float fixedTimeStep)
     }
 
     /* Solve collisions */
-    for (size_t i = 0; i < colliders.size(); i++)
-    {
-        for (size_t j = 0; j < colliders.size(); j++)
-        {
-            if (i == j)
-            {
-                continue;
-            }
-
-            if (Box3D::hasOverlap(colliders[i]->boundingBox, colliders[j]->boundingBox))
-            {
-                debugf("Overlapping colliders: %d and %d\n", colliders[i]->entityId, colliders[j]->entityId);
-            }
-        }
-    }
+    runCollision();
 
     /* Clamp to world */
     for (auto *c : colliders)
@@ -62,5 +51,99 @@ void Scene::debugDraw()
     for (auto *c : colliders)
     {
         Debug::drawBox(c->boundingBox);
+    }
+}
+
+void Scene::runCollision()
+{
+    // === Sweep and Prune === //
+    int edgeCount = colliders.size() * 2;
+    std::vector<ColliderEdge> colliderEdges(edgeCount);
+    ColliderEdge *currEdge = &colliderEdges[0];
+
+    // Prune along x axis by looking at min and max x of each BB
+    for (size_t i = 0; i < colliders.size(); i++)
+    {
+        currEdge->isStartEdge = 1;
+        currEdge->objectIndex = i;
+        currEdge->x = (short)(colliders[i]->boundingBox.min.x);
+
+        currEdge += 1;
+
+        currEdge->isStartEdge = 0;
+        currEdge->objectIndex = i;
+        currEdge->x = (short)(colliders[i]->boundingBox.max.x);
+
+        currEdge += 1;
+    }
+
+    // Sort by x position of each edge
+    std::sort(colliderEdges.begin(), colliderEdges.end());
+
+    std::vector<uint16_t> activeObjects(colliders.size());
+    int activeObjectCount = 0;
+
+    for (int edgeIndex = 0; edgeIndex < edgeCount; edgeIndex++)
+    {
+        ColliderEdge edge = colliderEdges[edgeIndex];
+
+        if (edge.isStartEdge)
+        {
+            Collider *a = colliders[edge.objectIndex];
+
+            for (int activeIndex = 0; activeIndex < activeObjectCount; activeIndex++)
+            {
+                Collider *b = colliders[activeObjects[activeIndex]];
+
+                // === AABB === //
+                if (Box3D::hasOverlap(a->boundingBox, b->boundingBox))
+                {
+                    // === Check Collider Shapes == //
+                    debugf("Overlapping colliders: %d and %d\n", a->entityId, b->entityId);
+                }
+            }
+
+            activeObjects[activeObjectCount] = edge.objectIndex;
+            activeObjectCount++;
+        }
+        else
+        {
+            // End edge, remove active object
+            int foundIndex = -1;
+
+            for (int activeIndex = 0; activeIndex < activeObjectCount; activeIndex++)
+            {
+                if (activeObjects[activeIndex] == edge.objectIndex)
+                {
+                    foundIndex = activeIndex;
+                    break;
+                }
+            }
+
+            assert(foundIndex != -1);
+
+            // Remove item by replacing with the last one
+            activeObjects[foundIndex] = activeObjects[activeObjectCount - 1];
+            activeObjectCount--;
+        }
+    }
+}
+
+void Scene::collide(Collider *a, Collider *b)
+{
+    if (!(a->collisionLayers & b->collisionLayers))
+    {
+        return;
+    }
+
+    if (a->collisionGroup && a->collisionGroup == b->collisionGroup)
+    {
+        return;
+    }
+
+    Simplex simplex{};
+    if (!GJK::checkForOverlap(&simplex, a, b, {1.0f, 0.0f, 0.0f}))
+    {
+        return;
     }
 }

@@ -12,6 +12,9 @@ namespace Collision
     private:
         std::vector<Collider *> colliders;
 
+        void runCollision();
+        void collide(Collider *a, Collider *b);
+
     public:
         Scene();
         ~Scene();
