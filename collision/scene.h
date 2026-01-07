@@ -1,7 +1,9 @@
 #pragma once
 
 #include <vector>
+
 #include "collider.h"
+#include "epa.h"
 
 using namespace Collision;
 
@@ -14,6 +16,8 @@ namespace Collision
 
         void runCollision();
         void collide(Collider *a, Collider *b);
+        void correctOverlap(Collider *object, EpaResult *result, float ratio, float friction, float bounce);
+        void correctVelocity(Collider *object, EpaResult *result, float ratio, float friction, float bounce);
 
     public:
         Scene();

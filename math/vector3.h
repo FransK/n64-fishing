@@ -13,6 +13,7 @@ namespace Math
         static bool isZero(const Vector3 *a);
         static float magSqrd(const Vector3 *a);
         static void negate(const Vector3 *in, Vector3 *out);
+        static void normalize(const Vector3 *in, Vector3 *out);
         static void normAndScale(const Vector3 *in, float scale, Vector3 *out);
         static void perp(const Vector3 *a, Vector3 *out);
         static void scale(const Vector3 *in, float scale, Vector3 *out);

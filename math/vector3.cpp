@@ -47,6 +47,23 @@ void Vector3::negate(const Vector3 *in, Vector3 *out)
     out->z = -in->z;
 }
 
+void Vector3::normalize(const Vector3 *in, Vector3 *out)
+{
+    float denom = in->x * in->x + in->y * in->y + in->z * in->z;
+
+    if (denom == 0.0f)
+    {
+        out->x = 0.0f;
+        out->y = 0.0f;
+        out->z = 0.0f;
+    }
+    else
+    {
+        float invSqrt = 1.0f / sqrtf(denom);
+        scale(in, invSqrt, out);
+    }
+}
+
 void Vector3::normAndScale(const Vector3 *in, float scale, Vector3 *out)
 {
     const float x = in->x;

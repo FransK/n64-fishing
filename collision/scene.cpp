@@ -1,3 +1,5 @@
+#include "scene.h"
+
 #include <algorithm>
 #include <vector>
 
@@ -5,8 +7,8 @@
 #include "../math/vector3.h"
 
 #include "colliderEdge.h"
+#include "epa.h"
 #include "gjk.h"
-#include "scene.h"
 
 using namespace Collision;
 using namespace Math;
@@ -151,5 +153,39 @@ void Scene::collide(Collider *a, Collider *b)
         debugf("No colliders overlap: %d and %d\n", a->entityId, b->entityId);
         return;
     }
+
     debugf("Overlapping colliders: %d and %d\n", a->entityId, b->entityId);
+    EpaResult result;
+    if (!EpaResult::solve(&simplex, a, b, &result))
+    {
+        return;
+    }
+
+    float friction = a->type.friction < b->type.friction ? a->type.friction : b->type.friction;
+    float bounce = a->type.friction > b->type.friction ? a->type.friction : b->type.friction;
+
+    correctOverlap(b, &result, -0.8f, friction, bounce);
+    correctOverlap(a, &result, 0.2f, friction, bounce);
+}
+
+void Scene::correctOverlap(Collider *object, EpaResult *result, float ratio, float friction, float bounce)
+{
+    Vector3::addScaled(&object->position, &result->normal, result->penetration * ratio, &object->position);
+
+    correctVelocity(object, result, ratio, friction, bounce);
+}
+
+void Scene::correctVelocity(Collider *object, EpaResult *result, float ratio, float friction, float bounce)
+{
+    float velocityDot = Vector3::dot(&object->velocity, &result->normal);
+
+    if ((velocityDot < 0) == (ratio < 0))
+    {
+        struct Vector3 tangentVelocity;
+
+        Vector3::addScaled(&object->velocity, &result->normal, -velocityDot, &tangentVelocity);
+        Vector3::scale(&tangentVelocity, 1.0f - friction, &tangentVelocity);
+
+        Vector3::addScaled(&tangentVelocity, &result->normal, velocityDot * -bounce, &object->velocity);
+    }
 }
