@@ -33,6 +33,16 @@ namespace Fishing
     constexpr float SHOVE_TIME = 21.0f / 90.0f;
     constexpr float RECEIVE_SHOVE_TIME = 1.0f;
 
+    constexpr Collision::ColliderType PlayerColliderType = {
+        .minkowskiSum = Collision::Cylinder::MinkowskiSum,
+        .boundingBoxCalculator = Collision::Cylinder::BoundingBox,
+        .data = {
+            .cylinder = {
+                .radius = 5.0f,
+                .halfHeight = 12.0f}},
+        .bounce = 0.0f,
+        .friction = 0.0f};
+
     class Player
     {
     private:
@@ -43,16 +53,6 @@ namespace Fishing
             SHOVE,
             RECEIVE_SHOVE
         };
-
-        struct Collision::ColliderType PlayerColliderType = {
-            .minkowskiSum = Collision::Cylinder::MinkowskiSum,
-            .boundingBoxCalculator = Collision::Cylinder::BoundingBox,
-            .data = {
-                .cylinder = {
-                    .radius = 5.0f,
-                    .halfHeight = 12.0f}},
-            .bounce = 0.0f,
-            .friction = 0.0f};
 
         Collision::Scene *mScene{};
 
