@@ -36,5 +36,6 @@ namespace Collision
         void update(float timeStep);
         void recalcBB();
         void constrainPosition();
+        void minkowskiSumLocal(const Vector3 *direction, Vector3 *output);
     };
 }

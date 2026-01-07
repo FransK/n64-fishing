@@ -201,18 +201,18 @@ int GJK::checkForOverlap(Simplex *simplex, Collider *a, Collider *b, const Vecto
 
     if (Vector3::isZero(firstDirection))
     {
-        a->type.minkowskiSum(&a->type.data, &Math::Vec3Right, &aPoint);
+        a->minkowskiSumLocal(&Math::Vec3Right, &aPoint);
         Vector3::negate(&Math::Vec3Right, &nextDirection);
 
-        b->type.minkowskiSum(&b->type.data, &nextDirection, &bPoint);
+        b->minkowskiSumLocal(&nextDirection, &bPoint);
         simplex->addPoint(&aPoint, &bPoint);
     }
     else
     {
-        a->type.minkowskiSum(&a->type.data, firstDirection, &aPoint);
+        a->minkowskiSumLocal(firstDirection, &aPoint);
         Vector3::negate(firstDirection, &nextDirection);
 
-        b->type.minkowskiSum(&b->type.data, &nextDirection, &bPoint);
+        b->minkowskiSumLocal(&nextDirection, &bPoint);
         simplex->addPoint(&aPoint, &bPoint);
     }
 
@@ -220,12 +220,12 @@ int GJK::checkForOverlap(Simplex *simplex, Collider *a, Collider *b, const Vecto
     {
         Vector3 reverseDirection;
         Vector3::negate(&nextDirection, &reverseDirection);
-        a->type.minkowskiSum(&a->type.data, &nextDirection, &aPoint);
-        b->type.minkowskiSum(&b->type.data, &reverseDirection, &bPoint);
+        a->minkowskiSumLocal(&nextDirection, &aPoint);
+        b->minkowskiSumLocal(&reverseDirection, &bPoint);
 
         struct Vector3 *addedPoint = simplex->addPoint(&aPoint, &bPoint);
 
-        if (!addedPoint)
+        if (!addedPoint) // Too many points
         {
             return 0;
         }

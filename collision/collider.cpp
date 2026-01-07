@@ -34,3 +34,9 @@ void Collider::constrainPosition()
         Vector3::normAndScale(&position, PLAYING_R, &position);
     }
 }
+
+void Collider::minkowskiSumLocal(const Vector3 *direction, Vector3 *output)
+{
+    type.minkowskiSum(&type.data, direction, output);
+    Vector3::add(output, &position, output);
+}
