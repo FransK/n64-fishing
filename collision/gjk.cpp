@@ -201,18 +201,18 @@ int GJK::checkForOverlap(Simplex *simplex, Collider *a, Collider *b, const Vecto
 
     if (Vector3::isZero(firstDirection))
     {
-        a->minkowskiSumLocal(&Math::Vec3Right, &aPoint);
+        a->minkowskiSumWorld(&Math::Vec3Right, &aPoint);
         Vector3::negate(&Math::Vec3Right, &nextDirection);
 
-        b->minkowskiSumLocal(&nextDirection, &bPoint);
+        b->minkowskiSumWorld(&nextDirection, &bPoint);
         simplex->addPoint(&aPoint, &bPoint);
     }
     else
     {
-        a->minkowskiSumLocal(firstDirection, &aPoint);
+        a->minkowskiSumWorld(firstDirection, &aPoint);
         Vector3::negate(firstDirection, &nextDirection);
 
-        b->minkowskiSumLocal(&nextDirection, &bPoint);
+        b->minkowskiSumWorld(&nextDirection, &bPoint);
         simplex->addPoint(&aPoint, &bPoint);
     }
 
@@ -220,8 +220,8 @@ int GJK::checkForOverlap(Simplex *simplex, Collider *a, Collider *b, const Vecto
     {
         Vector3 reverseDirection;
         Vector3::negate(&nextDirection, &reverseDirection);
-        a->minkowskiSumLocal(&nextDirection, &aPoint);
-        b->minkowskiSumLocal(&reverseDirection, &bPoint);
+        a->minkowskiSumWorld(&nextDirection, &aPoint);
+        b->minkowskiSumWorld(&reverseDirection, &bPoint);
 
         struct Vector3 *addedPoint = simplex->addPoint(&aPoint, &bPoint);
 

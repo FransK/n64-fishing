@@ -403,9 +403,9 @@ bool EpaResult::solve(const Simplex *startingSimplex, Collider *a, Collider *b, 
         struct Vector3 *aPoint = &simplex.aPoints[nextIndex];
         struct Vector3 bPoint;
 
-        a->minkowskiSumLocal(&closestFace->normal, aPoint);
+        a->minkowskiSumWorld(&closestFace->normal, aPoint);
         Vector3::negate(&closestFace->normal, &reverseNormal);
-        b->minkowskiSumLocal(&reverseNormal, &bPoint);
+        b->minkowskiSumWorld(&reverseNormal, &bPoint);
 
         Vector3::sub(aPoint, &bPoint, &simplex.points[nextIndex]);
 

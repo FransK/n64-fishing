@@ -19,7 +19,7 @@ namespace Fishing
         Debug::init();
 
         mMapMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
-        t3d_mat4fp_from_srt_euler(mMapMatFP, (float[3]){0.13f, 0.13f, 0.13f}, (float[3]){0, 0, 0}, (float[3]){0, 0, 0});
+        t3d_mat4fp_from_srt_euler(mMapMatFP, (float[3]){0.13f, 1.0f, 0.13f}, (float[3]){0, 0, 0}, (float[3]){0, 0, 0});
 
         rspq_block_begin();
         t3d_matrix_push(mMapMatFP);

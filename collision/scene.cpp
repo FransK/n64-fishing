@@ -163,7 +163,7 @@ void Scene::collide(Collider *a, Collider *b)
     }
 
     float friction = a->type.friction < b->type.friction ? a->type.friction : b->type.friction;
-    float bounce = a->type.friction > b->type.friction ? a->type.friction : b->type.friction;
+    float bounce = a->type.bounce > b->type.bounce ? a->type.bounce : b->type.bounce;
 
     correctOverlap(b, &result, -0.7f, friction, bounce);
     correctOverlap(a, &result, 0.3f, friction, bounce);
@@ -192,20 +192,15 @@ void Scene::correctVelocity(Collider *object, EpaResult *result, float ratio, fl
 
 void Scene::constrainToWorld(Collider *object)
 {
-    Vector3 down;
-    Vector3::negate(&Vec3Up, &down);
-    Vector3 bottomMost;
-    object->minkowskiSumLocal(&down, &bottomMost);
-
-    if (bottomMost.y < 0.0f)
+    if (object->position.y < 0.0f)
     {
-        struct EpaResult result;
+        EpaResult result;
 
-        result.contactA = bottomMost;
-        result.contactB = bottomMost;
+        result.contactA = object->position;
+        result.contactB = object->position;
         result.contactB.y = 0.0f;
         result.normal = Vec3Up;
-        result.penetration = bottomMost.y;
+        result.penetration = object->position.y;
 
         correctOverlap(object, &result, -1.0f, object->type.friction, object->type.bounce);
     }

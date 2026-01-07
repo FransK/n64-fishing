@@ -40,8 +40,19 @@ void Collider::constrainPosition()
     }
 }
 
-void Collider::minkowskiSumLocal(const Vector3 *direction, Vector3 *output)
+void Collider::minkowskiSumWorld(const Vector3 *direction, Vector3 *output)
 {
     type.minkowskiSum(&type.data, direction, output);
+
+    if (scale != 1.0f)
+    {
+        Vector3::scale(output, scale, output);
+        Vector3::addScaled(output, &center, scale, output);
+    }
+    else
+    {
+        Vector3::add(output, &center, output);
+    }
+
     Vector3::add(output, &position, output);
 }
