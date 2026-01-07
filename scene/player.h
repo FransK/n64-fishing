@@ -9,6 +9,8 @@
 #include "../collision/collider.h"
 #include "../collision/cylinder.h"
 
+using namespace Math;
+
 namespace Fishing
 {
     constexpr float PLAYER_SCALE = 0.125f;

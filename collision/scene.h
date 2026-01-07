@@ -15,6 +15,7 @@ namespace Collision
         std::vector<Collider *> colliders;
 
         void runCollision();
+        void constrainToWorld(Collider *object);
         void collide(Collider *a, Collider *b);
         void correctOverlap(Collider *object, EpaResult *result, float ratio, float friction, float bounce);
         void correctVelocity(Collider *object, EpaResult *result, float ratio, float friction, float bounce);

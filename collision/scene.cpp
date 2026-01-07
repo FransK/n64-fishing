@@ -47,6 +47,7 @@ void Scene::update(float fixedTimeStep)
     /* Clamp to world */
     for (auto *c : colliders)
     {
+        constrainToWorld(c);
         c->constrainPosition();
     }
 }
@@ -164,8 +165,8 @@ void Scene::collide(Collider *a, Collider *b)
     float friction = a->type.friction < b->type.friction ? a->type.friction : b->type.friction;
     float bounce = a->type.friction > b->type.friction ? a->type.friction : b->type.friction;
 
-    correctOverlap(b, &result, -0.8f, friction, bounce);
-    correctOverlap(a, &result, 0.2f, friction, bounce);
+    correctOverlap(b, &result, -0.7f, friction, bounce);
+    correctOverlap(a, &result, 0.3f, friction, bounce);
 }
 
 void Scene::correctOverlap(Collider *object, EpaResult *result, float ratio, float friction, float bounce)
@@ -185,7 +186,27 @@ void Scene::correctVelocity(Collider *object, EpaResult *result, float ratio, fl
 
         Vector3::addScaled(&object->velocity, &result->normal, -velocityDot, &tangentVelocity);
         Vector3::scale(&tangentVelocity, 1.0f - friction, &tangentVelocity);
-
         Vector3::addScaled(&tangentVelocity, &result->normal, velocityDot * -bounce, &object->velocity);
+    }
+}
+
+void Scene::constrainToWorld(Collider *object)
+{
+    Vector3 down;
+    Vector3::negate(&Vec3Up, &down);
+    Vector3 bottomMost;
+    object->minkowskiSumLocal(&down, &bottomMost);
+
+    if (bottomMost.y < 0.0f)
+    {
+        struct EpaResult result;
+
+        result.contactA = bottomMost;
+        result.contactB = bottomMost;
+        result.contactB.y = 0.0f;
+        result.normal = Vec3Up;
+        result.penetration = bottomMost.y;
+
+        correctOverlap(object, &result, -1.0f, object->type.friction, object->type.bounce);
     }
 }

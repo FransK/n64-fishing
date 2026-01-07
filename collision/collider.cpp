@@ -4,6 +4,11 @@ using namespace Collision;
 
 void Collider::update(float timeStep)
 {
+    if (hasGravity)
+    {
+        velocity.y += timeStep * GRAVITY_CONSTANT;
+    }
+
     Vector3::addScaled(&position, &velocity, timeStep, &position);
 }
 

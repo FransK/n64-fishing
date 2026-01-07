@@ -12,6 +12,7 @@ using namespace Math;
 
 namespace Collision
 {
+    constexpr float GRAVITY_CONSTANT = -10.f * 64.f;
     constexpr float PLAYING_R = 60.f;
     constexpr float PLAYING_R2 = PLAYING_R * PLAYING_R;
 
@@ -30,6 +31,8 @@ namespace Collision
         ColliderType type{};
         Box3D boundingBox{};
         float scale{};
+        bool hasGravity{true};
+        bool isFixed{false};
         uint16_t collisionLayers{};
         uint16_t collisionGroup{};
 

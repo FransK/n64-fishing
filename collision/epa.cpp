@@ -124,7 +124,7 @@ void ExpandingSimplex::addTriangle(const SimplexTriangleIndexData *data)
     triangleDetermineDistance(&triangles[result]);
 
     triangleHeap[result] = result;
-    siftDownHeap(result);
+    siftUpHeap(result);
 }
 
 SimplexTriangle *ExpandingSimplex::closestFace()
@@ -204,14 +204,14 @@ int ExpandingSimplex::findHeapIndex(int value)
 
 void ExpandingSimplex::fixHeap(int heapIndex)
 {
-    int nextHeapIndex = siftUpHeap(heapIndex);
+    int nextHeapIndex = siftDownHeap(heapIndex);
 
     if (nextHeapIndex != heapIndex)
     {
         return;
     }
 
-    siftDownHeap(nextHeapIndex);
+    siftUpHeap(nextHeapIndex);
 }
 
 void ExpandingSimplex::rotateEdge(SimplexTriangle *triangleA, int triangleAIndex, int heapIndex)
@@ -264,7 +264,7 @@ void ExpandingSimplex::rotateEdge(SimplexTriangle *triangleA, int triangleAIndex
     }
 }
 
-int ExpandingSimplex::siftDownHeap(int heapIndex)
+int ExpandingSimplex::siftUpHeap(int heapIndex)
 {
     int parentHeapIndex = GetParentIndex(heapIndex);
     float currentDistance = ExpandingSimplexGetDistance(this, triangleHeap[heapIndex]);
@@ -284,13 +284,13 @@ int ExpandingSimplex::siftDownHeap(int heapIndex)
 
         // move up to the parent
         heapIndex = parentHeapIndex;
-        parentHeapIndex = ExpandingSimplexGetDistance(this, heapIndex);
+        parentHeapIndex = GetParentIndex(heapIndex);
     }
 
     return heapIndex;
 }
 
-int ExpandingSimplex::siftUpHeap(int heapIndex)
+int ExpandingSimplex::siftDownHeap(int heapIndex)
 {
     float currentDistance = ExpandingSimplexGetDistance(this, triangleHeap[heapIndex]);
 

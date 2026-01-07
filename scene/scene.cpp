@@ -49,10 +49,10 @@ namespace Fishing
 
         // === Initialize the players === //
         T3DVec3 startPositions[] = {
-            (T3DVec3){{-55, 0.15f, 0}},
-            (T3DVec3){{0, 0.15f, -55}},
-            (T3DVec3){{55, 0.15f, 0}},
-            (T3DVec3){{0, 0.15f, 55}},
+            (T3DVec3){{-55, 0.0f, 0}},
+            (T3DVec3){{0, 0.0f, -55}},
+            (T3DVec3){{55, 0.0f, 0}},
+            (T3DVec3){{0, 0.0f, 55}},
         };
 
         Vector2 startRotations[] = {

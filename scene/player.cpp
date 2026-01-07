@@ -1,4 +1,5 @@
 #include <string>
+#include "../main.h"
 #include "player.h"
 #include "fish.h"
 #include "../math/quaternion.h"
@@ -83,6 +84,8 @@ namespace Fishing
             .rotation = rotation,
             .type = PlayerColliderType,
             .scale = 1.0f,
+            .hasGravity = true,
+            .isFixed = false,
             .collisionLayers = CollisionLayerTangible,
             .collisionGroup = uint16_t(FIRST_PLAYER_COLLIDER_GROUP + playerNumber),
         };
