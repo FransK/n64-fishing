@@ -5,7 +5,7 @@ using namespace Collision;
 
 constexpr float SQRT_1_2 = 0.707106781f;
 
-void Cylinder::MinkowskiSum(ColliderTypeData *data, Vector3 *direction, Vector3 *output)
+void Cylinder::MinkowskiSum(const ColliderTypeData *data, const Vector3 *direction, Vector3 *output)
 {
     float absX = fabsf(direction->x);
     float absY = fabsf(direction->y);

@@ -73,7 +73,7 @@ namespace Fishing
         }
     }
 
-    void Player::init(int playerNumber, T3DVec3 position, Vector2 rotation, color_t color, bool is_human)
+    void Player::init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, color_t color, bool is_human)
     {
         assert(playerNumber >= 0 && playerNumber < MAXPLAYERS);
 
@@ -82,7 +82,10 @@ namespace Fishing
             .position = {position.x, position.y, position.z},
             .rotation = rotation,
             .type = PlayerColliderType,
-            .scale = 1.0f};
+            .scale = 1.0f,
+            .collisionLayers = CollisionLayerTangible,
+            .collisionGroup = uint16_t(FIRST_PLAYER_COLLIDER_GROUP + playerNumber),
+        };
 
         mCollider.center.y = PlayerColliderType.data.cylinder.halfHeight;
         mCollider.recalcBB();

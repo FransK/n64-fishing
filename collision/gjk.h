@@ -10,6 +10,7 @@ using namespace Math;
 namespace Collision
 {
     constexpr uint16_t MaxSimplexSize = 4;
+    constexpr uint16_t MaxGJKIterations = 16;
 
     struct Simplex
     {
@@ -17,14 +18,16 @@ namespace Collision
         Vector3 objectAPoint[MaxSimplexSize];
         int16_t nPoints;
 
-        Simplex(int16_t points = 0) : nPoints(points) {};
+        Simplex() : nPoints(0) {}
+
+        Vector3 *addPoint(Vector3 *aPoint, Vector3 *bPoint);
+        void movePoint(int to, int from);
         int check(Vector3 *nextDirection);
     };
 
-    struct GJK
+    class GJK
     {
-        typedef void (*MinkowskiSum)(ColliderTypeData *data, Vector3 *direction, Vector3 *output);
-
-        static int checkForOverlap(Simplex *simplex, Collider *a, Collider *b, const Vector3 &firstDirection);
+    public:
+        static int checkForOverlap(Simplex *simplex, Collider *a, Collider *b, const Vector3 *firstDirection);
     };
 }

@@ -61,7 +61,7 @@ namespace Fishing
             {0, -1},
             {-1, 0}};
 
-        for (size_t i = 0; i < MAXPLAYERS; i++)
+        for (uint16_t i = 0; i < MAXPLAYERS; i++)
         {
             mPlayers[i] = new Player(&mCollisionScene, mPlayerModel);
             mPlayers[i]->init(i, startPositions[i], startRotations[i], COLORS[i], i < core_get_playercount());

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <t3d/t3danim.h>
 #include <t3d/t3dmodel.h>
 #include <t3d/t3dskeleton.h>
@@ -22,6 +23,8 @@ namespace Fishing
     constexpr float SHOVE_DIST = 7.f;
     constexpr float MIN_MOVE_INPUT = 8.f;
     constexpr float ROTATION_INPUT = 26.f;
+
+    constexpr int8_t FIRST_PLAYER_COLLIDER_GROUP = 1;
 
     constexpr float CATCH_TIMER = 1.f;
 
@@ -80,7 +83,7 @@ namespace Fishing
         [[nodiscard]] bool is_fishing() const { return mFishingTimer > 0.0f; };
         [[nodiscard]] bool is_catchable() const { return mFishingTimer < CATCH_TIMER && mFishingTimer > 0.0f; };
         [[nodiscard]] bool can_attack() const { return mFishingTimer <= 0.0f && mAnimTimer <= 0.0f; };
-        void init(int playerNumber, T3DVec3 position, Vector2 rotation, color_t color, bool isHuman);
+        void init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, color_t color, bool isHuman);
         void update_fixed(float deltaTime, InputState input);
         void update(float deltaTime, InputState input, bool updateAI);
         uint32_t draw(T3DViewport &viewport, const T3DVec3 &cameraPos) const;

@@ -1,9 +1,12 @@
-#include "scene.h"
-#include "colliderEdge.h"
-#include "../debug/debugDraw.h"
-#include "../math/vector3.h"
 #include <algorithm>
 #include <vector>
+
+#include "../debug/debugDraw.h"
+#include "../math/vector3.h"
+
+#include "colliderEdge.h"
+#include "gjk.h"
+#include "scene.h"
 
 using namespace Collision;
 using namespace Math;
@@ -99,7 +102,8 @@ void Scene::runCollision()
                 if (Box3D::hasOverlap(a->boundingBox, b->boundingBox))
                 {
                     // === Check Collider Shapes == //
-                    debugf("Overlapping colliders: %d and %d\n", a->entityId, b->entityId);
+                    debugf("Overlapping AABB: %d and %d\n", a->entityId, b->entityId);
+                    collide(a, b);
                 }
             }
 
@@ -142,8 +146,10 @@ void Scene::collide(Collider *a, Collider *b)
     }
 
     Simplex simplex{};
-    if (!GJK::checkForOverlap(&simplex, a, b, {1.0f, 0.0f, 0.0f}))
+    if (!GJK::checkForOverlap(&simplex, a, b, &Vec3Right))
     {
+        debugf("No colliders overlap: %d and %d\n", a->entityId, b->entityId);
         return;
     }
+    debugf("Overlapping colliders: %d and %d\n", a->entityId, b->entityId);
 }

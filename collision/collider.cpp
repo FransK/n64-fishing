@@ -13,8 +13,8 @@ void Collider::recalcBB()
     Vector3 offset;
     if (scale != 1.0f)
     {
-        Vector3::scale(&boundingBox.min, &boundingBox.min, scale);
-        Vector3::scale(&boundingBox.max, &boundingBox.max, scale);
+        Vector3::scale(&boundingBox.min, scale, &boundingBox.min);
+        Vector3::scale(&boundingBox.max, scale, &boundingBox.max);
         Vector3::addScaled(&position, &center, scale, &offset);
     }
     else
@@ -31,6 +31,6 @@ void Collider::constrainPosition()
 
     if (squared_position > PLAYING_R2)
     {
-        Vector3::normAndScale(&position, &position, PLAYING_R);
+        Vector3::normAndScale(&position, PLAYING_R, &position);
     }
 }

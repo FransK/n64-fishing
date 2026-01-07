@@ -1,5 +1,4 @@
 #pragma once
-#include <cmath>
 
 namespace Math
 {
@@ -7,49 +6,23 @@ namespace Math
     {
         float x, y, z;
 
-        static void add(Vector3 *a, Vector3 *b, Vector3 *out)
-        {
-            out->x = a->x + b->x;
-            out->y = a->y + b->y;
-            out->z = a->z + b->z;
-        }
-
-        static void addScaled(Vector3 *a, Vector3 *normal, float scale, Vector3 *out)
-        {
-            out->x = a->x + normal->x * scale;
-            out->y = a->y + normal->y * scale;
-            out->z = a->z + normal->z * scale;
-        }
-
-        static void normAndScale(Vector3 *in, Vector3 *out, float scale)
-        {
-            const float x = in->x;
-            const float y = in->y;
-            const float z = in->z;
-
-            const float len2 = x * x + y * y + z * z;
-
-            if (len2 <= 1e-20f)
-            {
-                out->x = 0.0f;
-                out->y = 0.0f;
-                out->z = 0.0f;
-                return;
-            }
-
-            const float invLen = 1.0f / sqrtf(len2);
-            const float s = scale * invLen;
-
-            out->x = x * s;
-            out->y = y * s;
-            out->z = z * s;
-        }
-
-        static void scale(Vector3 *in, Vector3 *out, float scale)
-        {
-            out->x = in->x * scale;
-            out->y = in->y * scale;
-            out->z = in->z * scale;
-        }
+        static void add(const Vector3 *a, const Vector3 *b, Vector3 *out);
+        static void addScaled(const Vector3 *a, const Vector3 *normal, float scale, Vector3 *out);
+        static void cross(const Vector3 *a, const Vector3 *b, Vector3 *out);
+        static float dot(const Vector3 *a, const Vector3 *b);
+        static bool isZero(const Vector3 *a);
+        static float magSqrd(const Vector3 *a);
+        static void negate(const Vector3 *in, Vector3 *out);
+        static void normAndScale(const Vector3 *in, float scale, Vector3 *out);
+        static void perp(const Vector3 *a, Vector3 *out);
+        static void scale(const Vector3 *in, float scale, Vector3 *out);
+        static void sub(const Vector3 *a, const Vector3 *b, Vector3 *out);
+        static void tripleProduct(const Vector3 *a, const Vector3 *b, const Vector3 *c, Vector3 *out);
     };
+
+    constexpr Vector3 Vec3Right = {1.0f, 0.0f, 0.0f};
+    constexpr Vector3 Vec3Up = {0.0f, 1.0f, 0.0f};
+    constexpr Vector3 Vec3Forward = {0.0f, 0.0f, 1.0f};
+    constexpr Vector3 Vec3Zero = {0.0f, 0.0f, 0.0f};
+    constexpr Vector3 Vec3One = {1.0f, 1.0f, 1.0f};
 }

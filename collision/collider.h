@@ -1,10 +1,12 @@
 #pragma once
 
+#include <cstdint>
+
 #include "../math/vector2.h"
 #include "../math/vector3.h"
 #include "../math/box3d.h"
+
 #include "colliderType.h"
-#include "gjk.h"
 
 using namespace Math;
 
@@ -12,6 +14,11 @@ namespace Collision
 {
     constexpr float PLAYING_R = 60.f;
     constexpr float PLAYING_R2 = PLAYING_R * PLAYING_R;
+
+    enum CollisionLayers
+    {
+        CollisionLayerTangible = (1 << 0),
+    };
 
     struct Collider
     {
