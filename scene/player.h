@@ -30,8 +30,10 @@ namespace Fishing
 
     constexpr float CATCH_TIMER = 1.f;
 
-    constexpr float SHOVE_TIME = 21.0f / 90.0f;
-    constexpr float RECEIVE_SHOVE_TIME = 1.0f;
+    constexpr float SHOVE_TIME_SCALE = 3.0f;
+    constexpr float SHOVE_TIME = 21.0f / (30.0f * SHOVE_TIME_SCALE);
+    constexpr float RECEIVE_SHOVE_TIME = SHOVE_TIME * 3.0f;
+    constexpr float CAST_TIME = 21.0f / 30.0f;
 
     constexpr Collision::ColliderType PlayerColliderType = {
         .minkowskiSum = Collision::Cylinder::MinkowskiSum,
@@ -51,7 +53,8 @@ namespace Fishing
             IDLE = 0,
             RUN,
             SHOVE,
-            RECEIVE_SHOVE
+            RECEIVE_SHOVE,
+            CAST
         };
 
         Collision::Scene *mScene{};
@@ -66,6 +69,7 @@ namespace Fishing
         T3DAnim mAnimPunch{};
         T3DAnim mAnimReceiveHit{};
         T3DAnim mAnimRun{};
+        T3DAnim mAnimCast{};
         T3DAnim *mActiveAnim{};
         T3DSkeleton mSkeleton{};
 
@@ -73,6 +77,7 @@ namespace Fishing
         float mFishingTimer{};
         float mAnimTimer{};
         float mAiDelayTimer{};
+        float mCastTimer{};
         int8_t mFishCaught{};
         int8_t mPlayerNumber{-1};
         color_t mColor{};
@@ -82,9 +87,11 @@ namespace Fishing
         void update_animation(float deltaTime);
 
     public:
-        [[nodiscard]] bool is_fishing() const { return mFishingTimer > 0.0f; };
-        [[nodiscard]] bool is_catchable() const { return mFishingTimer < CATCH_TIMER && mFishingTimer > 0.0f; };
-        [[nodiscard]] bool can_attack() const { return mFishingTimer <= 0.0f && mAnimTimer <= 0.0f; };
+        [[nodiscard]] constexpr bool is_casting() const { return mCastTimer > 0.0f; }
+        [[nodiscard]] constexpr bool is_fishing() const { return mFishingTimer > 0.0f; }
+        [[nodiscard]] constexpr bool is_catchable() const { return mFishingTimer < CATCH_TIMER && mFishingTimer > 0.0f; }
+        [[nodiscard]] constexpr bool can_move() const { return mFishingTimer <= 0.0f && mAnimTimer <= 0.0f; }
+
         void init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, color_t color, bool isHuman);
         void update_fixed(float deltaTime, InputState input);
         void update(float deltaTime, InputState input, bool updateAI);
@@ -97,6 +104,7 @@ namespace Fishing
 
         void shove();
         void receive_shove(const float &direction);
+        void cast();
 
         Player(Collision::Scene *scene, T3DModel *model);
         ~Player();

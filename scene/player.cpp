@@ -23,12 +23,17 @@ namespace Fishing
         t3d_anim_attach(&mAnimPunch, &mSkeleton);
         t3d_anim_set_looping(&mAnimPunch, false);
         t3d_anim_set_playing(&mAnimPunch, false);
-        t3d_anim_set_speed(&mAnimPunch, 3.0);
+        t3d_anim_set_speed(&mAnimPunch, SHOVE_TIME_SCALE);
 
         mAnimReceiveHit = t3d_anim_create(mModel, "RecieveHit");
         t3d_anim_attach(&mAnimReceiveHit, &mSkeleton);
         t3d_anim_set_looping(&mAnimReceiveHit, false);
         t3d_anim_set_playing(&mAnimReceiveHit, false);
+
+        mAnimCast = t3d_anim_create(mModel, "SwordSlash");
+        t3d_anim_attach(&mAnimCast, &mSkeleton);
+        t3d_anim_set_looping(&mAnimCast, false);
+        t3d_anim_set_playing(&mAnimCast, false);
 
         mActiveAnim = &mAnimIdle;
         mModelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
@@ -45,6 +50,7 @@ namespace Fishing
         t3d_anim_destroy(&mAnimRun);
         t3d_anim_destroy(&mAnimPunch);
         t3d_anim_destroy(&mAnimReceiveHit);
+        t3d_anim_destroy(&mAnimCast);
         t3d_skeleton_destroy(&mSkeleton);
 
         free_uncached(mModelMatFP);
@@ -56,6 +62,7 @@ namespace Fishing
         t3d_anim_set_playing(&mAnimRun, anim == Anim::RUN);
         t3d_anim_set_playing(&mAnimPunch, anim == Anim::SHOVE);
         t3d_anim_set_playing(&mAnimReceiveHit, anim == Anim::RECEIVE_SHOVE);
+        t3d_anim_set_playing(&mAnimCast, anim == Anim::CAST);
 
         switch (anim)
         {
@@ -70,6 +77,9 @@ namespace Fishing
             return;
         case Anim::RECEIVE_SHOVE:
             mActiveAnim = &mAnimReceiveHit;
+            return;
+        case Anim::CAST:
+            mActiveAnim = &mAnimCast;
             return;
         }
     }
@@ -144,11 +154,21 @@ namespace Fishing
     {
         assert(mPlayerNumber != -1 && "Player needs to be initialized before update.");
 
-        // If currently playing a stunned animation, continue playing
+        // If currently playing an animation, continue playing
         if (mAnimTimer >= 0)
         {
             mAnimTimer -= deltaTime;
             update_animation(deltaTime);
+
+            if (is_casting())
+            {
+                mCastTimer -= deltaTime;
+                if (mCastTimer <= 0.0f)
+                {
+                    mFishingTimer = Fish::get_new_timer();
+                    t3d_anim_set_time(&mAnimCast, 0.0f);
+                }
+            }
             return;
         }
 
@@ -159,7 +179,7 @@ namespace Fishing
         // Resting thumb on stick doesn't do anything
         // Lightly pressing rotates character
         // Pushing on stick moves character
-        if (!is_fishing() &&
+        if (can_move() &&
             (abs(input.move.x) > MIN_MOVE_INPUT || abs(input.move.y) > MIN_MOVE_INPUT))
         {
             Vector2 normMove{};
@@ -213,7 +233,7 @@ namespace Fishing
         }
         else if (input.fish)
         {
-            mFishingTimer = Fish::get_new_timer();
+            cast();
         }
         else if (!mIsHuman && updateAI)
         {
@@ -223,7 +243,7 @@ namespace Fishing
             }
             else
             {
-                mFishingTimer = Fish::get_new_timer();
+                cast();
             }
         }
 
@@ -297,5 +317,13 @@ namespace Fishing
 
         play_animation(Anim::RECEIVE_SHOVE);
         mAnimTimer = RECEIVE_SHOVE_TIME;
+    }
+
+    void Player::cast()
+    {
+        mCastTimer = CAST_TIME;
+
+        play_animation(Anim::CAST);
+        mAnimTimer = CAST_TIME;
     }
 }

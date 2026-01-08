@@ -115,7 +115,7 @@ namespace Fishing
 
     void Scene::process_attacks(PlyNum attacker)
     {
-        if (!mPlayers[attacker]->can_attack())
+        if (!mPlayers[attacker]->can_move())
         {
             return;
         }
