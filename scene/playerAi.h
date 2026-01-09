@@ -33,7 +33,7 @@ namespace Fishing
         Player *mTarget{};
         Vector3 mMovementTarget{};
         float mSpeed{70.0f};
-        float mDelayActionTimer{3.0f};
+        float mDelayActionTimer{0.0f};
         float mDelayCatchTimer{0.0f};
 
         void change_state(AIState newState);
