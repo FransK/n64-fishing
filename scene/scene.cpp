@@ -131,7 +131,7 @@ namespace Fishing
             return;
         }
 
-        for (size_t i = 0; i < core_get_playercount(); i++)
+        for (size_t i = 0; i < MAXPLAYERS; i++)
         {
             if (attacker == i)
             {
