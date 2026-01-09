@@ -125,6 +125,8 @@ namespace Fishing
                             scale,
                             quat,
                             pos);
+
+        update_animation(0.0f);
     }
 
     void Player::update_fixed(float deltaTime, InputState input)
