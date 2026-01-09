@@ -180,22 +180,30 @@ namespace Fishing
         // Resting thumb on stick doesn't do anything
         // Lightly pressing rotates character
         // Pushing on stick moves character
-        if (can_move() &&
-            (abs(input.move.x) > MIN_MOVE_INPUT || abs(input.move.y) > MIN_MOVE_INPUT))
+        if (can_move())
         {
-            Vector2 normMove{};
-            Vector2::norm(&input.move, &normMove);
-            mCollider.rotation = {-normMove.y, normMove.x};
-
-            if (abs(input.move.x) > ROTATION_INPUT || abs(input.move.y) > ROTATION_INPUT)
+            if (input.attack)
             {
-                mCollider.velocity = {normMove.x * mSpeed, 0, -normMove.y * mSpeed};
-
-                play_animation(Anim::RUN);
+                shove();
+                return;
             }
 
-            update_animation(deltaTime);
-            return;
+            if (abs(input.move.x) > MIN_MOVE_INPUT || abs(input.move.y) > MIN_MOVE_INPUT)
+            {
+                Vector2 normMove{};
+                Vector2::norm(&input.move, &normMove);
+                mCollider.rotation = {-normMove.y, normMove.x};
+
+                if (abs(input.move.x) > ROTATION_INPUT || abs(input.move.y) > ROTATION_INPUT)
+                {
+                    mCollider.velocity = {normMove.x * mSpeed, 0, -normMove.y * mSpeed};
+
+                    play_animation(Anim::RUN);
+                }
+
+                update_animation(deltaTime);
+                return;
+            }
         }
 
         if (is_fishing())
@@ -288,12 +296,9 @@ namespace Fishing
         mAnimTimer = SHOVE_TIME;
     }
 
-    void Player::receive_shove(const float &direction)
+    void Player::receive_shove()
     {
-        float s, c;
-        fm_sincosf(direction, &s, &c);
-        mCollider.velocity.x += s * SHOVE_DIST;
-        mCollider.velocity.y += c * SHOVE_DIST;
+        mCollider.velocity = {0.0f, 0.0f, 0.0f};
 
         mFishingTimer = 0.0f;
 

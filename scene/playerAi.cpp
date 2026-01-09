@@ -26,28 +26,46 @@ void PlayerAi::change_state(AIState newState)
     switch (mCurrentState)
     {
     case STATE_IDLE:
+        mInputState.move = {0.0f, 0.0f};
+        mInputState.fish = false;
+        mInputState.attack = false;
         break;
     case STATE_MOVE_TO_PLAYER:
+        mInputState.move = {0.0f, 0.0f};
+        mInputState.fish = false;
+        mInputState.attack = false;
         break;
     case STATE_ATTACK:
+        mInputState.move = {0.0f, 0.0f};
+        mInputState.fish = false;
+        mInputState.attack = true;
         break;
     case STATE_MOVE_TO_FISH:
+        mInputState.move = {0.0f, 0.0f};
+        mInputState.fish = false;
+        mInputState.attack = false;
         break;
     case STATE_FISH:
+        mInputState.move = {0.0f, 0.0f};
+        mInputState.fish = true;
+        mInputState.attack = false;
         mDelayCatchTimer = 0.9f;
         break;
     case STATE_ANIMATION_LOCKED:
+        mInputState.move = {0.0f, 0.0f};
+        mInputState.fish = false;
+        mInputState.attack = false;
         break;
     }
 }
 
 void PlayerAi::update_idle(float deltaTime)
 {
-    mInputState = {
-        .move = {0.0f, 0.0f},
-        .fish = false,
-        .attack = false,
-    };
+    if (mDelayActionTimer > 0.0f)
+    {
+        mDelayActionTimer -= deltaTime;
+        return;
+    }
 
     switch (mBehavior)
     {
@@ -66,11 +84,37 @@ void PlayerAi::update_idle(float deltaTime)
 void PlayerAi::update_move_to_player(float deltaTime)
 {
     mMovementTarget = mTarget->get_position();
-    move_to_target();
+
+    Vector3 position = mPlayer.get_position();
+    Vector3 distance;
+    Vector3::sub(&position, &mMovementTarget, &distance);
+
+    if (Vector3::magSqrd(&distance) < powf(ATTACK_RADIUS + HITBOX_RADIUS, 2))
+    {
+        mNextState = STATE_ATTACK;
+    }
+    else
+    {
+        move_to_target();
+    }
 }
 
 void PlayerAi::update_attack(float deltaTime)
 {
+    if (mPlayer.can_move())
+    {
+        Vector3 position = mPlayer.get_position();
+        Vector3 distance;
+        Vector3::sub(&mMovementTarget, &position, &distance);
+
+        float direction = atan2f(distance.x, distance.z);
+        mTarget->receive_shove();
+
+        mNextState = STATE_ANIMATION_LOCKED;
+        mAnimationLockedTimer = SHOVE_TIME;
+        mDelayActionTimer = 5.0f;
+        return;
+    }
 }
 
 void PlayerAi::update_move_to_fish(float deltaTime)
@@ -163,11 +207,11 @@ Player *PlayerAi::get_player()
     return &mPlayer;
 }
 
-void PlayerAi::receive_shove(float direction)
+void PlayerAi::receive_shove()
 {
     mNextState = STATE_ANIMATION_LOCKED;
     mAnimationLockedTimer = RECEIVE_SHOVE_TIME;
-    mPlayer.receive_shove(direction);
+    mPlayer.receive_shove();
 }
 
 void PlayerAi::update_fixed(float deltaTime, Player *currentLeader)
@@ -184,12 +228,6 @@ void PlayerAi::update_fixed(float deltaTime, Player *currentLeader)
 
 void PlayerAi::update(float deltaTime)
 {
-    if (mDelayActionTimer > 0.0f)
-    {
-        mDelayActionTimer -= deltaTime;
-        return;
-    }
-
     switch (mCurrentState)
     {
     case STATE_IDLE:

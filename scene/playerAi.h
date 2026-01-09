@@ -51,7 +51,7 @@ namespace Fishing
 
         void init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, color_t color);
         [[nodiscard]] Player *get_player();
-        void receive_shove(float direction);
+        void receive_shove();
         void update_fixed(float deltaTime, Player *currentLeader);
         void update(float deltaTime);
     };

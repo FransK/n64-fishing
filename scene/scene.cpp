@@ -68,7 +68,8 @@ namespace Fishing
         }
         for (uint16_t i = core_get_playercount(); i < MAXPLAYERS; i++)
         {
-            mAIPlayers[i] = new PlayerAi(&mCollisionScene, mPlayerModel, AIBehavior::BEHAVE_FISHERMAN);
+            AIBehavior behavior = (i == MAXPLAYERS - 1) ? AIBehavior::BEHAVE_BULLY : AIBehavior::BEHAVE_FISHERMAN;
+            mAIPlayers[i] = new PlayerAi(&mCollisionScene, mPlayerModel, behavior);
             mAIPlayers[i]->init(i, startPositions[i], startRotations[i], COLORS[i]);
             mPlayers[i] = mAIPlayers[i]->get_player();
         }
@@ -117,11 +118,6 @@ namespace Fishing
             .move = {(float)inputs.stick_x, (float)inputs.stick_y},
             .fish = btn.a != 0,
             .attack = btn.b != 0};
-
-        if (mInputState[plyNum].attack)
-        {
-            process_attacks(plyNum);
-        }
     }
 
     void Scene::process_attacks(PlyNum attacker)
@@ -151,14 +147,13 @@ namespace Fishing
 
             if (square_distance < powf((ATTACK_RADIUS + HITBOX_RADIUS), 2))
             {
-                float direction = atan2f(pos_diff[0], pos_diff[1]);
                 if (i < core_get_playercount())
                 {
-                    mPlayers[i]->receive_shove(direction);
+                    mPlayers[i]->receive_shove();
                 }
                 else
                 {
-                    mAIPlayers[i]->receive_shove(direction);
+                    mAIPlayers[i]->receive_shove();
                 }
             }
         }
@@ -255,6 +250,10 @@ namespace Fishing
             for (size_t i = 0; i < core_get_playercount(); i++)
             {
                 read_inputs((PlyNum)i);
+                if (mInputState[i].attack)
+                {
+                    process_attacks((PlyNum)i);
+                }
             }
         }
 
