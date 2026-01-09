@@ -26,7 +26,6 @@ void PlayerAi::change_state(AIState newState)
     switch (mCurrentState)
     {
     case STATE_IDLE:
-        mDelayActionTimer = 3.0f;
         break;
     case STATE_MOVE_TO_PLAYER:
         break;
@@ -118,6 +117,7 @@ void PlayerAi::update_fish(float deltaTime)
                 .fish = true,
                 .attack = false,
             };
+            mDelayActionTimer = 3.0f;
             mNextState = STATE_IDLE;
         }
     }
@@ -125,6 +125,11 @@ void PlayerAi::update_fish(float deltaTime)
 
 void PlayerAi::update_animation_locked(float deltaTime)
 {
+    mAnimationLockedTimer -= deltaTime;
+    if (mAnimationLockedTimer <= 0.0f)
+    {
+        mNextState = STATE_IDLE;
+    }
 }
 
 void PlayerAi::move_to_target()
@@ -156,6 +161,13 @@ void PlayerAi::init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, col
 Player *PlayerAi::get_player()
 {
     return &mPlayer;
+}
+
+void PlayerAi::receive_shove(float direction)
+{
+    mNextState = STATE_ANIMATION_LOCKED;
+    mAnimationLockedTimer = RECEIVE_SHOVE_TIME;
+    mPlayer.receive_shove(direction);
 }
 
 void PlayerAi::update_fixed(float deltaTime, Player *currentLeader)

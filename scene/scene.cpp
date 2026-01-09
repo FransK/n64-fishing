@@ -152,7 +152,14 @@ namespace Fishing
             if (square_distance < powf((ATTACK_RADIUS + HITBOX_RADIUS), 2))
             {
                 float direction = atan2f(pos_diff[0], pos_diff[1]);
-                mPlayers[i]->receive_shove(direction);
+                if (i < core_get_playercount())
+                {
+                    mPlayers[i]->receive_shove(direction);
+                }
+                else
+                {
+                    mAIPlayers[i]->receive_shove(direction);
+                }
             }
         }
     }

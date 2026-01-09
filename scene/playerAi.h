@@ -33,6 +33,7 @@ namespace Fishing
         Player *mTarget{};
         Vector3 mMovementTarget{};
         float mSpeed{70.0f};
+        float mAnimationLockedTimer{0.0f};
         float mDelayActionTimer{0.0f};
         float mDelayCatchTimer{0.0f};
 
@@ -50,6 +51,7 @@ namespace Fishing
 
         void init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, color_t color);
         [[nodiscard]] Player *get_player();
+        void receive_shove(float direction);
         void update_fixed(float deltaTime, Player *currentLeader);
         void update(float deltaTime);
     };
