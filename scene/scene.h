@@ -6,6 +6,7 @@
 #include "../debug/overlay.h"
 #include "camera.h"
 #include "player.h"
+#include "playerAi.h"
 
 using CollisionScene = ::Collision::Scene;
 
@@ -48,6 +49,7 @@ namespace Fishing
         rspq_block_t *mDplMap{};
 
         Player *mPlayers[MAXPLAYERS]{};
+        PlayerAi *mAIPlayers[MAXPLAYERS]{};
         InputState mInputState[MAXPLAYERS]{};
         uint8_t mWinners[MAXPLAYERS]{0};
         uint8_t mCurrTopScore{0};

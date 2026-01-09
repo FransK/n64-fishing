@@ -84,7 +84,7 @@ namespace Fishing
         }
     }
 
-    void Player::init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, color_t color, bool is_human)
+    void Player::init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, color_t color)
     {
         assert(playerNumber >= 0 && playerNumber < MAXPLAYERS);
 
@@ -107,7 +107,6 @@ namespace Fishing
 
         mPlayerNumber = playerNumber;
         mColor = color;
-        mIsHuman = is_human;
 
         rspq_block_begin();
         t3d_matrix_push(mModelMatFP);
@@ -150,7 +149,7 @@ namespace Fishing
                             pos);
     }
 
-    void Player::update(float deltaTime, InputState input, bool updateAI = true)
+    void Player::update(float deltaTime, InputState input)
     {
         assert(mPlayerNumber != -1 && "Player needs to be initialized before update.");
 
@@ -201,50 +200,23 @@ namespace Fishing
         {
             mFishingTimer -= deltaTime;
 
-            if (mIsHuman)
+            if (input.fish)
             {
-                if (input.fish)
-                {
-                    if (is_catchable())
-                    {
-                        mFishCaught++;
-                        debugf("Caught fish: %i\n", mFishCaught);
-                    }
-                    else
-                    {
-                        debugf("Missed a fish!\n");
-                    }
-                    mFishingTimer = 0.0f;
-                }
-            }
-            else
-            {
-                // AI fishing
                 if (is_catchable())
                 {
-                    if (mFishingTimer <= 0.1f)
-                    {
-                        mFishCaught++;
-                        mFishingTimer = 0.0f;
-                        mAiDelayTimer = (2 - core_get_aidifficulty()) * 5 + rand() % ((3 - core_get_aidifficulty()) * 3);
-                    }
+                    mFishCaught++;
+                    debugf("Caught fish: %i\n", mFishCaught);
                 }
+                else
+                {
+                    debugf("Missed a fish!\n");
+                }
+                mFishingTimer = 0.0f;
             }
         }
         else if (input.fish)
         {
             cast();
-        }
-        else if (!mIsHuman && updateAI)
-        {
-            if (mAiDelayTimer > 0.0f)
-            {
-                mAiDelayTimer -= deltaTime;
-            }
-            else
-            {
-                cast();
-            }
         }
 
         update_animation(deltaTime);
@@ -298,6 +270,14 @@ namespace Fishing
     const Vector3 &Player::get_position() const
     {
         return mCollider.position;
+    }
+
+    Vector3 Player::get_closest_fish() const
+    {
+        Vector3 position = mCollider.position;
+        Vector3 closestFish;
+        Vector3::normAndScale(&position, PLAYING_R, &closestFish);
+        return closestFish;
     }
 
     void Player::shove()

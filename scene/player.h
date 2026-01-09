@@ -8,6 +8,7 @@
 #include "../collision/scene.h"
 #include "../collision/collider.h"
 #include "../collision/cylinder.h"
+#include "../math/vector2.h"
 
 using namespace Math;
 
@@ -76,12 +77,10 @@ namespace Fishing
         float mSpeed{BASE_SPEED};
         float mFishingTimer{};
         float mAnimTimer{};
-        float mAiDelayTimer{};
         float mCastTimer{};
         int8_t mFishCaught{};
         int8_t mPlayerNumber{-1};
         color_t mColor{};
-        bool mIsHuman{};
 
         void play_animation(Anim anim);
         void update_animation(float deltaTime);
@@ -92,15 +91,16 @@ namespace Fishing
         [[nodiscard]] constexpr bool is_catchable() const { return mFishingTimer < CATCH_TIMER && mFishingTimer > 0.0f; }
         [[nodiscard]] constexpr bool can_move() const { return mFishingTimer <= 0.0f && mAnimTimer <= 0.0f; }
 
-        void init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, color_t color, bool isHuman);
+        void init(int8_t playerNumber, T3DVec3 position, Vector2 rotation, color_t color);
         void update_fixed(float deltaTime, InputState input);
-        void update(float deltaTime, InputState input, bool updateAI);
+        void update(float deltaTime, InputState input);
         uint32_t draw(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
         void draw_billboard(T3DViewport &viewport, const T3DVec3 &cameraPos) const;
 
         void get_attack_position(Vector2 &attack_pos) const;
         [[nodiscard]] uint8_t get_fish_caught() const;
         const Vector3 &get_position() const;
+        [[nodiscard]] Vector3 get_closest_fish() const;
 
         void shove();
         void receive_shove(const float &direction);

@@ -61,10 +61,16 @@ namespace Fishing
             {0, -1},
             {-1, 0}};
 
-        for (uint16_t i = 0; i < MAXPLAYERS; i++)
+        for (uint16_t i = 0; i < core_get_playercount(); i++)
         {
             mPlayers[i] = new Player(&mCollisionScene, mPlayerModel);
-            mPlayers[i]->init(i, startPositions[i], startRotations[i], COLORS[i], i < core_get_playercount());
+            mPlayers[i]->init(i, startPositions[i], startRotations[i], COLORS[i]);
+        }
+        for (uint16_t i = core_get_playercount(); i < MAXPLAYERS; i++)
+        {
+            mAIPlayers[i] = new PlayerAi(&mCollisionScene, mPlayerModel, AIBehavior::BEHAVE_FISHERMAN);
+            mAIPlayers[i]->init(i, startPositions[i], startRotations[i], COLORS[i]);
+            mPlayers[i] = mAIPlayers[i]->get_player();
         }
 
         mState = State::INTRO;
@@ -87,10 +93,15 @@ namespace Fishing
         rdpq_text_unregister_font(FONT_BILLBOARD);
         rdpq_font_free(mFontBillboard);
 
-        for (size_t i = 0; i < MAXPLAYERS; i++)
+        for (size_t i = 0; i < core_get_playercount(); i++)
         {
             delete mPlayers[i];
             mPlayers[i] = nullptr;
+        }
+        for (size_t i = core_get_playercount(); i < MAXPLAYERS; i++)
+        {
+            delete mAIPlayers[i];
+            mAIPlayers[i] = nullptr;
         }
 
         timer_close();
@@ -120,7 +131,7 @@ namespace Fishing
             return;
         }
 
-        for (size_t i = 0; i < MAXPLAYERS; i++)
+        for (size_t i = 0; i < core_get_playercount(); i++)
         {
             if (attacker == i)
             {
@@ -177,19 +188,28 @@ namespace Fishing
         }
 
         // === Update Fixed Players === //
-        for (size_t i = 0; i < MAXPLAYERS; i++)
+        for (size_t i = 0; i < core_get_playercount(); i++)
         {
             mPlayers[i]->update_fixed(deltaTime, mInputState[i]);
+        }
+        for (size_t i = core_get_playercount(); i < MAXPLAYERS; i++)
+        {
+            mAIPlayers[i]->update_fixed(deltaTime, mPlayers[0]); // TODO
         }
 
         // === Update Collision Scene === //
         mCollisionScene.update(deltaTime);
 
-        // === Keep Track of Leader === //
+        // === Keep Track of Leaders === //
         mCurrTopScore = 0;
         for (auto &p : mPlayers)
         {
             mCurrTopScore = std::max(mCurrTopScore, p->get_fish_caught());
+        }
+
+        for (int i = 0; i < MAXPLAYERS; i++)
+        {
+            mWinners[i] = mPlayers[i]->get_fish_caught() >= mCurrTopScore;
         }
     }
 
@@ -232,9 +252,16 @@ namespace Fishing
         }
 
         // === Update Players === //
-        for (size_t i = 0; i < MAXPLAYERS; i++)
+        if (mState == State::GAME)
         {
-            mPlayers[i]->update(deltaTime, mInputState[i], mState == State::GAME);
+            for (size_t i = 0; i < core_get_playercount(); i++)
+            {
+                mPlayers[i]->update(deltaTime, mInputState[i]);
+            }
+            for (size_t i = core_get_playercount(); i < MAXPLAYERS; i++)
+            {
+                mAIPlayers[i]->update(deltaTime);
+            }
         }
         ticksActorUpdate = get_ticks() - ticksActorUpdate;
 
