@@ -12,7 +12,7 @@ using CollisionScene = ::Collision::Scene;
 
 namespace Fishing
 {
-    constexpr float INTRO_TIME = 1.f;
+    constexpr float INTRO_TIME = 5.f;
     constexpr float GAME_TIME = 30.f;
     constexpr float GAME_OVER_TIME = 5.f;
 

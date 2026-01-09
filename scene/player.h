@@ -84,6 +84,7 @@ namespace Fishing
 
         void play_animation(Anim anim);
         void update_animation(float deltaTime);
+        void cancel_actions();
 
     public:
         [[nodiscard]] constexpr bool is_casting() const { return mCastTimer > 0.0f; }

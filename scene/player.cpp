@@ -73,12 +73,15 @@ namespace Fishing
             mActiveAnim = &mAnimRun;
             return;
         case Anim::SHOVE:
+            t3d_anim_set_time(&mAnimPunch, 0.0f);
             mActiveAnim = &mAnimPunch;
             return;
         case Anim::RECEIVE_SHOVE:
+            t3d_anim_set_time(&mAnimReceiveHit, 0.0f);
             mActiveAnim = &mAnimReceiveHit;
             return;
         case Anim::CAST:
+            t3d_anim_set_time(&mAnimCast, 0.0f);
             mActiveAnim = &mAnimCast;
             return;
         }
@@ -156,7 +159,7 @@ namespace Fishing
         assert(mPlayerNumber != -1 && "Player needs to be initialized before update.");
 
         // If currently playing an animation, continue playing
-        if (mAnimTimer >= 0)
+        if (mAnimTimer > 0.0f)
         {
             mAnimTimer -= deltaTime;
             update_animation(deltaTime);
@@ -167,7 +170,6 @@ namespace Fishing
                 if (mCastTimer <= 0.0f)
                 {
                     mFishingTimer = Fish::get_new_timer();
-                    t3d_anim_set_time(&mAnimCast, 0.0f);
                 }
             }
             return;
@@ -292,15 +294,15 @@ namespace Fishing
 
     void Player::shove()
     {
+        mCollider.velocity = {0.0f, 0.0f, 0.0f};
+
         play_animation(Anim::SHOVE);
         mAnimTimer = SHOVE_TIME;
     }
 
     void Player::receive_shove()
     {
-        mCollider.velocity = {0.0f, 0.0f, 0.0f};
-
-        mFishingTimer = 0.0f;
+        cancel_actions();
 
         play_animation(Anim::RECEIVE_SHOVE);
         mAnimTimer = RECEIVE_SHOVE_TIME;
@@ -312,5 +314,13 @@ namespace Fishing
 
         play_animation(Anim::CAST);
         mAnimTimer = CAST_TIME;
+    }
+
+    void Player::cancel_actions()
+    {
+        mCollider.velocity = {0.0f, 0.0f, 0.0f};
+
+        mFishingTimer = 0.0f;
+        mCastTimer = 0.0f;
     }
 }
