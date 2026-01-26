@@ -21,4 +21,4 @@ In order to run the game, you will need the most recent [N64 fishing assets](htt
 
 ### Sample Gameplay
 
-![Fishing gameplay demonstration](docs/fishing.gif)
+![Fishing gameplay demonstration](docs/fishing2.gif)
