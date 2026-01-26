@@ -7,7 +7,7 @@ In this fishing game, the goal is simple: Fish the waters around the island to c
 
 ### Running the game
 
-In order to run the game, you will need the [N64brew GameJam](https://github.com/n64brew/N64brew-GameJam2024) loader and the most recent [N64 fishing assets](https://github.com/FransK/n64-assets).
+In order to run the game, you will need the most recent [N64 fishing assets](https://github.com/FransK/n64-assets).
 
 
 ### Implemented Features
