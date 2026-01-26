@@ -16,7 +16,7 @@ In order to run the game, you will need the [N64brew GameJam](https://github.com
 - State machines for main scene and AI players
 - Game logic for fishing, accruing points, and pushing other players to stun them
 - Modified CC0 animations with reduced tri count to optimize performance on N64 hardware
-- Coding decisions with thought to limited hardware (e.g. avoiding virtuals and std::function, instead favouring switch/case statements)
+- Modified debug system to show AABBs and some diagnostic information such as FPS
 
 
 ### Sample Gameplay
