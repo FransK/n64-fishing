@@ -1,6 +1,6 @@
 #include "playerAi.h"
 
-#include "../../core.h"
+#include "config.h"
 #include "collider.h"
 
 void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playerNumber, PlayerData *players, uint8_t *winners)

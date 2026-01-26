@@ -4,7 +4,7 @@
 #include <t3d/t3d.h>
 #include <vector>
 
-#include "../../core.h"
+#include "GameSettingsInterface.h"
 
 #include "adapters/t3d.h"
 #include "animation/animationComponent.h"

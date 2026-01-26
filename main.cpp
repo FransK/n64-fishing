@@ -9,7 +9,7 @@ and provides a basic game loop.
 #include <rspq_profile.h>
 #include <memory>
 #include "include/config.h"
-#include "core.h"
+#include "GameSettingsInterface.h"
 #include "world.h"
 
 /*==============================
@@ -53,23 +53,22 @@ int main()
     register_VI_handler((void (*)(void))rand);
 
     // Load game
+    GameSettingsInterface *game_settings = get_game_settings_interface();
     bool joinedPlayers[Core::MAX_PLAYERS] = {true, false, false, false};
-    Core::core_set_playercount(joinedPlayers);
-    Core::core_set_aidifficulty(Core::AiDiff::DIFF_EASY);
-    Core::core_set_subtick(0.0);
-
+    game_settings->core_set_playercount(joinedPlayers);
+    game_settings->core_set_aidifficulty(Core::AiDiff::DIFF_EASY);
+    game_settings->core_set_subtick(0.0);
     std::unique_ptr<World> world = std::make_unique<World>();
 
     while (1)
     {
-        Core::global_game_ending = false;
-        Core::core_reset_winners();
+        game_settings->core_reset_game();
 
         float accumulator = 0;
         const float dt = Core::DELTA_TIME;
 
         // Program loop
-        while (!Core::global_game_ending)
+        while (!game_settings->core_get_game_ending())
         {
             float frametime = display_get_delta_time();
 
@@ -90,7 +89,7 @@ int main()
             mixer_try_play();
 
             // Unfixed loop
-            Core::core_set_subtick(accumulator / dt);
+            get_game_settings_interface()->core_set_subtick(accumulator / dt);
             world->loop(frametime);
         }
 

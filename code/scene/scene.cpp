@@ -3,6 +3,8 @@
 #include <variant>
 #include "timer.h"
 
+#include "GameSettingsInterface.h"
+
 #include "scene.h"
 #include "config.h"
 #include "debug/debugDraw.h"
@@ -76,7 +78,7 @@ Scene::Scene()
         mPlayers[i].init(&mCollisionScene, &mPlayerData[i], &mPlayerStates[i], i);
         mAIPlayers[i].init(&mPlayerData[i]);
 
-        if (i < core_get_playercount())
+        if (i < get_game_settings_interface()->core_get_playercount())
         {
             mInputComponents.emplace_back(PlayerInputStrategy((joypad_port_t)i));
         }
@@ -136,7 +138,7 @@ void Scene::update_fixed(float deltaTime)
     case State::GAME_OVER:
         if (mStateTime <= 0)
         {
-            Core::core_game_end();
+            get_game_settings_interface()->core_game_end();
         }
         return;
     default:
@@ -159,7 +161,7 @@ void Scene::update_fixed(float deltaTime)
         mStunnedIds[i] = -1;
     }
 
-    for (size_t i = core_get_playercount(); i < MAX_PLAYERS; i++)
+    for (size_t i = get_game_settings_interface()->core_get_playercount(); i < MAX_PLAYERS; i++)
     {
         mAIPlayers[i].update(deltaTime, mPlayerStates[i], i, mPlayerData.data(), mWinners.data());
     }
@@ -198,7 +200,7 @@ void Scene::update(float deltaTime)
 {
     // === Debug Controls === //
     {
-        auto ctrl = core_get_playercontroller(PlyNum::PLAYER_1);
+        auto ctrl = get_game_settings_interface()->core_get_playercontroller(PlyNum::PLAYER_1);
         auto btn = joypad_get_buttons_pressed(ctrl);
         auto held = joypad_get_buttons_held(ctrl);
 
@@ -295,7 +297,7 @@ void Scene::update(float deltaTime)
             mWinners[i] = mPlayerStates[i].getFishCaught() >= mCurrTopScore;
             if (mWinners[i])
             {
-                core_set_winner((PlyNum)i);
+                get_game_settings_interface()->core_set_winner((PlyNum)i);
                 message += ("Player " + std::to_string(i + 1) + " wins!\n");
             }
         }
