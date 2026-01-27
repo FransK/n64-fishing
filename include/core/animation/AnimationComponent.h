@@ -2,6 +2,7 @@
 
 #include <t3d/t3danim.h>
 
+#include "adapters/T3d.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "PlayerState.h"
@@ -19,7 +20,7 @@ class AnimationComponent : public Observer<PlayerState>
 {
 public:
     AnimationComponent(T3DModel *model, PlayerState *playerState, color_t primColor);
-    ~AnimationComponent();
+    ~AnimationComponent() = default;
 
     AnimationComponent(const AnimationComponent &) = delete;
     AnimationComponent &operator=(const AnimationComponent &) = delete;
@@ -32,16 +33,16 @@ public:
 
 private:
     T3DModel *mModel{};
-    T3DMat4FP *mModelMatFP{};
-    rspq_block_t *mDplPlayer{};
+    Adapters::Mat4FPAdapter mModelMatFP;
+    Adapters::RspqBlockAdapter mDplPlayer;
 
-    T3DAnim mAnimIdle{};
-    T3DAnim mAnimPunch{};
-    T3DAnim mAnimReceiveHit{};
-    T3DAnim mAnimRun{};
-    T3DAnim mAnimCast{};
+    Adapters::SkeletonAdapter mSkeleton;
+    Adapters::AnimAdapter mAnimIdle;
+    Adapters::AnimAdapter mAnimPunch;
+    Adapters::AnimAdapter mAnimReceiveHit;
+    Adapters::AnimAdapter mAnimRun;
+    Adapters::AnimAdapter mAnimCast;
     T3DAnim *mActiveAnim{};
-    T3DSkeleton mSkeleton{};
 
     color_t mPrimColor{};
 

@@ -5,65 +5,47 @@ AnimationComponent::AnimationComponent(T3DModel *model, PlayerState *playerState
     : Observer<PlayerState>([this](const PlayerState &state)
                             { this->on_player_state_change(state); }),
       mModel(model),
+      mSkeleton(model),
+      mAnimIdle(model, "Idle"),
+      mAnimPunch(model, "Punch"),
+      mAnimReceiveHit(model, "RecieveHit"),
+      mAnimRun(model, "Run"),
+      mAnimCast(model, "SwordSlash"),
       mPrimColor(primColor)
 {
     // Model Credits: Quaternius (CC0) https://quaternius.com/
-    mSkeleton = t3d_skeleton_create(mModel);
+    mAnimIdle.attach(mSkeleton);
 
-    mAnimIdle = t3d_anim_create(mModel, "Idle");
-    t3d_anim_attach(&mAnimIdle, &mSkeleton);
+    mAnimRun.attach(mSkeleton);
+    t3d_anim_set_playing(mAnimRun.get(), false);
 
-    mAnimRun = t3d_anim_create(mModel, "Run");
-    t3d_anim_attach(&mAnimRun, &mSkeleton);
-    t3d_anim_set_playing(&mAnimRun, false);
+    mAnimPunch.attach(mSkeleton);
+    t3d_anim_set_looping(mAnimPunch.get(), false);
+    t3d_anim_set_playing(mAnimPunch.get(), false);
+    t3d_anim_set_speed(mAnimPunch.get(), SHOVE_TIME_SCALE);
 
-    mAnimPunch = t3d_anim_create(mModel, "Punch");
-    t3d_anim_attach(&mAnimPunch, &mSkeleton);
-    t3d_anim_set_looping(&mAnimPunch, false);
-    t3d_anim_set_playing(&mAnimPunch, false);
-    t3d_anim_set_speed(&mAnimPunch, SHOVE_TIME_SCALE);
+    mAnimReceiveHit.attach(mSkeleton);
+    t3d_anim_set_looping(mAnimReceiveHit.get(), false);
+    t3d_anim_set_playing(mAnimReceiveHit.get(), false);
 
-    mAnimReceiveHit = t3d_anim_create(mModel, "RecieveHit");
-    t3d_anim_attach(&mAnimReceiveHit, &mSkeleton);
-    t3d_anim_set_looping(&mAnimReceiveHit, false);
-    t3d_anim_set_playing(&mAnimReceiveHit, false);
+    mAnimCast.attach(mSkeleton);
+    t3d_anim_set_looping(mAnimCast.get(), false);
+    t3d_anim_set_playing(mAnimCast.get(), false);
 
-    mAnimCast = t3d_anim_create(mModel, "SwordSlash");
-    t3d_anim_attach(&mAnimCast, &mSkeleton);
-    t3d_anim_set_looping(&mAnimCast, false);
-    t3d_anim_set_playing(&mAnimCast, false);
-
-    mActiveAnim = &mAnimIdle;
-    mModelMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
+    mActiveAnim = mAnimIdle.get();
 
     rspq_block_begin();
-    t3d_matrix_push(mModelMatFP);
+    t3d_matrix_push(mModelMatFP.get());
     rdpq_set_prim_color(mPrimColor);
-    t3d_model_draw_skinned(mModel, &mSkeleton);
+    t3d_model_draw_skinned(mModel, mSkeleton.get());
     t3d_matrix_pop(1);
-    mDplPlayer = rspq_block_end();
-}
-
-AnimationComponent::~AnimationComponent()
-{
-    rspq_block_free(mDplPlayer);
-
-    mActiveAnim = nullptr;
-
-    t3d_anim_destroy(&mAnimIdle);
-    t3d_anim_destroy(&mAnimRun);
-    t3d_anim_destroy(&mAnimPunch);
-    t3d_anim_destroy(&mAnimReceiveHit);
-    t3d_anim_destroy(&mAnimCast);
-    t3d_skeleton_destroy(&mSkeleton);
-
-    free_uncached(mModelMatFP);
+    mDplPlayer = Adapters::RspqBlockAdapter(rspq_block_end());
 }
 
 void AnimationComponent::update(float deltaTime)
 {
     t3d_anim_update(mActiveAnim, deltaTime);
-    t3d_skeleton_update(&mSkeleton);
+    t3d_skeleton_update(mSkeleton.get());
 }
 
 void AnimationComponent::draw(const Vector3 &position, const Vector2 &rotation) const
@@ -77,12 +59,12 @@ void AnimationComponent::draw(const Vector3 &position, const Vector2 &rotation) 
     T3DVec3 scale = {{PLAYER_SCALE, PLAYER_SCALE, PLAYER_SCALE}};
     T3DQuat quat = {{mathQuat.x, mathQuat.y, mathQuat.z, mathQuat.w}};
     T3DVec3 pos = {{position.x, position.y, position.z}};
-    t3d_mat4fp_from_srt(mModelMatFP,
+    t3d_mat4fp_from_srt(mModelMatFP.get(),
                         scale,
                         quat,
                         pos);
 
-    rspq_block_run(mDplPlayer);
+    rspq_block_run(mDplPlayer.get());
 }
 
 void AnimationComponent::on_player_state_change(const PlayerState &state)
@@ -112,31 +94,31 @@ void AnimationComponent::on_player_state_change(const PlayerState &state)
 
 void AnimationComponent::play_animation(Anim anim)
 {
-    t3d_anim_set_playing(&mAnimIdle, anim == Anim::IDLE);
-    t3d_anim_set_playing(&mAnimRun, anim == Anim::RUN);
-    t3d_anim_set_playing(&mAnimPunch, anim == Anim::SHOVE);
-    t3d_anim_set_playing(&mAnimReceiveHit, anim == Anim::RECEIVE_SHOVE);
-    t3d_anim_set_playing(&mAnimCast, anim == Anim::CAST);
+    t3d_anim_set_playing(mAnimIdle.get(), anim == Anim::IDLE);
+    t3d_anim_set_playing(mAnimRun.get(), anim == Anim::RUN);
+    t3d_anim_set_playing(mAnimPunch.get(), anim == Anim::SHOVE);
+    t3d_anim_set_playing(mAnimReceiveHit.get(), anim == Anim::RECEIVE_SHOVE);
+    t3d_anim_set_playing(mAnimCast.get(), anim == Anim::CAST);
 
     switch (anim)
     {
     case Anim::IDLE:
-        mActiveAnim = &mAnimIdle;
+        mActiveAnim = mAnimIdle.get();
         return;
     case Anim::RUN:
-        mActiveAnim = &mAnimRun;
+        mActiveAnim = mAnimRun.get();
         return;
     case Anim::SHOVE:
-        t3d_anim_set_time(&mAnimPunch, 0.0f);
-        mActiveAnim = &mAnimPunch;
+        t3d_anim_set_time(mAnimPunch.get(), 0.0f);
+        mActiveAnim = mAnimPunch.get();
         return;
     case Anim::RECEIVE_SHOVE:
-        t3d_anim_set_time(&mAnimReceiveHit, 0.0f);
-        mActiveAnim = &mAnimReceiveHit;
+        t3d_anim_set_time(mAnimReceiveHit.get(), 0.0f);
+        mActiveAnim = mAnimReceiveHit.get();
         return;
     case Anim::CAST:
-        t3d_anim_set_time(&mAnimCast, 0.0f);
-        mActiveAnim = &mAnimCast;
+        t3d_anim_set_time(mAnimCast.get(), 0.0f);
+        mActiveAnim = mAnimCast.get();
         return;
     }
 }

@@ -42,7 +42,7 @@ class Scene
 {
 public:
     Scene();
-    ~Scene();
+    ~Scene() = default;
 
     long ticksActorUpdate{0};
     long ticksCollisionUpdate{0};
@@ -82,11 +82,11 @@ private:
 
     surface_t *mCurrentFB{};
     surface_t *mLastFB{};
-    T3DMat4FP *mMapMatFP{};
-    rspq_block_t *mDplMap{};
+    Adapters::Mat4FPAdapter mMapMatFP;
+    Adapters::RspqBlockAdapter mDplMap;
 
-    rdpq_font_t *mFontBillboard{};
-    rdpq_font_t *mFontText{};
+    Adapters::FontAdapter mFontBillboard;
+    Adapters::FontAdapter mFontText;
 
     T3DViewport mViewport{};
     Camera mCamera{};

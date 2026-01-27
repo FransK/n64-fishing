@@ -23,30 +23,28 @@ const std::string playerPath = std::string(FS_BASE) + "player3.t3dm";
 const std::string mapPath = std::string(FS_BASE) + "map.t3dm";
 
 Scene::Scene()
-    : mPlayerModel(playerPath), mMapModel(mapPath)
+    : mPlayerModel(playerPath),
+      mMapModel(mapPath),
+      mFontBillboard(FS_BASE_PATH "squarewave.font64", FONT_BILLBOARD),
+      mFontText(FS_BASE_PATH "squarewave.font64", FONT_TEXT)
 {
     Debug::init();
 
-    mMapMatFP = (T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP));
-    t3d_mat4fp_from_srt_euler(mMapMatFP, (float[3]){PLAYER_SCALE, 1.0f, PLAYER_SCALE}, (float[3]){0, 0, 0}, (float[3]){0, 0, 0});
+    t3d_mat4fp_from_srt_euler(mMapMatFP.get(), (float[3]){PLAYER_SCALE, 1.0f, PLAYER_SCALE}, (float[3]){0, 0, 0}, (float[3]){0, 0, 0});
 
     rspq_block_begin();
-    t3d_matrix_push(mMapMatFP);
+    t3d_matrix_push(mMapMatFP.get());
     t3d_model_draw(mMapModel.getModel());
     t3d_matrix_pop(1);
-    mDplMap = rspq_block_end();
+    mDplMap = Adapters::RspqBlockAdapter(rspq_block_end());
 
-    mFontBillboard = rdpq_font_load(FS_BASE_PATH "squarewave.font64");
-    rdpq_text_register_font(FONT_BILLBOARD, mFontBillboard);
-    mFontText = rdpq_font_load(FS_BASE_PATH "squarewave.font64");
-    rdpq_text_register_font(FONT_TEXT, mFontText);
     for (size_t i = 0; i < MAX_PLAYERS; i++)
     {
         const rdpq_fontstyle_t style{.color = COLORS[i]};
-        rdpq_font_style(mFontText, i, &style);
+        rdpq_font_style(mFontText.get(), i, &style);
     }
     const rdpq_fontstyle_t countdown_style{.color = RGBA32(255, 255, 255, 255)};
-    rdpq_font_style(mFontText, 4, &countdown_style);
+    rdpq_font_style(mFontText.get(), 4, &countdown_style);
 
     // === Setup viewport and lighting ==== //
     mViewport = t3d_viewport_create();
@@ -97,23 +95,8 @@ Scene::Scene()
     // === Initialize Game State === //
     mState = State::INTRO;
     mStateTime = INTRO_TIME;
-
-    timer_init();
 }
 
-Scene::~Scene()
-{
-    rspq_block_free(mDplMap);
-
-    free_uncached(mMapMatFP);
-
-    rdpq_text_unregister_font(FONT_TEXT);
-    rdpq_font_free(mFontText);
-    rdpq_text_unregister_font(FONT_BILLBOARD);
-    rdpq_font_free(mFontBillboard);
-
-    timer_close();
-}
 
 void Scene::update_fixed(float deltaTime)
 {
@@ -249,7 +232,7 @@ void Scene::update(float deltaTime)
     t3d_light_set_count(1);
 
     uint32_t vertices = mMapModel.getModel()->totalVertCount;
-    rspq_block_run(mDplMap);
+    rspq_block_run(mDplMap.get());
 
     // === Draw players (3D Pass) === //
     for (size_t i = 0; i < MAX_PLAYERS; i++)
