@@ -3,8 +3,8 @@
 
 #include <functional>
 #include <libdragon.h>
-#include "input/inputState.h"
-#include "scene/playerAi.h"
+#include "input/InputState.h"
+#include "scene/PlayerAi.h"
 
 class AIInputStrategy
 {

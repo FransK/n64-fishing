@@ -3,12 +3,12 @@
 #include <algorithm>
 #include <vector>
 
-#include "debug/debugDraw.h"
-#include "math/vector3.h"
+#include "debug/DebugDraw.h"
+#include "math/Vector3.h"
 
-#include "colliderEdge.h"
-#include "epa.h"
-#include "gjk.h"
+#include "ColliderEdge.h"
+#include "Epa.h"
+#include "Gjk.h"
 
 using namespace Collision;
 using namespace Math;

@@ -2,7 +2,7 @@
 #define INPUT_COMPONENT_VARIANT_H
 
 #include <variant>
-#include "inputComponent.h"
+#include "InputComponent.h"
 #include "AIInputStrategy.h"
 #include "PlayerInputStrategy.h"
 

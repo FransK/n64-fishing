@@ -2,7 +2,7 @@
 #define PLAYER_INPUT_STRATEGY_H
 
 #include <libdragon.h>
-#include "input/inputState.h"
+#include "input/InputState.h"
 #include <functional>
 
 class PlayerInputStrategy

@@ -2,7 +2,7 @@
 #define GAMESETTINGSINTERFACE_H
 
 #include <libdragon.h>
-#include "config.h"
+#include "Config.h"
 
 class GameSettingsInterface
 {

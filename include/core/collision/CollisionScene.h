@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "collider.h"
-#include "epa.h"
+#include "Collider.h"
+#include "Epa.h"
 
 namespace Collision
 {

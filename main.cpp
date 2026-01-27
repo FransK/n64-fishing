@@ -8,9 +8,9 @@ and provides a basic game loop.
 #include <libdragon.h>
 #include <rspq_profile.h>
 #include <memory>
-#include "include/config.h"
+#include "include/Config.h"
 #include "GameSettingsInterface.h"
-#include "world.h"
+#include "World.h"
 
 /*==============================
     main
