@@ -66,14 +66,14 @@ private:
     /* Player Data Block - Positions, Velocities, etc*/
     std::array<PlayerData, MAX_PLAYERS> mPlayerData{};
     std::array<PlayerState, MAX_PLAYERS> mPlayerStates{};
-    std::array<PlayerAi, MAX_PLAYERS> mAIPlayers{};
+    std::vector<PlayerAi> mAIPlayers;
     std::vector<InputComponentVariant> mInputComponents;
     CollisionScene mCollisionScene;
     std::vector<AnimationComponent> mAnimationComponents;
     std::array<int, MAX_PLAYERS> mStunnedIds{-1};
 
     /* Container class? */
-    std::array<Player, MAX_PLAYERS> mPlayers{};
+    std::vector<Player> mPlayers;
     std::array<uint8_t, MAX_PLAYERS> mWinners{0};
     int mCurrTopScore{0};
 

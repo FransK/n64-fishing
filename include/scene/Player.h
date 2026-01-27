@@ -12,10 +12,8 @@ using namespace Math;
 class Player
 {
 public:
-    Player() = default;
+    Player(Collision::CollisionScene *scene, PlayerData *data, PlayerState *state, int8_t playerNumber);
     ~Player();
-
-    void init(Collision::CollisionScene *scene, PlayerData *data, PlayerState *state, int8_t playerNumber);
     void draw_billboard(T3DViewport &viewport) const;
 
     Collision::Collider *get_collider() { return &mCollider; }

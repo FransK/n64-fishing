@@ -13,12 +13,9 @@
 
 using namespace Math;
 
-void Player::init(Collision::CollisionScene *scene, PlayerData *data, PlayerState *state, int8_t playerNumber)
+Player::Player(Collision::CollisionScene *scene, PlayerData *data, PlayerState *state, int8_t playerNumber)
+    : mScene(scene), mPlayerData(data), mPlayerState(state)
 {
-    mScene = scene;
-    mPlayerData = data;
-    mPlayerState = state;
-
     mCollider = Collision::Collider{
         .entityId = data->getEntityId(),
         .actor = data,

@@ -17,19 +17,14 @@ enum struct AIBehavior : uint8_t
 class PlayerAi
 {
 public:
-    PlayerAi() = default;
-    void init(PlayerData *player)
-    {
-        mBehavior = AIBehavior::BEHAVE_FISHERMAN;
-        mPlayer = player;
-    }
+    PlayerAi(PlayerData *player) : mPlayer(player) {}
 
     void set_behavior(AIBehavior behavior) { mBehavior = behavior; }
     void update(float deltaTime, const PlayerState &state, int playerNumber, PlayerData *players, uint8_t *winners);
     InputState get_input_state() const { return mInputState; }
 
 private:
-    AIBehavior mBehavior;
+    AIBehavior mBehavior{AIBehavior::BEHAVE_FISHERMAN};
     Vector3 mMovementTarget{};
     const PlayerData *mPlayer{};
     const PlayerData *mTarget{};

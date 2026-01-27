@@ -68,13 +68,18 @@ Scene::Scene()
 
     mInputComponents.reserve(MAX_PLAYERS);
     mAnimationComponents.reserve(MAX_PLAYERS);
+    mPlayers.reserve(MAX_PLAYERS);
+    mAIPlayers.reserve(MAX_PLAYERS);
 
     for (size_t i = 0; i < MAX_PLAYERS; i++)
     {
         mPlayerData[i].setPosition(initialPositions[i]);
         mPlayerData[i].setRotation(initialRotations[i]);
-        mPlayers[i].init(&mCollisionScene, &mPlayerData[i], &mPlayerStates[i], i);
-        mAIPlayers[i].init(&mPlayerData[i]);
+        mPlayers.emplace_back(&mCollisionScene, &mPlayerData[i], &mPlayerStates[i], i);
+
+        AIBehavior behavior = (i == MAX_PLAYERS - 1) ? AIBehavior::BEHAVE_BULLY : AIBehavior::BEHAVE_FISHERMAN;
+        mAIPlayers.emplace_back(&mPlayerData[i]);
+        mAIPlayers.back().set_behavior(behavior);
 
         if (i < get_game_settings_interface()->core_get_playercount())
         {
@@ -84,9 +89,6 @@ Scene::Scene()
         {
             mInputComponents.emplace_back(AIInputStrategy(&mAIPlayers[i]));
         }
-
-        AIBehavior behavior = (i == MAX_PLAYERS - 1) ? AIBehavior::BEHAVE_BULLY : AIBehavior::BEHAVE_FISHERMAN;
-        mAIPlayers[i].set_behavior(behavior);
 
         mAnimationComponents.emplace_back(mPlayerModel.getModel(), &mPlayerStates[i], COLORS[i]);
         mPlayerStates[i].attach(&mAnimationComponents.back());
