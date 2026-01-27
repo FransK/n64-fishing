@@ -16,5 +16,5 @@ public:
     void reset();
 
 private:
-    std::unique_ptr<Scene> scene;
+    std::unique_ptr<Scene> mScene;
 };

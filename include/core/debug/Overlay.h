@@ -29,7 +29,7 @@ namespace Debug
             int currIndex;
         };
 
-        Menu menu{};
+        Menu mMenu{};
 
     public:
         void draw(Scene &scene, uint32_t vertCount, float deltaTime);

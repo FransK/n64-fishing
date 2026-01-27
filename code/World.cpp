@@ -7,7 +7,7 @@ World::World()
 
     // Needs to be called after display_init
     // because it uses display_get_width/height
-    scene = std::make_unique<Scene>();
+    mScene = std::make_unique<Scene>();
 }
 
 World::~World()
@@ -22,7 +22,7 @@ World::~World()
 ==============================*/
 void World::reset()
 {
-    scene->reset();
+    mScene->reset();
 }
 
 /*==============================
@@ -34,7 +34,7 @@ void World::reset()
 ==============================*/
 void World::fixedloop(float deltatime)
 {
-    scene->update_fixed(deltatime);
+    mScene->updateFixed(deltatime);
 }
 
 /*==============================
@@ -44,5 +44,5 @@ void World::fixedloop(float deltatime)
 ==============================*/
 void World::loop(float deltatime)
 {
-    scene->update(deltatime);
+    mScene->update(deltatime);
 }

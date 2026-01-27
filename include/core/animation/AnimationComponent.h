@@ -27,7 +27,7 @@ public:
     AnimationComponent(AnimationComponent &&) = default;
     AnimationComponent &operator=(AnimationComponent &&) = default;
 
-    uint32_t get_vert_count() const { return mModel->totalVertCount; }
+    uint32_t getVertCount() const { return mModel->totalVertCount; }
     void update(float deltaTime);
     void draw(const Vector3 &position, const Vector2 &rotation) const;
 
@@ -46,8 +46,8 @@ private:
 
     color_t mPrimColor{};
 
-    void on_player_state_change(const PlayerState &state);
-    void play_animation(Anim anim);
+    void onPlayerStateChange(const PlayerState &state);
+    void playAnimation(Anim anim);
 };
 
 void update(AnimationComponent &comp, float deltaTime);

@@ -7,11 +7,11 @@ class Component
 {
 public:
     template <typename T>
-    Component(T x) : self_(std::make_unique<ComponentModel<T>>(std::move(x))) {}
+    Component(T x) : mSelf(std::make_unique<ComponentModel<T>>(std::move(x))) {}
 
     friend void update(Component &c, float deltaTime)
     {
-        c.self_->update_(deltaTime);
+        c.mSelf->update_(deltaTime);
     }
 
 private:
@@ -30,5 +30,5 @@ private:
         T data_;
     };
 
-    std::unique_ptr<ComponentConcept> self_;
+    std::unique_ptr<ComponentConcept> mSelf;
 };

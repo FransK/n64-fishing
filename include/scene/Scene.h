@@ -49,7 +49,7 @@ public:
     long ticksAnimationUpdate{0};
 
     const CollisionScene &getCollScene();
-    void update_fixed(float deltaTime);
+    void updateFixed(float deltaTime);
     void update(float deltaTime);
     void reset();
 
@@ -92,5 +92,5 @@ private:
     Camera mCamera{};
     T3DVec3 mLightDirVec{};
 
-    Debug::Overlay debugOvl{};
+    Debug::Overlay mDebugOverlay{};
 };

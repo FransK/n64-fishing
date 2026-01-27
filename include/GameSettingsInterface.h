@@ -8,34 +8,34 @@ class GameSettingsInterface
 public:
     virtual ~GameSettingsInterface() = default;
 
-    uint32_t core_get_playercount() { return do_get_playercount(); }
-    joypad_port_t core_get_playercontroller(Core::PlyNum ply) { return do_get_playercontroller(ply); }
-    Core::AiDiff core_get_aidifficulty() { return do_get_aidifficulty(); }
-    bool core_get_game_ending() { return do_get_game_ending(); }
-    double core_get_subtick() { return do_get_subtick(); }
-    void core_set_winner(Core::PlyNum ply) { do_set_winner(ply); }
-    void core_game_end() { do_game_end(); }
-    void core_set_playercount(bool *enabledconts) { do_set_playercount(enabledconts); }
-    void core_set_aidifficulty(Core::AiDiff difficulty) { do_set_aidifficulty(difficulty); }
-    void core_set_subtick(double subtick) { do_set_subtick(subtick); }
-    void core_reset_game() { do_reset_game(); }
+    uint32_t coreGetPlayercount() { return doGetPlayercount(); }
+    joypad_port_t coreGetPlayercontroller(Core::PlyNum ply) { return doGetPlayercontroller(ply); }
+    Core::AiDiff coreGetAidifficulty() { return doGetAidifficulty(); }
+    bool coreGetGameEnding() { return doGetGameEnding(); }
+    double coreGetSubtick() { return doGetSubtick(); }
+    void coreSetWinner(Core::PlyNum ply) { doSetWinner(ply); }
+    void coreGameEnd() { doGameEnd(); }
+    void coreSetPlayercount(bool *enabledConts) { doSetPlayercount(enabledConts); }
+    void coreSetAidifficulty(Core::AiDiff difficulty) { doSetAidifficulty(difficulty); }
+    void coreSetSubtick(double subtick) { doSetSubtick(subtick); }
+    void coreResetGame() { doResetGame(); }
 
 private:
-    virtual uint32_t do_get_playercount() = 0;
-    virtual joypad_port_t do_get_playercontroller(Core::PlyNum ply) = 0;
-    virtual Core::AiDiff do_get_aidifficulty() = 0;
-    virtual bool do_get_game_ending() = 0;
-    virtual double do_get_subtick() = 0;
-    virtual void do_set_winner(Core::PlyNum ply) = 0;
-    virtual void do_game_end() = 0;
+    virtual uint32_t doGetPlayercount() = 0;
+    virtual joypad_port_t doGetPlayercontroller(Core::PlyNum ply) = 0;
+    virtual Core::AiDiff doGetAidifficulty() = 0;
+    virtual bool doGetGameEnding() = 0;
+    virtual double doGetSubtick() = 0;
+    virtual void doSetWinner(Core::PlyNum ply) = 0;
+    virtual void doGameEnd() = 0;
 
-    virtual void do_set_playercount(bool *enabledconts) = 0;
-    virtual void do_set_aidifficulty(Core::AiDiff difficulty) = 0;
-    virtual void do_set_subtick(double subtick) = 0;
-    virtual void do_reset_game() = 0;
+    virtual void doSetPlayercount(bool *enabledConts) = 0;
+    virtual void doSetAidifficulty(Core::AiDiff difficulty) = 0;
+    virtual void doSetSubtick(double subtick) = 0;
+    virtual void doResetGame() = 0;
 };
 
-GameSettingsInterface *get_game_settings_interface();
-void set_game_settings_interface(GameSettingsInterface *game_settings);
+GameSettingsInterface *getGameSettingsInterface();
+void setGameSettingsInterface(GameSettingsInterface *gameSettings);
 
 extern GameSettingsInterface *instance;

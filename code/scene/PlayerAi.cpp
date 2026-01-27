@@ -24,11 +24,11 @@ void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playe
     {
     case PlayerStateEnum::STATE_IDLE:
         // Find something to do
-        update_idle(deltaTime, playerNumber, players, winners);
+        updateIdle(deltaTime, playerNumber, players, winners);
     case PlayerStateEnum::STATE_WALKING:
         // Move towards target and perform actions
-        update_movement_target();
-        move_to_target();
+        updateMovementTarget();
+        moveToTarget();
         break;
     case PlayerStateEnum::STATE_FISHING:
         // Check fishing status
@@ -50,7 +50,7 @@ void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playe
     }
 }
 
-void PlayerAi::update_idle(float deltaTime, int playerNumber, PlayerData *players, uint8_t *winners)
+void PlayerAi::updateIdle(float deltaTime, int playerNumber, PlayerData *players, uint8_t *winners)
 {
     switch (mBehavior)
     {
@@ -59,31 +59,31 @@ void PlayerAi::update_idle(float deltaTime, int playerNumber, PlayerData *player
         if (mTarget)
         {
             mTarget = nullptr;
-            mMovementTarget = find_closest_fish();
+            mMovementTarget = findClosestFish();
         }
         else
         {
-            mTarget = find_winner_target(playerNumber, players, winners);
+            mTarget = findWinnerTarget(playerNumber, players, winners);
             if (!mTarget)
             {
-                mMovementTarget = find_closest_fish();
+                mMovementTarget = findClosestFish();
             }
         }
         break;
     case AIBehavior::BEHAVE_BULLY:
-        mTarget = find_winner_target(playerNumber, players, winners);
+        mTarget = findWinnerTarget(playerNumber, players, winners);
         if (!mTarget)
         {
-            mMovementTarget = find_closest_fish();
+            mMovementTarget = findClosestFish();
         }
         break;
     case AIBehavior::BEHAVE_FISHERMAN:
-        mMovementTarget = find_closest_fish();
+        mMovementTarget = findClosestFish();
         break;
     }
 }
 
-void PlayerAi::update_movement_target()
+void PlayerAi::updateMovementTarget()
 {
     if (mTarget)
     {
@@ -91,7 +91,7 @@ void PlayerAi::update_movement_target()
     }
 }
 
-void PlayerAi::move_to_target()
+void PlayerAi::moveToTarget()
 {
     Vector3 position = mPlayer->getPosition();
     Vector3 distance;
@@ -116,7 +116,7 @@ void PlayerAi::move_to_target()
     };
 }
 
-PlayerData *PlayerAi::find_winner_target(int playerNumber, PlayerData *players, uint8_t *winners) const
+PlayerData *PlayerAi::findWinnerTarget(int playerNumber, PlayerData *players, uint8_t *winners) const
 {
     for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {
@@ -133,7 +133,7 @@ PlayerData *PlayerAi::find_winner_target(int playerNumber, PlayerData *players, 
     return nullptr;
 }
 
-Vector3 PlayerAi::find_closest_fish() const
+Vector3 PlayerAi::findClosestFish() const
 {
     Vector3 position = mPlayer->getPosition();
     Vector3 closestFish;

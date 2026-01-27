@@ -55,7 +55,7 @@ Player::~Player()
     mScene->remove(&mDamageTrigger);
 }
 
-void Player::draw_billboard(T3DViewport &viewport) const
+void Player::drawBillboard(T3DViewport &viewport) const
 {
     if (mPlayerState->getState() != PlayerStateEnum::STATE_FISHING)
     {

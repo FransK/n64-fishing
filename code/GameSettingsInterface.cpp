@@ -4,7 +4,7 @@
 
 GameSettingsInterface *instance = nullptr;
 
-GameSettingsInterface *get_game_settings_interface()
+GameSettingsInterface *getGameSettingsInterface()
 {
     static std::once_flag initFlag;
     std::call_once(initFlag, []()
@@ -18,7 +18,7 @@ GameSettingsInterface *get_game_settings_interface()
     return instance;
 }
 
-void set_game_settings_interface(GameSettingsInterface *game_settings)
+void setGameSettingsInterface(GameSettingsInterface *game_settings)
 {
     instance = game_settings;
 }

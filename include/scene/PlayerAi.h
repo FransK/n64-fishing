@@ -19,9 +19,9 @@ class PlayerAi
 public:
     PlayerAi(PlayerData *player) : mPlayer(player) {}
 
-    void set_behavior(AIBehavior behavior) { mBehavior = behavior; }
+    void setBehavior(AIBehavior behavior) { mBehavior = behavior; }
     void update(float deltaTime, const PlayerState &state, int playerNumber, PlayerData *players, uint8_t *winners);
-    InputState get_input_state() const { return mInputState; }
+    InputState getInputState() const { return mInputState; }
 
 private:
     AIBehavior mBehavior{AIBehavior::BEHAVE_FISHERMAN};
@@ -32,9 +32,9 @@ private:
     float mDelayCatchTimer{0.8f};
     InputState mInputState{};
 
-    void update_idle(float deltaTime, int playerNumber, PlayerData *players, uint8_t *winners);
-    void update_movement_target();
-    void move_to_target();
-    PlayerData *find_winner_target(int playerNumber, PlayerData *players, uint8_t *winners) const;
-    Vector3 find_closest_fish() const;
+    void updateIdle(float deltaTime, int playerNumber, PlayerData *players, uint8_t *winners);
+    void updateMovementTarget();
+    void moveToTarget();
+    PlayerData *findWinnerTarget(int playerNumber, PlayerData *players, uint8_t *winners) const;
+    Vector3 findClosestFish() const;
 };

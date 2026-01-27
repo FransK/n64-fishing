@@ -38,33 +38,33 @@ void Debug::Overlay::draw(Scene &scene, uint32_t vertCount, float deltaTime)
     auto btn = joypad_get_buttons_pressed(JOYPAD_PORT_1);
     // auto held = joypad_get_buttons_held(JOYPAD_PORT_1);
 
-    if (menu.items.empty())
+    if (mMenu.items.empty())
     {
-        menu.items.push_back({"Spheres", 0, true, [](MenuItem &item)
+        mMenu.items.push_back({"Spheres", 0, true, [](MenuItem &item)
                               {
                                   showCollSpheres = item.value;
                               }});
-        // menu.items.push_back({"Coll-Tri", 0, true, [](MenuItem &item)
+        // mMenu.items.push_back({"Coll-Tri", 0, true, [](MenuItem &item)
         //                       {
         //                           showCollMesh = item.value;
         //                       }});
-        // menu.items.push_back({"Actor", 0, true, [](MenuItem &item)
+        // mMenu.items.push_back({"Actor", 0, true, [](MenuItem &item)
         //                       {
         //                           actorDebug = item.value;
         //                       }});
-        // menu.items.push_back({"Focus Player", scene.followPlayer, true, [&scene](MenuItem &item)
+        // mMenu.items.push_back({"Focus Player", scene.followPlayer, true, [&scene](MenuItem &item)
         //                       {
         //                           scene.followPlayer = item.value;
         //                       }});
-        // menu.items.push_back({"Scroll", scene.autoScroll, true, [&scene](MenuItem &item)
+        // mMenu.items.push_back({"Scroll", scene.autoScroll, true, [&scene](MenuItem &item)
         //                       {
         //                           scene.autoScroll = item.value;
         //                       }});
-        // menu.items.push_back({"All-AI", scene.forceAI, true, [&scene](MenuItem &item)
+        // mMenu.items.push_back({"All-AI", scene.forceAI, true, [&scene](MenuItem &item)
         //                       {
         //                           scene.forceAI = item.value;
         //                       }});
-        // menu.items.push_back({"Boss", 1, false, [&scene](MenuItem &item)
+        // mMenu.items.push_back({"Boss", 1, false, [&scene](MenuItem &item)
         //                       {
         //                           auto p = scene.getCamera().getTarget();
         //                           p.x = 810;
@@ -74,16 +74,16 @@ void Debug::Overlay::draw(Scene &scene, uint32_t vertCount, float deltaTime)
     }
 
     if (btn.d_up)
-        menu.currIndex = (menu.currIndex - 1) % menu.items.size();
+        mMenu.currIndex = (mMenu.currIndex - 1) % mMenu.items.size();
     if (btn.d_down)
-        menu.currIndex = (menu.currIndex + 1) % menu.items.size();
+        mMenu.currIndex = (mMenu.currIndex + 1) % mMenu.items.size();
     if (btn.d_left)
-        menu.items[menu.currIndex].value--;
+        mMenu.items[mMenu.currIndex].value--;
     if (btn.d_right)
-        menu.items[menu.currIndex].value++;
+        mMenu.items[mMenu.currIndex].value++;
     if (btn.d_left || btn.d_right)
     {
-        auto &item = menu.items[menu.currIndex];
+        auto &item = mMenu.items[mMenu.currIndex];
         if (item.isBool)
             item.value = (item.value < 0) ? 1 : (item.value % 2);
         item.onChange(item);
@@ -156,9 +156,9 @@ void Debug::Overlay::draw(Scene &scene, uint32_t vertCount, float deltaTime)
 
     // Menu
     posY = 38;
-    for (auto &item : menu.items)
+    for (auto &item : mMenu.items)
     {
-        bool isSel = menu.currIndex == &item - &menu.items[0];
+        bool isSel = mMenu.currIndex == &item - &mMenu.items[0];
         Debug::printf(posX, posY, "%c %s: %d", isSel ? '>' : ' ', item.text, item.value);
         posY += 8;
     }

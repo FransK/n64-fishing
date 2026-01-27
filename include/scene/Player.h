@@ -14,10 +14,10 @@ class Player
 public:
     Player(Collision::CollisionScene *scene, PlayerData *data, PlayerState *state, int8_t playerNumber);
     ~Player();
-    void draw_billboard(T3DViewport &viewport) const;
+    void drawBillboard(T3DViewport &viewport) const;
 
-    Collision::Collider *get_collider() { return &mCollider; }
-    Collision::Collider *get_damage_trigger() { return &mDamageTrigger; }
+    Collision::Collider *getCollider() { return &mCollider; }
+    Collision::Collider *getDamageTrigger() { return &mDamageTrigger; }
 
 private:
     Collision::Collider mCollider{};

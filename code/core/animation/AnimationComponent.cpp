@@ -3,7 +3,7 @@
 
 AnimationComponent::AnimationComponent(T3DModel *model, PlayerState *playerState, color_t primColor)
     : Observer<PlayerState>([this](const PlayerState &state)
-                            { this->on_player_state_change(state); }),
+                            { this->onPlayerStateChange(state); }),
       mModel(model),
       mSkeleton(model),
       mAnimIdle(model, "Idle"),
@@ -67,32 +67,32 @@ void AnimationComponent::draw(const Vector3 &position, const Vector2 &rotation) 
     rspq_block_run(mDplPlayer.get());
 }
 
-void AnimationComponent::on_player_state_change(const PlayerState &state)
+void AnimationComponent::onPlayerStateChange(const PlayerState &state)
 {
     switch (state.getState())
     {
     case PlayerStateEnum::STATE_IDLE:
-        play_animation(Anim::IDLE);
+        playAnimation(Anim::IDLE);
         break;
     case PlayerStateEnum::STATE_WALKING:
-        play_animation(Anim::RUN);
+        playAnimation(Anim::RUN);
         break;
     case PlayerStateEnum::STATE_ATTACKING:
-        play_animation(Anim::SHOVE);
+        playAnimation(Anim::SHOVE);
         break;
     case PlayerStateEnum::STATE_STUNNED:
-        play_animation(Anim::RECEIVE_SHOVE);
+        playAnimation(Anim::RECEIVE_SHOVE);
         break;
     case PlayerStateEnum::STATE_CASTING:
-        play_animation(Anim::CAST);
+        playAnimation(Anim::CAST);
         break;
     case PlayerStateEnum::STATE_FISHING:
-        play_animation(Anim::IDLE);
+        playAnimation(Anim::IDLE);
         break;
     }
 }
 
-void AnimationComponent::play_animation(Anim anim)
+void AnimationComponent::playAnimation(Anim anim)
 {
     t3d_anim_set_playing(mAnimIdle.get(), anim == Anim::IDLE);
     t3d_anim_set_playing(mAnimRun.get(), anim == Anim::RUN);

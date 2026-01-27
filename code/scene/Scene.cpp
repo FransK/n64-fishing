@@ -79,9 +79,9 @@ Scene::Scene()
 
         AIBehavior behavior = (i == MAX_PLAYERS - 1) ? AIBehavior::BEHAVE_BULLY : AIBehavior::BEHAVE_FISHERMAN;
         mAIPlayers.emplace_back(&mPlayerData[i]);
-        mAIPlayers.back().set_behavior(behavior);
+        mAIPlayers.back().setBehavior(behavior);
 
-        if (i < get_game_settings_interface()->core_get_playercount())
+        if (i < getGameSettingsInterface()->coreGetPlayercount())
         {
             mInputComponents.emplace_back(PlayerInputStrategy((joypad_port_t)i));
         }
@@ -99,8 +99,7 @@ Scene::Scene()
     mStateTime = INTRO_TIME;
 }
 
-
-void Scene::update_fixed(float deltaTime)
+void Scene::updateFixed(float deltaTime)
 {
     // === Update Game State === //
     mStateTime -= deltaTime;
@@ -123,7 +122,7 @@ void Scene::update_fixed(float deltaTime)
     case State::GAME_OVER:
         if (mStateTime <= 0)
         {
-            get_game_settings_interface()->core_game_end();
+            getGameSettingsInterface()->coreGameEnd();
         }
         return;
     default:
@@ -137,7 +136,7 @@ void Scene::update_fixed(float deltaTime)
     {
         for (int j = 0; j < MAX_PLAYERS; j++)
         {
-            if (mStunnedIds[i] == mPlayers[j].get_collider()->entityId)
+            if (mStunnedIds[i] == mPlayers[j].getCollider()->entityId)
             {
                 stunnedThisFrame[j] = true;
                 break;
@@ -146,7 +145,7 @@ void Scene::update_fixed(float deltaTime)
         mStunnedIds[i] = -1;
     }
 
-    for (size_t i = get_game_settings_interface()->core_get_playercount(); i < MAX_PLAYERS; i++)
+    for (size_t i = getGameSettingsInterface()->coreGetPlayercount(); i < MAX_PLAYERS; i++)
     {
         mAIPlayers[i].update(deltaTime, mPlayerStates[i], i, mPlayerData.data(), mWinners.data());
     }
@@ -157,7 +156,7 @@ void Scene::update_fixed(float deltaTime)
                                         mPlayerStates[i],
                                         mPlayerData[i],
                                         mCollisionScene,
-                                        mPlayers[i].get_damage_trigger(),
+                                        mPlayers[i].getDamageTrigger(),
                                         stunnedThisFrame[i]},
                    mInputComponents[i]);
     }
@@ -185,7 +184,7 @@ void Scene::update(float deltaTime)
 {
     // === Debug Controls === //
     {
-        auto ctrl = get_game_settings_interface()->core_get_playercontroller(PlyNum::PLAYER_1);
+        auto ctrl = getGameSettingsInterface()->coreGetPlayercontroller(PlyNum::PLAYER_1);
         auto btn = joypad_get_buttons_pressed(ctrl);
         auto held = joypad_get_buttons_held(ctrl);
 
@@ -245,7 +244,7 @@ void Scene::update(float deltaTime)
     // === Draw billboards (2D Pass) === //
     for (size_t i = 0; i < MAX_PLAYERS; i++)
     {
-        mPlayers[i].draw_billboard(mViewport);
+        mPlayers[i].drawBillboard(mViewport);
     }
 
     // === Draw UI === //
@@ -282,7 +281,7 @@ void Scene::update(float deltaTime)
             mWinners[i] = mPlayerStates[i].getFishCaught() >= mCurrTopScore;
             if (mWinners[i])
             {
-                get_game_settings_interface()->core_set_winner((PlyNum)i);
+                getGameSettingsInterface()->coreSetWinner((PlyNum)i);
                 message += ("Player " + std::to_string(i + 1) + " wins!\n");
             }
         }
@@ -292,7 +291,7 @@ void Scene::update(float deltaTime)
     // Debug UI
     if (debugOverlay)
     {
-        debugOvl.draw(*this, vertices, deltaTime);
+        mDebugOverlay.draw(*this, vertices, deltaTime);
         Debug::draw((uint16_t *)mCurrentFB->buffer);
     }
     else if (showFPS)

@@ -15,25 +15,25 @@ public:
     GameSettings &operator=(GameSettings &&) = delete;
 
 private:
-    uint32_t do_get_playercount() override;
-    joypad_port_t do_get_playercontroller(Core::PlyNum ply) override;
-    Core::AiDiff do_get_aidifficulty() override;
-    bool do_get_game_ending() override;
-    double do_get_subtick() override;
-    void do_set_winner(Core::PlyNum ply) override;
-    void do_game_end() override;
+    uint32_t doGetPlayercount() override;
+    joypad_port_t doGetPlayercontroller(Core::PlyNum ply) override;
+    Core::AiDiff doGetAidifficulty() override;
+    bool doGetGameEnding() override;
+    double doGetSubtick() override;
+    void doSetWinner(Core::PlyNum ply) override;
+    void doGameEnd() override;
 
-    void do_set_playercount(bool *enabledconts) override;
-    void do_set_aidifficulty(Core::AiDiff difficulty) override;
-    void do_set_subtick(double subtick) override;
-    void do_reset_game() override;
+    void doSetPlayercount(bool *enabledconts) override;
+    void doSetAidifficulty(Core::AiDiff difficulty) override;
+    void doSetSubtick(double subtick) override;
+    void doResetGame() override;
 
-    std::array<Core::PlayerJoypad, JOYPAD_PORT_COUNT> player_joypads;
-    std::array<bool, Core::MAX_PLAYERS> player_is_winner;
-    Core::AiDiff ai_difficulty;
-    uint32_t player_count;
-    bool game_ending;
+    std::array<Core::PlayerJoypad, JOYPAD_PORT_COUNT> mPlayerJoypads;
+    std::array<bool, Core::MAX_PLAYERS> mPlayerIsWinner;
+    Core::AiDiff mAiDifficulty;
+    uint32_t mPlayerCount;
+    bool mGameEnding;
 
     // Core info
-    double subtick;
+    double mSubtick;
 };

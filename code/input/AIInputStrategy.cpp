@@ -2,5 +2,5 @@
 
 InputState AIInputStrategy::update()
 {
-    return mAi->get_input_state();
+    return mAi->getInputState();
 }

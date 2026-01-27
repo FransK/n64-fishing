@@ -1,40 +1,40 @@
 #include "GameSettings.h"
 
-uint32_t GameSettings::do_get_playercount()
+uint32_t GameSettings::doGetPlayercount()
 {
-    return player_count;
+    return mPlayerCount;
 }
 
-joypad_port_t GameSettings::do_get_playercontroller(Core::PlyNum ply)
+joypad_port_t GameSettings::doGetPlayercontroller(Core::PlyNum ply)
 {
-    return player_joypads[static_cast<size_t>(ply)].port;
+    return mPlayerJoypads[static_cast<size_t>(ply)].port;
 }
 
-Core::AiDiff GameSettings::do_get_aidifficulty()
+Core::AiDiff GameSettings::doGetAidifficulty()
 {
-    return ai_difficulty;
+    return mAiDifficulty;
 }
 
-double GameSettings::do_get_subtick()
+double GameSettings::doGetSubtick()
 {
-    return subtick;
+    return mSubtick;
 }
 
-bool GameSettings::do_get_game_ending()
+bool GameSettings::doGetGameEnding()
 {
-    return game_ending;
+    return mGameEnding;
 }
 
-void GameSettings::do_set_winner(Core::PlyNum ply)
+void GameSettings::doSetWinner(Core::PlyNum ply)
 {
-    player_is_winner[static_cast<size_t>(ply)] = true;
+    mPlayerIsWinner[static_cast<size_t>(ply)] = true;
 }
-void GameSettings::do_game_end()
+void GameSettings::doGameEnd()
 {
-    game_ending = true;
+    mGameEnding = true;
 }
 
-void GameSettings::do_set_playercount(bool *enabledconts)
+void GameSettings::doSetPlayercount(bool *enabledconts)
 {
     int plynum = 0;
 
@@ -43,25 +43,25 @@ void GameSettings::do_set_playercount(bool *enabledconts)
     {
         if (enabledconts[i])
         {
-            player_joypads[plynum].port = static_cast<joypad_port_t>(i);
+            mPlayerJoypads[plynum].port = static_cast<joypad_port_t>(i);
             plynum++;
         }
     }
-    player_count = plynum;
+    mPlayerCount = plynum;
 }
 
-void GameSettings::do_set_aidifficulty(Core::AiDiff difficulty)
+void GameSettings::doSetAidifficulty(Core::AiDiff difficulty)
 {
-    ai_difficulty = difficulty;
+    mAiDifficulty = difficulty;
 }
 
-void GameSettings::do_set_subtick(double subtick)
+void GameSettings::doSetSubtick(double subtick)
 {
-    this->subtick = subtick;
+    mSubtick = subtick;
 }
 
-void GameSettings::do_reset_game()
+void GameSettings::doResetGame()
 {
-    game_ending = false;
-    player_is_winner.fill(false);
+    mGameEnding = false;
+    mPlayerIsWinner.fill(false);
 }
