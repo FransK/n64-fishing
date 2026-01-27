@@ -9,7 +9,6 @@
 #include "input/PlayerConsts.h"
 #include "PlayerColliders.h"
 
-#include "scene/Entity.h"
 #include "Fish.h"
 
 using namespace Math;
@@ -19,10 +18,9 @@ void Player::init(Collision::CollisionScene *scene, PlayerData *data, PlayerStat
     mScene = scene;
     mPlayerData = data;
     mPlayerState = state;
-    mEntityId = GetNextEntityId();
 
     mCollider = Collision::Collider{
-        .entityId = mEntityId,
+        .entityId = data->getEntityId(),
         .actor = data,
         .type = PlayerColliderType,
         .scale = 1.0f,
@@ -38,7 +36,7 @@ void Player::init(Collision::CollisionScene *scene, PlayerData *data, PlayerStat
     mScene->add(&mCollider);
 
     mDamageTrigger = Collision::Collider{
-        .entityId = mEntityId,
+        .entityId = data->getEntityId(),
         .actor = data->getAttackActor(),
         .type = DamageTriggerType,
         .scale = 1.0f,
