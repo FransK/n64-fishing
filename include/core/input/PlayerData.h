@@ -1,5 +1,4 @@
-#ifndef PLAYER_POSITION_H
-#define PLAYER_POSITION_H
+#pragma once
 
 #include "math/Vector2.h"
 #include "math/Vector3.h"
@@ -17,5 +16,3 @@ public:
 private:
     Actor mAttackActor{};
 };
-
-#endif

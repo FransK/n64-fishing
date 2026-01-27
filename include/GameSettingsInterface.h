@@ -1,5 +1,4 @@
-#ifndef GAMESETTINGSINTERFACE_H
-#define GAMESETTINGSINTERFACE_H
+#pragma once
 
 #include <libdragon.h>
 #include "Config.h"
@@ -40,5 +39,3 @@ GameSettingsInterface *get_game_settings_interface();
 void set_game_settings_interface(GameSettingsInterface *game_settings);
 
 extern GameSettingsInterface *instance;
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef INPUT_COMPONENT_H
-#define INPUT_COMPONENT_H
+#pragma once
 
 #include <libdragon.h>
 
@@ -85,5 +84,3 @@ public:
 private:
     InputStrategy mInputStrategy{};
 };
-
-#endif

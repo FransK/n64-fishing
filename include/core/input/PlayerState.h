@@ -1,5 +1,4 @@
-#ifndef PLAYER_STATE
-#define PLAYER_STATE
+#pragma once
 
 #include "PlayerConsts.h"
 #include "PlayerData.h"
@@ -37,5 +36,3 @@ private:
     int mFishCaught{};
     bool mActionSuccess{false};
 };
-
-#endif

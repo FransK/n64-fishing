@@ -1,5 +1,4 @@
-#ifndef CORE_COMMON_COMPONENT_H
-#define CORE_COMMON_COMPONENT_H
+#pragma once
 
 #include <memory>
 
@@ -33,5 +32,3 @@ private:
 
     std::unique_ptr<ComponentConcept> self_;
 };
-
-#endif // CORE_COMMON_COMPONENT_H

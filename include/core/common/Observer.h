@@ -1,5 +1,4 @@
-#ifndef N64BASE_CORE_COMMON_OBSERVER_H
-#define N64BASE_CORE_COMMON_OBSERVER_H
+#pragma once
 
 #include <functional>
 
@@ -22,5 +21,3 @@ public:
 private:
     OnUpdate mOnUpdate;
 };
-
-#endif // N64BASE_CORE_COMMON_OBSERVER_H

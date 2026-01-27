@@ -1,5 +1,4 @@
-#ifndef CORE_COMMON_OBSERVABLE_H
-#define CORE_COMMON_OBSERVABLE_H
+#pragma once
 
 #include <set>
 #include "Observer.h"
@@ -30,5 +29,3 @@ public:
 private:
     std::set<Observer<T> *> mObservers{};
 };
-
-#endif

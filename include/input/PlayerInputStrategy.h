@@ -1,5 +1,4 @@
-#ifndef PLAYER_INPUT_STRATEGY_H
-#define PLAYER_INPUT_STRATEGY_H
+#pragma once
 
 #include <libdragon.h>
 #include "input/InputState.h"
@@ -15,5 +14,3 @@ public:
 private:
     joypad_port_t mPort;
 };
-
-#endif

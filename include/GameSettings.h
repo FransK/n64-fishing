@@ -1,5 +1,4 @@
-#ifndef GAMESETTINGS_H
-#define GAMESETTINGS_H
+#pragma once
 
 #include <array>
 
@@ -38,5 +37,3 @@ private:
     // Core info
     double subtick;
 };
-
-#endif

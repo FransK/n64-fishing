@@ -1,5 +1,4 @@
-#ifndef N64BASE_CONFIG_H
-#define N64BASE_CONFIG_H
+#pragma once
 
 #include <libdragon.h>
 
@@ -83,5 +82,3 @@ namespace Core
     constexpr int FONT_BILLBOARD = 1;
     constexpr int FONT_TEXT = 2;
 }
-
-#endif // N64BASE_CONFIG_H

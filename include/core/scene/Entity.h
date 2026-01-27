@@ -1,5 +1,4 @@
-#ifndef CORE_SCENE_ENTITY_H
-#define CORE_SCENE_ENTITY_H
+#pragma once
 
 #include "Vector2.h"
 #include "Vector3.h"
@@ -17,5 +16,3 @@ private:
     Math::Vector3 mPosition{};
     Math::Vector2 mRotation{};
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef ANIMATION_COMPONENT
-#define ANIMATION_COMPONENT
+#pragma once
 
 #include <t3d/t3danim.h>
 
@@ -52,5 +51,3 @@ private:
 
 void update(AnimationComponent &comp, float deltaTime);
 void draw(const AnimationComponent &comp, const Vector3 &position, const Vector2 &rotation);
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef AI_INPUT_STRATEGY_H
-#define AI_INPUT_STRATEGY_H
+#pragma once
 
 #include <functional>
 #include <libdragon.h>
@@ -16,5 +15,3 @@ public:
 private:
     PlayerAi *mAi;
 };
-
-#endif

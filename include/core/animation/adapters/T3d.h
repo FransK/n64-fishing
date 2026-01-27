@@ -1,5 +1,4 @@
-#ifndef CORE_ANIMATION_ADAPTERS_T3D_H
-#define CORE_ANIMATION_ADAPTERS_T3D_H
+#pragma once
 
 #include <t3d/t3danim.h>
 #include <memory>
@@ -34,5 +33,3 @@ namespace Adapters
         std::unique_ptr<T3DModel, Deleter> mModel;
     };
 }
-
-#endif // CORE_ANIMATION_ADAPTERS_T3D_H

@@ -1,5 +1,4 @@
-#ifndef INPUT_COMPONENT_VARIANT_H
-#define INPUT_COMPONENT_VARIANT_H
+#pragma once
 
 #include <variant>
 #include "InputComponent.h"
@@ -9,5 +8,3 @@
 using InputComponentVariant = std::variant<
     InputComponent<PlayerInputStrategy>,
     InputComponent<AIInputStrategy>>;
-
-#endif // INPUT_COMPONENT_VARIANT_H

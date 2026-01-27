@@ -1,5 +1,4 @@
-#ifndef CORE_SCENE_ACTOR_H
-#define CORE_SCENE_ACTOR_H
+#pragma once
 
 #include "Entity.h"
 #include "Vector3.h"
@@ -14,5 +13,3 @@ public:
 private:
     Math::Vector3 mVelocity{};
 };
-
-#endif

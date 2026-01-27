@@ -1,5 +1,4 @@
-#ifndef ANIM
-#define ANIM
+#pragma once
 
 #include <cstdint>
 
@@ -13,5 +12,3 @@ enum struct Anim : uint8_t
 };
 
 constexpr float PLAYER_SCALE = 0.125f;
-
-#endif

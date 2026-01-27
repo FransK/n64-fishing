@@ -1,5 +1,4 @@
-#ifndef CORE_INPUT_UPDATE_H
-#define CORE_INPUT_UPDATE_H
+#pragma once
 
 #include "input/InputComponentVariant.h"
 
@@ -42,5 +41,3 @@ struct InputComponentUpdate
                               args.stunned);
     }
 };
-
-#endif // CORE_INPUT_UPDATE_H
