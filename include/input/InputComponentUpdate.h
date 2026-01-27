@@ -21,17 +21,8 @@ struct InputComponentUpdate
                          Collision::Collider *damageTrigger,
                          bool stunned) : args{deltaTime, playerState, playerData, collScene, damageTrigger, stunned} {}
 
-    void operator()(InputComponent<PlayerInputStrategy> &inputComponent)
-    {
-        inputComponent.update(args.deltaTime,
-                              args.playerState,
-                              args.playerData,
-                              args.collScene,
-                              args.damageTrigger,
-                              args.stunned);
-    }
-
-    void operator()(InputComponent<AIInputStrategy> &inputComponent)
+    template <typename InputComponentType>
+    void operator()(InputComponentType &inputComponent)
     {
         inputComponent.update(args.deltaTime,
                               args.playerState,
