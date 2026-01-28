@@ -31,13 +31,9 @@ Player::Player(Collision::CollisionScene *scene, PlayerState *state, int8_t play
     };
 
     mCollider.center.y = PlayerColliderType.data.cylinder.halfHeight;
-
-    debugf("Collider information for Player %d: EntityId=%d, \n", playerNumber, mCollider.entityId);
     mCollider.recalcBB();
 
     mScene->add(&mCollider);
-
-    debugf("Successfully added Player %d collider to CollisionScene.\n", playerNumber);
 
     mDamageTrigger = Collision::Collider{
         .entityId = this->getEntityId(),
