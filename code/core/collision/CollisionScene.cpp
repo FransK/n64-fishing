@@ -6,6 +6,8 @@
 #include "debug/DebugDraw.h"
 #include "math/Vector3.h"
 
+#include "ActorFlags.h"
+#include "Player.h"
 #include "ColliderEdge.h"
 #include "Epa.h"
 #include "Gjk.h"
@@ -65,7 +67,7 @@ void CollisionScene::deactivate(Collider *object)
     }
 }
 
-void CollisionScene::update(float fixedTimeStep, int *stunnedIds)
+void CollisionScene::update(float fixedTimeStep)
 {
     /* Integrate objects */
     for (auto *c : activeColliders)
@@ -75,7 +77,7 @@ void CollisionScene::update(float fixedTimeStep, int *stunnedIds)
     }
 
     /* Solve collisions */
-    runCollision(stunnedIds);
+    runCollision();
 
     /* Clamp to world */
     for (auto *c : activeColliders)
@@ -93,7 +95,7 @@ void CollisionScene::debugDraw()
     }
 }
 
-void CollisionScene::runCollision(int *stunnedIds)
+void CollisionScene::runCollision()
 {
     // === Sweep and Prune === //
     int edgeCount = activeColliders.size() * 2;
@@ -137,7 +139,7 @@ void CollisionScene::runCollision(int *stunnedIds)
                 if (Box3D::hasOverlap(a->boundingBox, b->boundingBox))
                 {
                     // === Check Collider Shapes == //
-                    collide(a, b, stunnedIds);
+                    collide(a, b);
                 }
             }
 
@@ -167,7 +169,7 @@ void CollisionScene::runCollision(int *stunnedIds)
     }
 }
 
-void CollisionScene::collide(Collider *a, Collider *b, int *stunnedIds)
+void CollisionScene::collide(Collider *a, Collider *b)
 {
     if (!(a->collisionLayers & b->collisionLayers))
     {
@@ -194,9 +196,18 @@ void CollisionScene::collide(Collider *a, Collider *b, int *stunnedIds)
     {
         for (int i = 0; i < 4; i++)
         {
-            if (stunnedIds[i] == -1)
+            if (a->isTrigger &&
+                (a->flags & static_cast<uint32_t>(ColliderFlags::IsAttackTrigger)) &&
+                b->actor->hasFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_PLAYER)))
             {
-                stunnedIds[i] = a->isTrigger ? b->entityId : a->entityId;
+                b->actor->setFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_STUNNED));
+                break;
+            }
+            if (b->isTrigger &&
+                (b->flags & static_cast<uint32_t>(ColliderFlags::IsAttackTrigger)) &&
+                a->actor->hasFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_PLAYER)))
+            {
+                a->actor->setFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_STUNNED));
                 break;
             }
         }

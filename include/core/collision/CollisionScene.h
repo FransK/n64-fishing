@@ -17,16 +17,16 @@ namespace Collision
         void activate(Collider *object);
         void deactivate(Collider *object);
 
-        void update(float fixedTimeStep, int *stunnedIds);
+        void update(float fixedTimeStep);
         void debugDraw();
 
     private:
         std::vector<Collider *> colliders{};
         std::vector<Collider *> activeColliders{};
 
-        void runCollision(int *stunnedIds);
+        void runCollision();
         void constrainToWorld(Collider *object);
-        void collide(Collider *a, Collider *b, int *stunnedIds);
+        void collide(Collider *a, Collider *b);
         void correctOverlap(Collider *object, EpaResult *result, float ratio, float friction, float bounce);
         void correctVelocity(Collider *object, EpaResult *result, float ratio, float friction, float bounce);
     };

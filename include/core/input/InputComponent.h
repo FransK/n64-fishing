@@ -5,8 +5,7 @@
 #include "collision/CollisionScene.h"
 
 #include "InputState.h"
-#include "PlayerData.h"
-#include "PlayerState.h"
+#include "Player.h"
 
 template <typename InputStrategy>
 class InputComponent
@@ -15,17 +14,13 @@ public:
     InputComponent(InputStrategy inputStrategy) : mInputStrategy(inputStrategy) {}
 
     void update(float deltaTime,
-                PlayerState &playerState,
-                PlayerData &playerData,
-                Collision::CollisionScene &collScene,
-                Collision::Collider *damageTrigger,
-                bool stunned)
+                Player &player,
+                Collision::CollisionScene &collScene)
     {
         InputState inputState = mInputStrategy.update();
 
-        playerState.update(deltaTime, playerData, collScene, damageTrigger, stunned);
-
-        switch (playerState.getState())
+        player.getPlayerState()->update(deltaTime, player, collScene);
+        switch (player.getPlayerState()->getState())
         {
         case PlayerStateEnum::STATE_STUNNED:
         case PlayerStateEnum::STATE_CASTING:
@@ -37,12 +32,12 @@ public:
             if (inputState.fish)
             {
                 // Stop fishing and check for success
-                if (playerState.getStateTimer() <= CATCH_TIMER)
+                if (player.getPlayerState()->getStateTimer() <= CATCH_TIMER)
                 {
                     // Successful catch
-                    playerState.setActionSuccess(true);
+                    player.getPlayerState()->setActionSuccess(true);
                 }
-                playerState.changeState(PlayerStateEnum::STATE_IDLE, playerData, collScene, damageTrigger);
+                player.getPlayerState()->changeState(PlayerStateEnum::STATE_IDLE, player, collScene);
             }
             break;
         case PlayerStateEnum::STATE_WALKING:
@@ -51,14 +46,14 @@ public:
             if (inputState.attack)
             {
                 // Start attack
-                playerState.changeState(PlayerStateEnum::STATE_ATTACKING, playerData, collScene, damageTrigger);
+                player.getPlayerState()->changeState(PlayerStateEnum::STATE_ATTACKING, player, collScene);
                 break;
             }
 
             if (inputState.fish)
             {
                 // Start fishing
-                playerState.changeState(PlayerStateEnum::STATE_CASTING, playerData, collScene, damageTrigger);
+                player.getPlayerState()->changeState(PlayerStateEnum::STATE_CASTING, player, collScene);
                 break;
             }
 
@@ -68,13 +63,13 @@ public:
                 Vector2 normMove{};
                 Vector2::norm(&inputState.move, &normMove);
                 // Start walking
-                playerState.changeState(PlayerStateEnum::STATE_WALKING, playerData, collScene, damageTrigger);
-                playerData.setRotation({normMove.x, normMove.y});
-                playerData.setVelocity({normMove.x * BASE_SPEED, 0.0f, -normMove.y * BASE_SPEED});
+                player.getPlayerState()->changeState(PlayerStateEnum::STATE_WALKING, player, collScene);
+                player.setRotation({normMove.x, normMove.y});
+                player.setVelocity({normMove.x * BASE_SPEED, 0.0f, -normMove.y * BASE_SPEED});
                 break;
             }
 
-            playerState.changeState(PlayerStateEnum::STATE_IDLE, playerData, collScene, damageTrigger);
+            player.getPlayerState()->changeState(PlayerStateEnum::STATE_IDLE, player, collScene);
             break;
         default:
             break;

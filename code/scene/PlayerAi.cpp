@@ -3,7 +3,20 @@
 #include "Config.h"
 #include "Collider.h"
 
-void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playerNumber, PlayerData *players, std::vector<bool> &winners)
+void PlayerAi::reset()
+{
+    mMovementTarget = {};
+    mTarget = nullptr;
+    mDelayActionTimer = 0.0f;
+    mDelayCatchTimer = 0.8f;
+    mInputState = {
+        .move = {0.0f, 0.0f},
+        .fish = false,
+        .attack = false,
+    };
+}
+
+void PlayerAi::update(float deltaTime, Player *allPlayers, std::vector<bool> &winners)
 {
     // Reset input state
     mInputState = {
@@ -18,13 +31,13 @@ void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playe
         return;
     }
 
-    PlayerStateEnum state = playerState.getState();
+    PlayerStateEnum state = mPlayer->getPlayerState()->getState();
 
     switch (state)
     {
     case PlayerStateEnum::STATE_IDLE:
         // Find something to do
-        updateIdle(deltaTime, playerNumber, players, winners);
+        updateIdle(deltaTime, allPlayers, winners);
     case PlayerStateEnum::STATE_WALKING:
         // Move towards target and perform actions
         updateMovementTarget();
@@ -32,7 +45,7 @@ void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playe
         break;
     case PlayerStateEnum::STATE_FISHING:
         // Check fishing status
-        if (playerState.getStateTimer() < CATCH_TIMER - mDelayCatchTimer)
+        if (mPlayer->getPlayerState()->getStateTimer() < CATCH_TIMER - mDelayCatchTimer)
         {
             mInputState.fish = true;
             mDelayActionTimer = 2.0f;
@@ -50,29 +63,29 @@ void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playe
     }
 }
 
-void PlayerAi::updateIdle(float deltaTime, int playerNumber, PlayerData *players, std::vector<bool> &winners)
+void PlayerAi::updateIdle(float deltaTime, Player *allPlayers, std::vector<bool> &winners)
 {
     switch (mBehavior)
     {
     case AIBehavior::BEHAVE_BALANCED:
         // Alternate between fish and players
-        if (mTarget)
+        if (mTarget != nullptr)
         {
             mTarget = nullptr;
             mMovementTarget = findClosestFish();
         }
         else
         {
-            mTarget = findWinnerTarget(playerNumber, players, winners);
-            if (!mTarget)
+            mTarget = findWinnerTarget(allPlayers, winners);
+            if (mTarget == nullptr)
             {
                 mMovementTarget = findClosestFish();
             }
         }
         break;
     case AIBehavior::BEHAVE_BULLY:
-        mTarget = findWinnerTarget(playerNumber, players, winners);
-        if (!mTarget)
+        mTarget = findWinnerTarget(allPlayers, winners);
+        if (mTarget == nullptr)
         {
             mMovementTarget = findClosestFish();
         }
@@ -85,7 +98,7 @@ void PlayerAi::updateIdle(float deltaTime, int playerNumber, PlayerData *players
 
 void PlayerAi::updateMovementTarget()
 {
-    if (mTarget)
+    if (mTarget != nullptr)
     {
         mMovementTarget = mTarget->getPosition();
     }
@@ -116,18 +129,18 @@ void PlayerAi::moveToTarget()
     };
 }
 
-PlayerData *PlayerAi::findWinnerTarget(int playerNumber, PlayerData *players, std::vector<bool> &winners) const
+Player *PlayerAi::findWinnerTarget(Player *allPlayers, std::vector<bool> &winners) const
 {
     for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        if (i == playerNumber)
+        if (i == mPlayer->getPlayerNumber())
         {
             continue;
         }
 
         if (winners[i])
         {
-            return &players[i];
+            return &allPlayers[i];
         }
     }
     return nullptr;

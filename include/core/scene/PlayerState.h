@@ -1,11 +1,11 @@
 #pragma once
 
-#include "PlayerConsts.h"
-#include "PlayerData.h"
-
 #include "CollisionScene.h"
 #include "Observable.h"
+#include "PlayerConsts.h"
 #include "Vector3.h"
+
+class Player;
 
 enum struct PlayerStateEnum
 {
@@ -26,9 +26,9 @@ public:
     float getStateTimer() const { return mStateTimer; }
     void setActionSuccess(bool success) { mActionSuccess = success; }
 
-    void changeState(const PlayerStateEnum &newState, PlayerData &playerData, Collision::CollisionScene &collScene, Collision::Collider *damageTrigger);
-    void reset();
-    void update(float deltaTime, PlayerData &playerData, Collision::CollisionScene &collScene, Collision::Collider *damageTrigger, bool stunned);
+    void changeState(const PlayerStateEnum &newState, Player &player, Collision::CollisionScene &collScene);
+    void reset(Player &player, Collision::CollisionScene &collScene);
+    void update(float deltaTime, Player &player, Collision::CollisionScene &collScene);
 
 private:
     PlayerStateEnum mState{PlayerStateEnum::STATE_IDLE};

@@ -2,23 +2,26 @@
 
 #include <string>
 
+#include "ActorFlags.h"
 #include "Config.h"
 #include "math/Quaternion.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
-#include "input/PlayerConsts.h"
+#include "PlayerConsts.h"
 #include "PlayerColliders.h"
 
 #include "Fish.h"
 
 using namespace Math;
 
-Player::Player(Collision::CollisionScene *scene, PlayerData *data, PlayerState *state, int8_t playerNumber)
-    : mScene(scene), mPlayerData(data), mPlayerState(state)
+Player::Player(Collision::CollisionScene *scene, PlayerState *state, int8_t playerNumber)
+    : Actor(), mScene(scene), mPlayerState(state), mPlayerNumber(playerNumber)
 {
+    setFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_PLAYER));
+
     mCollider = Collision::Collider{
-        .entityId = data->getEntityId(),
-        .actor = data,
+        .entityId = this->getEntityId(),
+        .actor = this,
         .type = PlayerColliderType,
         .scale = 1.0f,
         .hasGravity = true,
@@ -28,13 +31,17 @@ Player::Player(Collision::CollisionScene *scene, PlayerData *data, PlayerState *
     };
 
     mCollider.center.y = PlayerColliderType.data.cylinder.halfHeight;
+
+    debugf("Collider information for Player %d: EntityId=%d, \n", playerNumber, mCollider.entityId);
     mCollider.recalcBB();
 
     mScene->add(&mCollider);
 
+    debugf("Successfully added Player %d collider to CollisionScene.\n", playerNumber);
+
     mDamageTrigger = Collision::Collider{
-        .entityId = data->getEntityId(),
-        .actor = data->getAttackActor(),
+        .entityId = this->getEntityId(),
+        .actor = this->getAttackActor(),
         .type = DamageTriggerType,
         .scale = 1.0f,
         .hasGravity = false,
@@ -43,6 +50,7 @@ Player::Player(Collision::CollisionScene *scene, PlayerData *data, PlayerState *
         .collisionGroup = static_cast<uint16_t>(FIRST_PLAYER_COLLIDER_GROUP + playerNumber),
     };
 
+    mDamageTrigger.flags |= static_cast<uint32_t>(Collision::ColliderFlags::IsAttackTrigger);
     mDamageTrigger.center.y = DamageTriggerType.data.sphere.radius;
     mDamageTrigger.recalcBB();
 
@@ -67,9 +75,9 @@ void Player::drawBillboard(T3DViewport &viewport) const
 
     // Screen position
     T3DVec3 worldPos = (T3DVec3){{
-        mPlayerData->getPosition().x + localPos.v[0] * 0.125f,
-        mPlayerData->getPosition().y + localPos.v[1] * 0.125f,
-        mPlayerData->getPosition().z + localPos.v[2] * 0.125f,
+        this->getPosition().x + localPos.v[0] * 0.125f,
+        this->getPosition().y + localPos.v[1] * 0.125f,
+        this->getPosition().z + localPos.v[2] * 0.125f,
     }};
 
     T3DVec3 screenPos;

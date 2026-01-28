@@ -3,6 +3,7 @@
 #include <variant>
 #include "timer.h"
 
+#include "ActorFlags.h"
 #include "GameSettings.h"
 #include "GlobalSettingsInterface.h"
 
@@ -79,12 +80,12 @@ Scene::Scene()
 
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mPlayerData[i].setPosition(initialPositions[i]);
-        mPlayerData[i].setRotation(initialRotations[i]);
-        mPlayers.emplace_back(&mCollisionScene, &mPlayerData[i], &mPlayerStates[i], i);
+        mPlayers.emplace_back(&mCollisionScene, &mPlayerStates[i], i);
+        mPlayers.back().setPosition(initialPositions[i]);
+        mPlayers.back().setRotation(initialRotations[i]);
 
         AIBehavior behavior = (i == Core::MAX_PLAYERS - 1) ? AIBehavior::BEHAVE_BULLY : AIBehavior::BEHAVE_FISHERMAN;
-        mAIPlayers.emplace_back(&mPlayerData[i]);
+        mAIPlayers.emplace_back(&mPlayers.back());
         mAIPlayers.back().setBehavior(behavior);
 
         if (i < playerCount)
@@ -138,42 +139,27 @@ void Scene::updateFixed(float deltaTime)
 
     // === Update Inputs and AI === //
     ticksActorUpdate = get_ticks();
-    bool stunnedThisFrame[Core::MAX_PLAYERS] = {false, false, false, false};
-    for (int i = 0; i < Core::MAX_PLAYERS; i++)
-    {
-        for (int j = 0; j < Core::MAX_PLAYERS; j++)
-        {
-            if (mStunnedIds[i] == mPlayers[j].getCollider()->entityId)
-            {
-                stunnedThisFrame[j] = true;
-                break;
-            }
-        }
-        mStunnedIds[i] = -1;
-    }
 
     std::any playerCountAny = getGlobalSettingsInterface()->getGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::PLAYER_COUNT));
     size_t playerCount = std::any_cast<size_t>(playerCountAny);
     for (size_t i = playerCount; i < Core::MAX_PLAYERS; i++)
     {
-        mAIPlayers[i].update(deltaTime, mPlayerStates[i], i, mPlayerData.data(), mWinners);
+        mAIPlayers[i].update(deltaTime, &mPlayers.front(), mWinners);
     }
 
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
         std::visit(InputComponentUpdate{deltaTime,
-                                        mPlayerStates[i],
-                                        mPlayerData[i],
-                                        mCollisionScene,
-                                        mPlayers[i].getDamageTrigger(),
-                                        stunnedThisFrame[i]},
+                                        mPlayers[i],
+                                        mCollisionScene},
                    mInputComponents[i]);
     }
+
     ticksCollisionUpdate = get_ticks();
     ticksActorUpdate = ticksCollisionUpdate - ticksActorUpdate;
 
     // === Update Collision Scene === //
-    mCollisionScene.update(deltaTime, mStunnedIds.data());
+    mCollisionScene.update(deltaTime);
     ticksCollisionUpdate = get_ticks() - ticksCollisionUpdate;
 
     // === Keep Track of Leaders === //
@@ -250,7 +236,7 @@ void Scene::update(float deltaTime)
     // === Draw players (3D Pass) === //
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mAnimationComponents[i].draw(mPlayerData[i].getPosition(), mPlayerData[i].getRotation());
+        mAnimationComponents[i].draw(mPlayers[i].getPosition(), mPlayers[i].getRotation());
     }
 
     // === Draw billboards (2D Pass) === //
@@ -348,11 +334,13 @@ void Scene::reset()
 
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mPlayerData[i].setPosition(initialPositions[i]);
-        mPlayerData[i].setRotation(initialRotations[i]);
-        mPlayerStates[i].reset();
+        mPlayers[i].setPosition(initialPositions[i]);
+        mPlayers[i].setRotation(initialRotations[i]);
+        mPlayers[i].setVelocity({0.0f, 0.0f, 0.0f});
+        mPlayers[i].clearFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_STUNNED));
+        mPlayerStates[i].reset(mPlayers[i], mCollisionScene);
+        mAIPlayers[i].reset();
         mWinners[i] = false;
-        mStunnedIds[i] = -1;
     }
 
     // Reset game state

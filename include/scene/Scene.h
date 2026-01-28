@@ -12,15 +12,12 @@
 #include "debug/Overlay.h"
 #include "input/InputComponent.h"
 #include "input/InputComponentVariant.h"
-#include "input/PlayerData.h"
-#include "input/PlayerState.h"
-
-// #include "ComponentVector.h"
 
 #include "Camera.h"
 #include "Config.h"
 #include "Player.h"
 #include "PlayerAi.h"
+#include "PlayerState.h"
 
 using CollisionScene = ::Collision::CollisionScene;
 
@@ -63,14 +60,11 @@ private:
 
     float mStateTime{};
 
-    /* Player Data Block - Positions, Velocities, etc*/
-    std::array<PlayerData, Core::MAX_PLAYERS> mPlayerData{};
     std::array<PlayerState, Core::MAX_PLAYERS> mPlayerStates{};
     std::vector<PlayerAi> mAIPlayers;
     std::vector<InputComponentVariant> mInputComponents;
     CollisionScene mCollisionScene;
     std::vector<AnimationComponent> mAnimationComponents;
-    std::array<int, Core::MAX_PLAYERS> mStunnedIds{-1};
 
     std::vector<Player> mPlayers;
     std::vector<bool> mWinners;

@@ -7,28 +7,19 @@ struct InputComponentUpdate
     struct args
     {
         float deltaTime;
-        PlayerState &playerState;
-        PlayerData &playerData;
+        Player &player;
         Collision::CollisionScene &collScene;
-        Collision::Collider *damageTrigger;
-        bool stunned;
     } args;
 
     InputComponentUpdate(float deltaTime,
-                         PlayerState &playerState,
-                         PlayerData &playerData,
-                         Collision::CollisionScene &collScene,
-                         Collision::Collider *damageTrigger,
-                         bool stunned) : args{deltaTime, playerState, playerData, collScene, damageTrigger, stunned} {}
+                         Player &player,
+                         Collision::CollisionScene &collScene) : args{deltaTime, player, collScene} {}
 
     template <typename InputComponentType>
     void operator()(InputComponentType &inputComponent)
     {
         inputComponent.update(args.deltaTime,
-                              args.playerState,
-                              args.playerData,
-                              args.collScene,
-                              args.damageTrigger,
-                              args.stunned);
+                              args.player,
+                              args.collScene);
     }
 };

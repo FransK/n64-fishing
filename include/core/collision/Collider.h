@@ -22,6 +22,11 @@ namespace Collision
         CollisionLayerTangible = (1 << 0),
     };
 
+    enum struct ColliderFlags : uint32_t
+    {
+        IsAttackTrigger = (1 << 0),
+    };
+
     struct Collider
     {
         int entityId{};
@@ -35,6 +40,7 @@ namespace Collision
         bool isFixed{false};
         uint16_t collisionLayers{};
         uint16_t collisionGroup{};
+        uint32_t flags{};
 
         void update(float timeStep);
         void recalcBB();
