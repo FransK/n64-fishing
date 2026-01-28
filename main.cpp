@@ -9,7 +9,8 @@ and provides a basic game loop.
 #include <rspq_profile.h>
 #include <memory>
 #include "include/Config.h"
-#include "GameSettingsInterface.h"
+#include "GameSettings.h"
+#include "GlobalSettingsInterface.h"
 #include "World.h"
 
 /*==============================
@@ -53,22 +54,28 @@ int main()
     register_VI_handler((void (*)(void))rand);
 
     // Load game
-    GameSettingsInterface *game_settings = getGameSettingsInterface();
+    GlobalSettingsInterface *globalSettings = getGlobalSettingsInterface();
+
     bool joinedPlayers[Core::MAX_PLAYERS] = {true, false, false, false};
-    game_settings->coreSetPlayercount(joinedPlayers);
-    game_settings->coreSetAidifficulty(Core::AiDiff::DIFF_EASY);
-    game_settings->coreSetSubtick(0.0);
+    std::array<Core::PlayerJoypad, JOYPAD_PORT_COUNT> playerJoypads{};
+    size_t playerCount = setPlayers(joinedPlayers, playerJoypads);
+
+    globalSettings->setGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::PLAYER_COUNT), playerCount);
+    globalSettings->setGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::PLAYER_JOYPADS), playerJoypads);
+    globalSettings->setGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::AI_DIFFICULTY), Core::AiDiff::DIFF_EASY);
+    globalSettings->setGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::SUBTICK), 0.0);
+
     std::unique_ptr<World> world = std::make_unique<World>();
 
     while (1)
     {
-        game_settings->coreResetGame();
+        resetGameSettings(globalSettings);
 
         float accumulator = 0;
         const float dt = Core::DELTA_TIME;
 
         // Program loop
-        while (!game_settings->coreGetGameEnding())
+        while (!globalSettings->getGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::EXIT_GAME)).has_value())
         {
             float frametime = display_get_delta_time();
 
@@ -89,7 +96,7 @@ int main()
             mixer_try_play();
 
             // Unfixed loop
-            getGameSettingsInterface()->coreSetSubtick(accumulator / dt);
+            globalSettings->setGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::SUBTICK), accumulator / dt);
             world->loop(frametime);
         }
 

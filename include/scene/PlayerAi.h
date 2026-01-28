@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "input/InputState.h"
@@ -20,7 +21,7 @@ public:
     PlayerAi(PlayerData *player) : mPlayer(player) {}
 
     void setBehavior(AIBehavior behavior) { mBehavior = behavior; }
-    void update(float deltaTime, const PlayerState &state, int playerNumber, PlayerData *players, uint8_t *winners);
+    void update(float deltaTime, const PlayerState &state, int playerNumber, PlayerData *players, std::vector<bool> &winners);
     InputState getInputState() const { return mInputState; }
 
 private:
@@ -32,9 +33,9 @@ private:
     float mDelayCatchTimer{0.8f};
     InputState mInputState{};
 
-    void updateIdle(float deltaTime, int playerNumber, PlayerData *players, uint8_t *winners);
+    void updateIdle(float deltaTime, int playerNumber, PlayerData *players, std::vector<bool> &winners);
     void updateMovementTarget();
     void moveToTarget();
-    PlayerData *findWinnerTarget(int playerNumber, PlayerData *players, uint8_t *winners) const;
+    PlayerData *findWinnerTarget(int playerNumber, PlayerData *players, std::vector<bool> &winners) const;
     Vector3 findClosestFish() const;
 };

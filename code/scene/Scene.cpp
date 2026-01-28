@@ -3,7 +3,8 @@
 #include <variant>
 #include "timer.h"
 
-#include "GameSettingsInterface.h"
+#include "GameSettings.h"
+#include "GlobalSettingsInterface.h"
 
 #include "Scene.h"
 #include "Config.h"
@@ -25,8 +26,8 @@ const std::string mapPath = std::string(FS_BASE) + "map.t3dm";
 Scene::Scene()
     : mPlayerModel(playerPath),
       mMapModel(mapPath),
-      mFontBillboard(FS_BASE_PATH "squarewave.font64", FONT_BILLBOARD),
-      mFontText(FS_BASE_PATH "squarewave.font64", FONT_TEXT)
+      mFontBillboard(FS_BASE_PATH "squarewave.font64", Core::FONT_BILLBOARD),
+      mFontText(FS_BASE_PATH "squarewave.font64", Core::FONT_TEXT)
 {
     Debug::init();
 
@@ -38,7 +39,7 @@ Scene::Scene()
     t3d_matrix_pop(1);
     mDplMap = Adapters::RspqBlockAdapter(rspq_block_end());
 
-    for (size_t i = 0; i < MAX_PLAYERS; i++)
+    for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
         const rdpq_fontstyle_t style{.color = COLORS[i]};
         rdpq_font_style(mFontText.get(), i, &style);
@@ -55,33 +56,38 @@ Scene::Scene()
     t3d_vec3_norm(&mLightDirVec);
 
     // === Initialize the players and components === //
-    Vector3 initialPositions[MAX_PLAYERS] = {
+    Vector3 initialPositions[Core::MAX_PLAYERS] = {
         {-25, 0.0f, 0},
         {0, 0.0f, -25},
         {25, 0.0f, 0},
         {0, 0.0f, 25}};
-    Vector2 initialRotations[MAX_PLAYERS] = {
+    Vector2 initialRotations[Core::MAX_PLAYERS] = {
         {1, 0},
         {0, -1},
         {-1, 0},
         {0, 1}};
 
-    mInputComponents.reserve(MAX_PLAYERS);
-    mAnimationComponents.reserve(MAX_PLAYERS);
-    mPlayers.reserve(MAX_PLAYERS);
-    mAIPlayers.reserve(MAX_PLAYERS);
+    mInputComponents.reserve(Core::MAX_PLAYERS);
+    mAnimationComponents.reserve(Core::MAX_PLAYERS);
+    mPlayers.reserve(Core::MAX_PLAYERS);
+    mAIPlayers.reserve(Core::MAX_PLAYERS);
+    mWinners.reserve(Core::MAX_PLAYERS);
 
-    for (size_t i = 0; i < MAX_PLAYERS; i++)
+    GlobalSettingsInterface *globalSettings = getGlobalSettingsInterface();
+    std::any playerCountAny = globalSettings->getGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::PLAYER_COUNT));
+    size_t playerCount = std::any_cast<size_t>(playerCountAny);
+
+    for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
         mPlayerData[i].setPosition(initialPositions[i]);
         mPlayerData[i].setRotation(initialRotations[i]);
         mPlayers.emplace_back(&mCollisionScene, &mPlayerData[i], &mPlayerStates[i], i);
 
-        AIBehavior behavior = (i == MAX_PLAYERS - 1) ? AIBehavior::BEHAVE_BULLY : AIBehavior::BEHAVE_FISHERMAN;
+        AIBehavior behavior = (i == Core::MAX_PLAYERS - 1) ? AIBehavior::BEHAVE_BULLY : AIBehavior::BEHAVE_FISHERMAN;
         mAIPlayers.emplace_back(&mPlayerData[i]);
         mAIPlayers.back().setBehavior(behavior);
 
-        if (i < getGameSettingsInterface()->coreGetPlayercount())
+        if (i < playerCount)
         {
             mInputComponents.emplace_back(PlayerInputStrategy((joypad_port_t)i));
         }
@@ -92,6 +98,7 @@ Scene::Scene()
 
         mAnimationComponents.emplace_back(mPlayerModel.getModel(), &mPlayerStates[i], COLORS[i]);
         mPlayerStates[i].attach(&mAnimationComponents.back());
+        mWinners.push_back(false);
     }
 
     // === Initialize Game State === //
@@ -122,7 +129,7 @@ void Scene::updateFixed(float deltaTime)
     case State::GAME_OVER:
         if (mStateTime <= 0)
         {
-            getGameSettingsInterface()->coreGameEnd();
+            getGlobalSettingsInterface()->setGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::EXIT_GAME), true);
         }
         return;
     default:
@@ -131,10 +138,10 @@ void Scene::updateFixed(float deltaTime)
 
     // === Update Inputs and AI === //
     ticksActorUpdate = get_ticks();
-    bool stunnedThisFrame[MAX_PLAYERS] = {false, false, false, false};
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    bool stunnedThisFrame[Core::MAX_PLAYERS] = {false, false, false, false};
+    for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        for (int j = 0; j < MAX_PLAYERS; j++)
+        for (int j = 0; j < Core::MAX_PLAYERS; j++)
         {
             if (mStunnedIds[i] == mPlayers[j].getCollider()->entityId)
             {
@@ -145,12 +152,14 @@ void Scene::updateFixed(float deltaTime)
         mStunnedIds[i] = -1;
     }
 
-    for (size_t i = getGameSettingsInterface()->coreGetPlayercount(); i < MAX_PLAYERS; i++)
+    std::any playerCountAny = getGlobalSettingsInterface()->getGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::PLAYER_COUNT));
+    size_t playerCount = std::any_cast<size_t>(playerCountAny);
+    for (size_t i = playerCount; i < Core::MAX_PLAYERS; i++)
     {
-        mAIPlayers[i].update(deltaTime, mPlayerStates[i], i, mPlayerData.data(), mWinners.data());
+        mAIPlayers[i].update(deltaTime, mPlayerStates[i], i, mPlayerData.data(), mWinners);
     }
 
-    for (size_t i = 0; i < MAX_PLAYERS; i++)
+    for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
         std::visit(InputComponentUpdate{deltaTime,
                                         mPlayerStates[i],
@@ -174,7 +183,7 @@ void Scene::updateFixed(float deltaTime)
         mCurrTopScore = std::max(mCurrTopScore, state.getFishCaught());
     }
 
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {
         mWinners[i] = mPlayerStates[i].getFishCaught() >= mCurrTopScore;
     }
@@ -184,7 +193,10 @@ void Scene::update(float deltaTime)
 {
     // === Debug Controls === //
     {
-        auto ctrl = getGameSettingsInterface()->coreGetPlayercontroller(PlyNum::PLAYER_1);
+        using PlayerJoypadsArray = std::array<Core::PlayerJoypad, JOYPAD_PORT_COUNT>;
+        std::any playerJoypadsAny = getGlobalSettingsInterface()->getGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::PLAYER_JOYPADS));
+        auto playerJoypads = std::any_cast<PlayerJoypadsArray>(playerJoypadsAny);
+        auto ctrl = playerJoypads[static_cast<size_t>(Core::PlyNum::PLAYER_1)].port;
         auto btn = joypad_get_buttons_pressed(ctrl);
         auto held = joypad_get_buttons_held(ctrl);
 
@@ -221,7 +233,7 @@ void Scene::update(float deltaTime)
                         (uint8_t)(0xb8),
                         (uint8_t)(0xd8),
                         0xFF});
-    rdpq_fill_rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    rdpq_fill_rectangle(0, 0, Core::SCREEN_WIDTH, Core::SCREEN_HEIGHT);
 
     // === Draw 3D === //
     t3d_frame_start();
@@ -236,13 +248,13 @@ void Scene::update(float deltaTime)
     rspq_block_run(mDplMap.get());
 
     // === Draw players (3D Pass) === //
-    for (size_t i = 0; i < MAX_PLAYERS; i++)
+    for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
         mAnimationComponents[i].draw(mPlayerData[i].getPosition(), mPlayerData[i].getRotation());
     }
 
     // === Draw billboards (2D Pass) === //
-    for (size_t i = 0; i < MAX_PLAYERS; i++)
+    for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
         mPlayers[i].drawBillboard(mViewport);
     }
@@ -253,15 +265,15 @@ void Scene::update(float deltaTime)
         .width = (int16_t)display_get_width(),
         .align = ALIGN_CENTER,
     };
-    rdpq_text_printf(&center_text_h, FONT_TEXT, 0, TIMER_Y, "%d", (int)ceilf(mStateTime));
+    rdpq_text_printf(&center_text_h, Core::FONT_TEXT, 0, Core::TIMER_Y, "%d", (int)ceilf(mStateTime));
 
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {
         const rdpq_textparms_t score_params{.style_id = (int16_t)i};
         rdpq_text_printf(&score_params,
-                         FONT_TEXT,
-                         SCORE_X + i * SCORE_X_SPACING,
-                         SCORE_Y,
+                         Core::FONT_TEXT,
+                         Core::SCORE_X + i * Core::SCORE_X_SPACING,
+                         Core::SCORE_Y,
                          "%d",
                          mPlayerStates[i].getFishCaught());
     }
@@ -276,16 +288,27 @@ void Scene::update(float deltaTime)
             .valign = VALIGN_CENTER,
         };
         std::string message{};
-        for (int i = 0; i < MAX_PLAYERS; i++)
+        for (int i = 0; i < Core::MAX_PLAYERS; i++)
         {
             mWinners[i] = mPlayerStates[i].getFishCaught() >= mCurrTopScore;
             if (mWinners[i])
             {
-                getGameSettingsInterface()->coreSetWinner((PlyNum)i);
+                using WinningPlayersArray = std::array<bool, Core::MAX_PLAYERS>;
+                std::any winningPlayersAny = getGlobalSettingsInterface()->getGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::WINNING_PLAYERS));
+                WinningPlayersArray winningPlayers{false, false, false, false};
+
+                if (winningPlayersAny.has_value())
+                {
+                    winningPlayers = std::any_cast<WinningPlayersArray>(winningPlayersAny);
+                }
+
+                winningPlayers[i] = true;
+                getGlobalSettingsInterface()->setGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::WINNING_PLAYERS), winningPlayers);
+
                 message += ("Player " + std::to_string(i + 1) + " wins!\n");
             }
         }
-        rdpq_text_printf(&center_text_hv, FONT_TEXT, 0, 0, message.c_str());
+        rdpq_text_printf(&center_text_hv, Core::FONT_TEXT, 0, 0, message.c_str());
     }
 
     // Debug UI
@@ -312,23 +335,23 @@ const CollisionScene &Scene::getCollScene()
 void Scene::reset()
 {
     // Reset player positions and rotations
-    Vector3 initialPositions[MAX_PLAYERS] = {
+    Vector3 initialPositions[Core::MAX_PLAYERS] = {
         {-25, 0.0f, 0},
         {0, 0.0f, -25},
         {25, 0.0f, 0},
         {0, 0.0f, 25}};
-    Vector2 initialRotations[MAX_PLAYERS] = {
+    Vector2 initialRotations[Core::MAX_PLAYERS] = {
         {1, 0},
         {0, -1},
         {-1, 0},
         {0, 1}};
 
-    for (size_t i = 0; i < MAX_PLAYERS; i++)
+    for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
         mPlayerData[i].setPosition(initialPositions[i]);
         mPlayerData[i].setRotation(initialRotations[i]);
         mPlayerStates[i].reset();
-        mWinners[i] = 0;
+        mWinners[i] = false;
         mStunnedIds[i] = -1;
     }
 

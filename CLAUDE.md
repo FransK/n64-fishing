@@ -33,7 +33,7 @@ main.cpp → World → Scene (central hub)
 - **Strategy Pattern**: `InputComponent<T>` uses `PlayerInputStrategy` or `AIInputStrategy` to abstract input sources
 - **Observer Pattern**: `AnimationComponent` observes `PlayerState` changes to trigger animations
 - **Variant Pattern**: `InputComponentVariant` (std::variant) handles player vs AI without virtual inheritance
-- **Singleton**: `GameSettings` accessed via `getGameSettingsInterface()`
+- **Singleton**: `GlobalSettings` accessed via `getGlobalSettingsInterface()`
 - **State Machine**: Both Scene (INTRO→GAME→GAME_OVER) and PlayerState (IDLE→WALKING→ATTACKING/FISHING→STUNNED)
 
 ### Directory Layout
@@ -60,6 +60,6 @@ Uses custom GJK/EPA implementation with Minkowski sums. Two pruning passes: sing
 
 - **File names**: PascalCase (e.g., `PlayerAi.h`, `GameSettings.cpp`)
 - **Type names**: PascalCase (e.g., `PlayerState`, `AnimationComponent`, `CollisionScene`)
-- **Function names**: camelCase (e.g., `getGameSettingsInterface()`, `updateFixed()`, `drawBillboard()`)
+- **Function names**: camelCase (e.g., `getGlobalSettingsInterface()`, `updateFixed()`, `drawBillboard()`)
 - **Variable names**: camelCase
 - **Parameter names**: camelCase

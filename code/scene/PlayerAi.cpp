@@ -3,7 +3,7 @@
 #include "Config.h"
 #include "Collider.h"
 
-void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playerNumber, PlayerData *players, uint8_t *winners)
+void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playerNumber, PlayerData *players, std::vector<bool> &winners)
 {
     // Reset input state
     mInputState = {
@@ -50,7 +50,7 @@ void PlayerAi::update(float deltaTime, const PlayerState &playerState, int playe
     }
 }
 
-void PlayerAi::updateIdle(float deltaTime, int playerNumber, PlayerData *players, uint8_t *winners)
+void PlayerAi::updateIdle(float deltaTime, int playerNumber, PlayerData *players, std::vector<bool> &winners)
 {
     switch (mBehavior)
     {
@@ -116,7 +116,7 @@ void PlayerAi::moveToTarget()
     };
 }
 
-PlayerData *PlayerAi::findWinnerTarget(int playerNumber, PlayerData *players, uint8_t *winners) const
+PlayerData *PlayerAi::findWinnerTarget(int playerNumber, PlayerData *players, std::vector<bool> &winners) const
 {
     for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {

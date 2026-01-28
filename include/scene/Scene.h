@@ -4,7 +4,7 @@
 #include <t3d/t3d.h>
 #include <vector>
 
-#include "GameSettingsInterface.h"
+#include "GlobalSettingsInterface.h"
 
 #include "adapters/T3d.h"
 #include "animation/AnimationComponent.h"
@@ -18,24 +18,24 @@
 // #include "ComponentVector.h"
 
 #include "Camera.h"
+#include "Config.h"
 #include "Player.h"
 #include "PlayerAi.h"
 
 using CollisionScene = ::Collision::CollisionScene;
-using namespace Core;
 
-constexpr float INTRO_TIME = 3.f;
-constexpr float GAME_TIME = 60.f;
+constexpr float INTRO_TIME = 1.f;
+constexpr float GAME_TIME = 10.f;
 constexpr float GAME_OVER_TIME = 3.f;
 
 constexpr uint8_t COLOR_AMBIENT[4] = {0xAA, 0xAA, 0xAA, 0xFF};
 constexpr uint8_t COLOR_DIR[4] = {0xFF, 0xAA, 0xAA, 0xFF};
 
 constexpr color_t COLORS[] = {
-    PLAYER_COLOR_1,
-    PLAYER_COLOR_2,
-    PLAYER_COLOR_3,
-    PLAYER_COLOR_4,
+    Core::PLAYER_COLOR_1,
+    Core::PLAYER_COLOR_2,
+    Core::PLAYER_COLOR_3,
+    Core::PLAYER_COLOR_4,
 };
 
 class Scene
@@ -64,17 +64,16 @@ private:
     float mStateTime{};
 
     /* Player Data Block - Positions, Velocities, etc*/
-    std::array<PlayerData, MAX_PLAYERS> mPlayerData{};
-    std::array<PlayerState, MAX_PLAYERS> mPlayerStates{};
+    std::array<PlayerData, Core::MAX_PLAYERS> mPlayerData{};
+    std::array<PlayerState, Core::MAX_PLAYERS> mPlayerStates{};
     std::vector<PlayerAi> mAIPlayers;
     std::vector<InputComponentVariant> mInputComponents;
     CollisionScene mCollisionScene;
     std::vector<AnimationComponent> mAnimationComponents;
-    std::array<int, MAX_PLAYERS> mStunnedIds{-1};
+    std::array<int, Core::MAX_PLAYERS> mStunnedIds{-1};
 
-    /* Container class? */
     std::vector<Player> mPlayers;
-    std::array<uint8_t, MAX_PLAYERS> mWinners{0};
+    std::vector<bool> mWinners;
     int mCurrTopScore{0};
 
     Adapters::ModelAdapter mPlayerModel;
