@@ -19,7 +19,7 @@
 #include "PlayerAi.h"
 #include "PlayerState.h"
 
-using CollisionScene = ::Collision::CollisionScene;
+using Collision::CollisionScene;
 
 constexpr float INTRO_TIME = 1.f;
 constexpr float GAME_TIME = 10.f;
@@ -60,13 +60,12 @@ private:
 
     float mStateTime{};
 
-    std::array<PlayerState, Core::MAX_PLAYERS> mPlayerStates{};
+    std::vector<Player> mPlayers;
     std::vector<PlayerAi> mAIPlayers;
     std::vector<InputComponentVariant> mInputComponents;
-    CollisionScene mCollisionScene;
     std::vector<AnimationComponent> mAnimationComponents;
+    std::shared_ptr<CollisionScene> mCollisionScene;
 
-    std::vector<Player> mPlayers;
     std::vector<bool> mWinners;
     int mCurrTopScore{0};
 

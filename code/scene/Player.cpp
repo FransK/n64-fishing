@@ -14,12 +14,15 @@
 
 using namespace Math;
 
-Player::Player(Collision::CollisionScene *scene, PlayerState *state, int8_t playerNumber)
-    : Actor(), mScene(scene), mPlayerState(state), mPlayerNumber(playerNumber)
+Player::Player(Collision::CollisionScene *scene, int8_t playerNumber)
+    : mAttackActor(std::make_unique<Actor>()),
+      mPlayerState(std::make_unique<PlayerState>()),
+      mScene(std::shared_ptr<Collision::CollisionScene>(scene)),
+      mPlayerNumber(playerNumber)
 {
-    setFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_PLAYER));
+    setFlag(ActorFlags::IS_PLAYER);
 
-    mCollider = Collision::Collider{
+    Collision::Collider collider = Collision::Collider{
         .entityId = this->getEntityId(),
         .actor = this,
         .type = PlayerColliderType,
@@ -30,13 +33,13 @@ Player::Player(Collision::CollisionScene *scene, PlayerState *state, int8_t play
         .collisionGroup = static_cast<uint16_t>(FIRST_PLAYER_COLLIDER_GROUP + playerNumber),
     };
 
-    mCollider.center.y = PlayerColliderType.data.cylinder.halfHeight;
-    mCollider.recalcBB();
+    collider.center.y = PlayerColliderType.data.cylinder.halfHeight;
+    collider.recalcBB();
 
-    mScene->add(&mCollider);
+    mScene->add(std::move(collider));
 
-    mDamageTrigger = Collision::Collider{
-        .entityId = this->getEntityId(),
+    Collision::Collider damageTrigger = Collision::Collider{
+        .entityId = this->getAttackActor()->getEntityId(),
         .actor = this->getAttackActor(),
         .type = DamageTriggerType,
         .scale = 1.0f,
@@ -46,17 +49,17 @@ Player::Player(Collision::CollisionScene *scene, PlayerState *state, int8_t play
         .collisionGroup = static_cast<uint16_t>(FIRST_PLAYER_COLLIDER_GROUP + playerNumber),
     };
 
-    mDamageTrigger.flags |= static_cast<uint32_t>(Collision::ColliderFlags::IsAttackTrigger);
-    mDamageTrigger.center.y = DamageTriggerType.data.sphere.radius;
-    mDamageTrigger.recalcBB();
+    damageTrigger.setFlag(Collision::ColliderFlags::IS_ATTACK_TRIGGER);
+    damageTrigger.center.y = DamageTriggerType.data.sphere.radius;
+    damageTrigger.recalcBB();
 
-    mScene->add(&mDamageTrigger, false);
+    mScene->add(std::move(damageTrigger), false);
 }
 
 Player::~Player()
 {
-    mScene->remove(&mCollider);
-    mScene->remove(&mDamageTrigger);
+    mScene->remove(this->getEntityId());
+    mScene->remove(this->getAttackActor()->getEntityId());
 }
 
 void Player::drawBillboard(T3DViewport &viewport) const
@@ -85,4 +88,13 @@ void Player::drawBillboard(T3DViewport &viewport) const
     const rdpq_textparms_t param{};
     std::string mBillboardText = mPlayerState->canCatch() ? "HOOKED!" : "Fishing...";
     rdpq_text_printf(&param, Core::FONT_BILLBOARD, x, y, "%s", mBillboardText.c_str());
+}
+
+void Player::reset(Vector3 const &position, Vector2 const &rotation)
+{
+    setPosition(position);
+    setRotation(rotation);
+    setVelocity({0.0f, 0.0f, 0.0f});
+    clearFlag(ActorFlags::IS_STUNNED);
+    mPlayerState->reset(*this, *mScene);
 }

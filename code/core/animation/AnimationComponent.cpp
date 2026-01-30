@@ -1,7 +1,7 @@
 #include "animation/AnimationComponent.h"
 #include "math/Quaternion.h"
 
-AnimationComponent::AnimationComponent(T3DModel *model, PlayerState *playerState, color_t primColor)
+AnimationComponent::AnimationComponent(T3DModel *model, color_t primColor)
     : Observer<PlayerState>([this](const PlayerState &state)
                             { this->onPlayerStateChange(state); }),
       mModel(model),

@@ -15,20 +15,20 @@
 using namespace Collision;
 using namespace Math;
 
-void CollisionScene::add(Collider *object, bool isActive)
+void CollisionScene::add(Collider &&object, bool isActive)
 {
-    colliders.push_back(object);
+    colliders.push_back(std::make_shared<Collider>(std::move(object)));
     if (isActive)
     {
-        activeColliders.push_back(object);
+        activeColliders.push_back(std::make_shared<Collider>(std::move(object)));
     }
 }
 
-void CollisionScene::remove(Collider *object)
+void CollisionScene::remove(int entityId)
 {
     for (auto iter = activeColliders.begin(); iter != activeColliders.end(); ++iter)
     {
-        if (*iter == object)
+        if ((*iter)->entityId == entityId)
         {
             activeColliders.erase(iter);
             break;
@@ -36,33 +36,42 @@ void CollisionScene::remove(Collider *object)
     }
     for (auto iter = colliders.begin(); iter != colliders.end(); ++iter)
     {
-        if (*iter == object)
+        if ((*iter)->entityId == entityId)
         {
-            return (void)colliders.erase(iter);
+            colliders.erase(iter);
+            return;
         }
     }
 }
 
-void CollisionScene::activate(Collider *object)
+void CollisionScene::activate(int entityId)
 {
-    for (auto *c : activeColliders)
+    for (auto c : activeColliders)
     {
-        if (c == object)
+        if (c->entityId == entityId)
         {
             return;
         }
     }
 
-    activeColliders.push_back(object);
+    for (auto c : colliders)
+    {
+        if (c->entityId == entityId)
+        {
+            activeColliders.push_back(c);
+            return;
+        }
+    }
 }
 
-void CollisionScene::deactivate(Collider *object)
+void CollisionScene::deactivate(int entityId)
 {
     for (auto iter = activeColliders.begin(); iter != activeColliders.end(); ++iter)
     {
-        if (*iter == object)
+        if ((*iter)->entityId == entityId)
         {
-            return (void)activeColliders.erase(iter);
+            activeColliders.erase(iter);
+            return;
         }
     }
 }
@@ -70,7 +79,7 @@ void CollisionScene::deactivate(Collider *object)
 void CollisionScene::update(float fixedTimeStep)
 {
     /* Integrate objects */
-    for (auto *c : activeColliders)
+    for (auto c : activeColliders)
     {
         c->update(fixedTimeStep);
         c->recalcBB();
@@ -80,16 +89,16 @@ void CollisionScene::update(float fixedTimeStep)
     runCollision();
 
     /* Clamp to world */
-    for (auto *c : activeColliders)
+    for (auto c : activeColliders)
     {
-        constrainToWorld(c);
+        constrainToWorld(c.get());
         c->constrainPosition();
     }
 }
 
 void CollisionScene::debugDraw()
 {
-    for (auto *c : activeColliders)
+    for (auto c : activeColliders)
     {
         Debug::drawBox(c->boundingBox);
     }
@@ -130,10 +139,10 @@ void CollisionScene::runCollision()
 
         if (edge.isStartEdge)
         {
-            Collider *a = activeColliders[edge.objectIndex];
+            Collider *a = activeColliders[edge.objectIndex].get();
             for (int activeIndex = 0; activeIndex < activeObjectCount; activeIndex++)
             {
-                Collider *b = activeColliders[activeObjects[activeIndex]];
+                Collider *b = activeColliders[activeObjects[activeIndex]].get();
 
                 // === AABB === //
                 if (hasOverlap(a->boundingBox, b->boundingBox))
@@ -197,17 +206,17 @@ void CollisionScene::collide(Collider *a, Collider *b)
         for (int i = 0; i < 4; i++)
         {
             if (a->isTrigger &&
-                (a->flags & static_cast<uint32_t>(ColliderFlags::IsAttackTrigger)) &&
-                b->actor->hasFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_PLAYER)))
+                a->hasFlag(ColliderFlags::IS_ATTACK_TRIGGER) &&
+                b->actor->hasFlag(ActorFlags::IS_PLAYER))
             {
-                b->actor->setFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_STUNNED));
+                b->actor->setFlag(ActorFlags::IS_STUNNED);
                 break;
             }
             if (b->isTrigger &&
-                (b->flags & static_cast<uint32_t>(ColliderFlags::IsAttackTrigger)) &&
-                a->actor->hasFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_PLAYER)))
+                b->hasFlag(ColliderFlags::IS_ATTACK_TRIGGER) &&
+                a->actor->hasFlag(ActorFlags::IS_PLAYER))
             {
-                a->actor->setFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_STUNNED));
+                a->actor->setFlag(ActorFlags::IS_STUNNED);
                 break;
             }
         }

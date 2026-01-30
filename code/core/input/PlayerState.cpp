@@ -15,7 +15,7 @@ void PlayerState::changeState(const PlayerStateEnum &newState, Player &player, C
 
     if (mState == PlayerStateEnum::STATE_ATTACKING)
     {
-        collScene.deactivate(player.getDamageTrigger());
+        collScene.deactivate(player.getAttackActor()->getEntityId());
     }
 
     if (mState == PlayerStateEnum::STATE_FISHING && mActionSuccess)
@@ -34,7 +34,7 @@ void PlayerState::changeState(const PlayerStateEnum &newState, Player &player, C
         player.getAttackActor()->setPosition({player.getPosition().x + player.getRotation().x * ATTACK_OFFSET,
                                               player.getPosition().y + PlayerColliderType.data.cylinder.halfHeight,
                                               player.getPosition().z + -player.getRotation().y * ATTACK_OFFSET});
-        collScene.activate(player.getDamageTrigger());
+        collScene.activate(player.getAttackActor()->getEntityId());
         notify();
         break;
     case PlayerStateEnum::STATE_CASTING:
@@ -75,11 +75,10 @@ void PlayerState::reset(Player &player, Collision::CollisionScene &collScene)
 
 void PlayerState::update(float deltaTime, Player &player, Collision::CollisionScene &collScene)
 {
-    bool stunned = player.hasFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_STUNNED));
-    player.clearFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_STUNNED));
-
-    if (mState != PlayerStateEnum::STATE_STUNNED && stunned)
+    if (mState != PlayerStateEnum::STATE_STUNNED &&
+        player.hasFlag(ActorFlags::IS_STUNNED))
     {
+        player.clearFlag(ActorFlags::IS_STUNNED);
         changeState(PlayerStateEnum::STATE_STUNNED, player, collScene);
         return;
     }

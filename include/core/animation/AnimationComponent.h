@@ -19,7 +19,7 @@ Encapsulates both animation and rendering
 class AnimationComponent : public Observer<PlayerState>
 {
 public:
-    AnimationComponent(T3DModel *model, PlayerState *playerState, color_t primColor);
+    AnimationComponent(T3DModel *model, color_t primColor);
     ~AnimationComponent() = default;
 
     AnimationComponent(const AnimationComponent &) = delete;

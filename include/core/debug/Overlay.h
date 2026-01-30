@@ -14,23 +14,6 @@ namespace Debug
 {
     class Overlay
     {
-    private:
-        struct MenuItem
-        {
-            const char *text{};
-            int value{};
-            bool isBool{};
-            std::function<void(MenuItem &)> onChange{};
-        };
-
-        struct Menu
-        {
-            std::vector<MenuItem> items{};
-            int currIndex;
-        };
-
-        Menu mMenu{};
-
     public:
         void draw(Scene &scene, uint32_t vertCount, float deltaTime);
     };

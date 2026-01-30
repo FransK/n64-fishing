@@ -24,7 +24,7 @@ namespace Collision
 
     enum struct ColliderFlags : uint32_t
     {
-        IsAttackTrigger = (1 << 0),
+        IS_ATTACK_TRIGGER = (1 << 0),
     };
 
     struct Collider
@@ -45,6 +45,8 @@ namespace Collision
         void update(float timeStep);
         void recalcBB();
         void constrainPosition();
+        bool hasFlag(ColliderFlags flag) const { return (flags & static_cast<uint32_t>(flag)) != 0; }
+        void setFlag(ColliderFlags flag) { flags |= static_cast<uint32_t>(flag); }
         Vector3 minkowskiSumWorld(const Vector3 &direction);
     };
 }

@@ -25,7 +25,8 @@ const std::string playerPath = std::string(FS_BASE) + "player3.t3dm";
 const std::string mapPath = std::string(FS_BASE) + "map.t3dm";
 
 Scene::Scene()
-    : mPlayerModel(playerPath),
+    : mCollisionScene(std::make_shared<CollisionScene>()),
+      mPlayerModel(playerPath),
       mMapModel(mapPath),
       mFontBillboard(FS_BASE_PATH "squarewave.font64", Core::FONT_BILLBOARD),
       mFontText(FS_BASE_PATH "squarewave.font64", Core::FONT_TEXT)
@@ -40,7 +41,7 @@ Scene::Scene()
     t3d_matrix_pop(1);
     mDplMap = Adapters::RspqBlockAdapter(rspq_block_end());
 
-    for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
+    for (auto i = 0; i < Core::MAX_PLAYERS; i++)
     {
         const rdpq_fontstyle_t style{.color = COLORS[i]};
         rdpq_font_style(mFontText.get(), i, &style);
@@ -80,7 +81,7 @@ Scene::Scene()
 
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mPlayers.emplace_back(&mCollisionScene, &mPlayerStates[i], i);
+        mPlayers.emplace_back(mCollisionScene.get(), i);
         mPlayers.back().setPosition(initialPositions[i]);
         mPlayers.back().setRotation(initialRotations[i]);
 
@@ -97,8 +98,8 @@ Scene::Scene()
             mInputComponents.emplace_back(AIInputStrategy(&mAIPlayers[i]));
         }
 
-        mAnimationComponents.emplace_back(mPlayerModel.getModel(), &mPlayerStates[i], COLORS[i]);
-        mPlayerStates[i].attach(&mAnimationComponents.back());
+        mAnimationComponents.emplace_back(mPlayerModel.getModel(), COLORS[i]);
+        mPlayers.back().getPlayerState()->attach(&mAnimationComponents.back());
         mWinners.push_back(false);
     }
 
@@ -151,7 +152,7 @@ void Scene::updateFixed(float deltaTime)
     {
         std::visit(InputComponentUpdate{deltaTime,
                                         mPlayers[i],
-                                        mCollisionScene},
+                                        *mCollisionScene},
                    mInputComponents[i]);
     }
 
@@ -159,19 +160,19 @@ void Scene::updateFixed(float deltaTime)
     ticksActorUpdate = ticksCollisionUpdate - ticksActorUpdate;
 
     // === Update Collision Scene === //
-    mCollisionScene.update(deltaTime);
+    mCollisionScene->update(deltaTime);
     ticksCollisionUpdate = get_ticks() - ticksCollisionUpdate;
 
     // === Keep Track of Leaders === //
     mCurrTopScore = 0;
-    for (auto &state : mPlayerStates)
+    for (auto &player : mPlayers)
     {
-        mCurrTopScore = std::max(mCurrTopScore, state.getFishCaught());
+        mCurrTopScore = std::max(mCurrTopScore, player.getPlayerState()->getFishCaught());
     }
 
     for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mWinners[i] = mPlayerStates[i].getFishCaught() >= mCurrTopScore;
+        mWinners[i] = mPlayers[i].getPlayerState()->getFishCaught() >= mCurrTopScore;
     }
 }
 
@@ -261,7 +262,7 @@ void Scene::update(float deltaTime)
                          Core::SCORE_X + i * Core::SCORE_X_SPACING,
                          Core::SCORE_Y,
                          "%d",
-                         mPlayerStates[i].getFishCaught());
+                         mPlayers[i].getPlayerState()->getFishCaught());
     }
 
     if (mState == State::GAME_OVER)
@@ -276,7 +277,7 @@ void Scene::update(float deltaTime)
         std::string message{};
         for (int i = 0; i < Core::MAX_PLAYERS; i++)
         {
-            mWinners[i] = mPlayerStates[i].getFishCaught() >= mCurrTopScore;
+            mWinners[i] = mPlayers[i].getPlayerState()->getFishCaught() >= mCurrTopScore;
             if (mWinners[i])
             {
                 using WinningPlayersArray = std::array<bool, Core::MAX_PLAYERS>;
@@ -315,7 +316,7 @@ void Scene::update(float deltaTime)
 
 const CollisionScene &Scene::getCollScene()
 {
-    return mCollisionScene;
+    return *mCollisionScene;
 }
 
 void Scene::reset()
@@ -334,11 +335,7 @@ void Scene::reset()
 
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mPlayers[i].setPosition(initialPositions[i]);
-        mPlayers[i].setRotation(initialRotations[i]);
-        mPlayers[i].setVelocity({0.0f, 0.0f, 0.0f});
-        mPlayers[i].clearFlag(static_cast<uint32_t>(ActorFlags::FLAG_IS_STUNNED));
-        mPlayerStates[i].reset(mPlayers[i], mCollisionScene);
+        mPlayers[i].reset(initialPositions[i], initialRotations[i]);
         mAIPlayers[i].reset();
         mWinners[i] = false;
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "Collider.h"
@@ -10,19 +11,17 @@ namespace Collision
     class CollisionScene
     {
     public:
-        CollisionScene() = default;
-
-        void add(Collider *object, bool isActive = true);
-        void remove(Collider *object);
-        void activate(Collider *object);
-        void deactivate(Collider *object);
+        void add(Collider &&object, bool isActive = true);
+        void remove(int entityId);
+        void activate(int entityId);
+        void deactivate(int entityId);
 
         void update(float fixedTimeStep);
         void debugDraw();
 
     private:
-        std::vector<Collider *> colliders{};
-        std::vector<Collider *> activeColliders{};
+        std::vector<std::shared_ptr<Collider>> colliders{};
+        std::vector<std::shared_ptr<Collider>> activeColliders{};
 
         void runCollision();
         void constrainToWorld(Collider *object);

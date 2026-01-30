@@ -13,7 +13,7 @@ using namespace Math;
 class Player : public Actor
 {
 public:
-    Player(Collision::CollisionScene *scene, PlayerState *state, int8_t playerNumber);
+    Player(Collision::CollisionScene *scene, int8_t playerNumber);
     ~Player();
     Player(const Player &) = delete;
     Player &operator=(const Player &) = delete;
@@ -21,18 +21,15 @@ public:
     Player &operator=(Player &&) = default;
 
     void drawBillboard(T3DViewport &viewport) const;
+    void reset(Vector3 const &position, Vector2 const &rotation);
 
-    const Collision::Collider *getCollider() const { return &mCollider; }
-    Collision::Collider *getDamageTrigger() { return &mDamageTrigger; }
-    PlayerState *getPlayerState() const { return mPlayerState; }
-    Actor *getAttackActor() { return &mAttackActor; }
+    PlayerState *getPlayerState() const { return mPlayerState.get(); }
+    Actor *getAttackActor() const { return mAttackActor.get(); }
     int8_t getPlayerNumber() const { return mPlayerNumber; }
 
 private:
-    Actor mAttackActor{};
-    Collision::Collider mCollider{};
-    Collision::Collider mDamageTrigger{};
-    Collision::CollisionScene *mScene{};
-    PlayerState *mPlayerState{};
+    std::unique_ptr<Actor> mAttackActor{};
+    std::unique_ptr<PlayerState> mPlayerState{};
+    std::shared_ptr<Collision::CollisionScene> mScene{};
     int8_t mPlayerNumber{};
 };
