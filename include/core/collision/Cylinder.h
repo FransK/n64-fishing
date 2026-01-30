@@ -7,8 +7,7 @@ namespace Collision
     class Cylinder
     {
     public:
-        static void MinkowskiSum(const ColliderTypeData *data, const Vector3 *direction, Vector3 *output);
-
-        static void BoundingBox(ColliderTypeData *data, Vector2 *rotation, Box3D *box);
+        static Box3D BoundingBox(const ColliderTypeData &data, const Vector2 &rotation);
+        static Vector3 MinkowskiSum(const ColliderTypeData &data, const Vector3 &direction);
     };
 }

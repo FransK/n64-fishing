@@ -4,16 +4,16 @@ using namespace Collision;
 
 void Collider::update(float timeStep)
 {
-    if (hasGravity)
-    {
-        float y = actor->getVelocity().y;
-        y += timeStep * GRAVITY_CONSTANT;
-        actor->setVelocity({actor->getVelocity().x, y, actor->getVelocity().z});
-    }
-
     Vector3 position = actor->getPosition();
     Vector3 velocity = actor->getVelocity();
-    Vector3::addScaled(&position, &velocity, timeStep, &position);
+
+    if (hasGravity)
+    {
+        velocity.y += timeStep * GRAVITY_CONSTANT;
+        actor->setVelocity(velocity);
+    }
+
+    position += velocity * timeStep;
     actor->setPosition(position);
 }
 
@@ -21,20 +21,22 @@ void Collider::recalcBB()
 {
     Vector3 position = actor->getPosition();
     Vector2 rotation = actor->getRotation();
-    type.boundingBoxCalculator(&type.data, &rotation, &boundingBox);
+    boundingBox = type.boundingBoxCalculator(type.data, rotation);
+
     Vector3 offset;
     if (scale != 1.0f)
     {
-        Vector3::scale(&boundingBox.min, scale, &boundingBox.min);
-        Vector3::scale(&boundingBox.max, scale, &boundingBox.max);
-        Vector3::addScaled(&position, &center, scale, &offset);
+        boundingBox.min *= scale;
+        boundingBox.max *= scale;
+        offset = position + center * scale;
     }
     else
     {
-        Vector3::add(&center, &position, &offset);
+        offset = position + center;
     }
-    Vector3::add(&boundingBox.min, &offset, &boundingBox.min);
-    Vector3::add(&boundingBox.max, &offset, &boundingBox.max);
+
+    boundingBox.min += offset;
+    boundingBox.max += offset;
 }
 
 void Collider::constrainPosition()
@@ -44,25 +46,27 @@ void Collider::constrainPosition()
 
     if (squared_position > PLAYING_R2)
     {
-        Vector3::normAndScale(&position, PLAYING_R, &position);
+        position = normAndScale(position, PLAYING_R);
         actor->setPosition(position);
     }
 }
 
-void Collider::minkowskiSumWorld(const Vector3 *direction, Vector3 *output)
+Vector3 Collider::minkowskiSumWorld(const Vector3 &direction)
 {
-    type.minkowskiSum(&type.data, direction, output);
+    Vector3 output = type.minkowskiSum(type.data, direction);
 
     if (scale != 1.0f)
     {
-        Vector3::scale(output, scale, output);
-        Vector3::addScaled(output, &center, scale, output);
+        output *= scale;
+        output += center * scale;
     }
     else
     {
-        Vector3::add(output, &center, output);
+        output += center;
     }
 
     Vector3 position = actor->getPosition();
-    Vector3::add(output, &position, output);
+    output += position;
+
+    return output;
 }

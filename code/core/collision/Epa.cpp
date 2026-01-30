@@ -14,24 +14,21 @@ void ExpandingSimplex::triangleInit(SimplexTriangle *triangle, const SimplexTria
 
 bool ExpandingSimplex::triangleCheckEdge(SimplexTriangle *triangle, int index)
 {
-    const Vector3 *pointA = &points[triangle->indexData.indices[index]];
+    Vector3 &pointA = points[triangle->indexData.indices[index]];
 
-    struct Vector3 edge;
-    Vector3::sub(&points[triangle->indexData.indices[NextFace(index)]], pointA, &edge);
-    struct Vector3 toOrigin;
-    Vector3::negate(pointA, &toOrigin);
+    Vector3 edge = points[triangle->indexData.indices[NextFace(index)]] - pointA;
+    Vector3 toOrigin = -pointA;
 
-    struct Vector3 crossCheck;
-    Vector3::cross(&edge, &toOrigin, &crossCheck);
+    Vector3 crossCheck = cross(edge, toOrigin);
 
     // check if origin is off to the side of edge
-    if (Vector3::dot(&crossCheck, &triangle->normal) >= 0.0f)
+    if (dot(crossCheck, triangle->normal) >= 0.0f)
     {
         return false;
     }
 
-    float edgeLerp = Vector3::dot(&toOrigin, &edge);
-    float edgeMagSqrd = Vector3::magSqrd(&edge);
+    float edgeLerp = dot(toOrigin, edge);
+    float edgeMagSqrd = edge.magSqrd();
 
     if (edgeLerp < 0.0f)
     {
@@ -46,27 +43,24 @@ bool ExpandingSimplex::triangleCheckEdge(SimplexTriangle *triangle, int index)
         edgeLerp /= edgeMagSqrd;
     }
 
-    struct Vector3 nearestPoint;
-    Vector3::addScaled(pointA, &edge, edgeLerp, &nearestPoint);
+    Vector3 nearestPoint = pointA + edge * edgeLerp;
 
-    triangle->distanceToOrigin = sqrtf(Vector3::magSqrd(&nearestPoint));
+    triangle->distanceToOrigin = sqrtf(nearestPoint.magSqrd());
 
     return true;
 }
 
 void ExpandingSimplex::triangleInitNormal(SimplexTriangle *triangle)
 {
-    Vector3 edgeB;
-    Vector3::sub(&points[triangle->indexData.indices[1]], &points[triangle->indexData.indices[0]], &edgeB);
-    Vector3 edgeC;
-    Vector3::sub(&points[triangle->indexData.indices[2]], &points[triangle->indexData.indices[0]], &edgeC);
+    Vector3 edgeB = points[triangle->indexData.indices[1]] - points[triangle->indexData.indices[0]];
+    Vector3 edgeC = points[triangle->indexData.indices[2]] - points[triangle->indexData.indices[0]];
 
-    Vector3::cross(&edgeB, &edgeC, &triangle->normal);
+    triangle->normal = cross(edgeB, edgeC);
 }
 
 void ExpandingSimplex::triangleDetermineDistance(SimplexTriangle *triangle)
 {
-    Vector3::normalize(&triangle->normal, &triangle->normal);
+    triangle->normal = normalize(triangle->normal);
 
     for (int i = 0; i < 3; ++i)
     {
@@ -76,7 +70,7 @@ void ExpandingSimplex::triangleDetermineDistance(SimplexTriangle *triangle)
         }
     }
 
-    triangle->distanceToOrigin = Vector3::dot(&triangle->normal, &points[triangle->indexData.indices[0]]);
+    triangle->distanceToOrigin = dot(triangle->normal, points[triangle->indexData.indices[0]]);
 }
 
 ExpandingSimplex::ExpandingSimplex(const Simplex *startingSimplex, int flags)
@@ -219,7 +213,7 @@ void ExpandingSimplex::rotateEdge(SimplexTriangle *triangleA, int triangleAIndex
     // new triangles are setup so the edge to rotate is the first edge
     int triangleBIndex = triangleA->indexData.adjacentFaces[0];
 
-    struct SimplexTriangle *triangleB = &triangles[triangleBIndex];
+    SimplexTriangle *triangleB = &triangles[triangleBIndex];
 
     int relativeIndex0 = triangleA->indexData.oppositePoints[0];
     int relativeIndex1 = NextFace(relativeIndex0);
@@ -239,7 +233,7 @@ void ExpandingSimplex::rotateEdge(SimplexTriangle *triangleA, int triangleAIndex
     triangleB->indexData.oppositePoints[relativeIndex2] = 0;
 
     // update back references from adjacent triangles
-    struct SimplexTriangle *adjTriangle = &triangles[triangleA->indexData.adjacentFaces[0]];
+    SimplexTriangle *adjTriangle = &triangles[triangleA->indexData.adjacentFaces[0]];
     int adjIndex = NextFace(triangleA->indexData.oppositePoints[0]);
     adjTriangle->indexData.adjacentFaces[adjIndex] = triangleAIndex;
     adjTriangle->indexData.oppositePoints[adjIndex] = 2;
@@ -341,16 +335,15 @@ int ExpandingSimplex::siftDownHeap(int heapIndex)
 
 void ExpandingSimplex::triangleCheckRotate(int triangleIndex, int heapIndex)
 {
-    struct SimplexTriangle *triangle = &triangles[triangleIndex];
-    struct SimplexTriangle *adjacent = &triangles[triangle->indexData.adjacentFaces[0]];
-    struct Vector3 *oppositePoint = &points[adjacent->indexData.indices[triangle->indexData.oppositePoints[0]]];
+    SimplexTriangle *triangle = &triangles[triangleIndex];
+    SimplexTriangle *adjacent = &triangles[triangle->indexData.adjacentFaces[0]];
+    Vector3 *oppositePoint = &points[adjacent->indexData.indices[triangle->indexData.oppositePoints[0]]];
 
-    struct Vector3 *firstPoint = &points[triangle->indexData.indices[0]];
+    Vector3 *firstPoint = &points[triangle->indexData.indices[0]];
 
-    struct Vector3 offset;
-    Vector3::sub(oppositePoint, firstPoint, &offset);
+    Vector3 offset = *oppositePoint - *firstPoint;
 
-    if (Vector3::dot(&offset, &triangle->normal) > 0.0f)
+    if (dot(offset, triangle->normal) > 0.0f)
     {
         rotateEdge(triangle, triangleIndex, heapIndex);
     }
@@ -361,13 +354,13 @@ void ExpandingSimplex::triangleCheckRotate(int triangleIndex, int heapIndex)
     }
 }
 
-void EpaResult::calculateContact(struct ExpandingSimplex *simplex, struct SimplexTriangle *closestFace, struct Vector3 *planePos, struct EpaResult *result)
+void EpaResult::calculateContact(ExpandingSimplex *simplex, SimplexTriangle *closestFace, Vector3 *planePos, EpaResult *result)
 {
-    struct Vector3 baryCoords;
+    Vector3 baryCoords;
 
-    struct Vector3 *a = &simplex->points[closestFace->indexData.indices[0]];
-    struct Vector3 *b = &simplex->points[closestFace->indexData.indices[1]];
-    struct Vector3 *c = &simplex->points[closestFace->indexData.indices[2]];
+    Vector3 *a = &simplex->points[closestFace->indexData.indices[0]];
+    Vector3 *b = &simplex->points[closestFace->indexData.indices[1]];
+    Vector3 *c = &simplex->points[closestFace->indexData.indices[2]];
 
     Plane::calculateBarycentricCoords(
         a,
@@ -383,33 +376,32 @@ void EpaResult::calculateContact(struct ExpandingSimplex *simplex, struct Simple
         &baryCoords,
         &result->contactA);
 
-    Vector3::addScaled(&result->contactA, &result->normal, result->penetration, &result->contactB);
+    result->contactB = result->contactA + result->normal * result->penetration;
 }
 
 bool EpaResult::solve(const Simplex *startingSimplex, Collider *a, Collider *b, EpaResult *out)
 {
     ExpandingSimplex simplex(startingSimplex, 0);
-    struct SimplexTriangle *closestFace = 0;
+    SimplexTriangle *closestFace = 0;
     float projection = 0.0f;
 
     for (int i = 0; i < MaxIterations; ++i)
     {
-        struct Vector3 reverseNormal;
+        Vector3 reverseNormal;
 
         closestFace = simplex.closestFace();
 
         int nextIndex = simplex.pointCount;
 
-        struct Vector3 *aPoint = &simplex.aPoints[nextIndex];
-        struct Vector3 bPoint;
+        Vector3 &aPoint = simplex.aPoints[nextIndex];
+        Vector3 bPoint;
 
-        a->minkowskiSumWorld(&closestFace->normal, aPoint);
-        Vector3::negate(&closestFace->normal, &reverseNormal);
-        b->minkowskiSumWorld(&reverseNormal, &bPoint);
+        aPoint = a->minkowskiSumWorld(closestFace->normal);
+        reverseNormal = -closestFace->normal;
+        bPoint = b->minkowskiSumWorld(reverseNormal);
 
-        Vector3::sub(aPoint, &bPoint, &simplex.points[nextIndex]);
-
-        projection = Vector3::dot(&simplex.points[nextIndex], &closestFace->normal);
+        simplex.points[nextIndex] = aPoint - bPoint;
+        projection = dot(simplex.points[nextIndex], closestFace->normal);
 
         if ((projection - closestFace->distanceToOrigin) < 0.001f)
         {
@@ -420,12 +412,11 @@ bool EpaResult::solve(const Simplex *startingSimplex, Collider *a, Collider *b, 
         simplex.expand(nextIndex, simplex.triangleHeap[0]);
     }
 
-    if (closestFace && Vector3::magSqrd(&closestFace->normal) > 0.5f)
+    if (closestFace && closestFace->normal.magSqrd() > 0.5f)
     {
         out->normal = closestFace->normal;
         out->penetration = -projection;
-        struct Vector3 planePos;
-        Vector3::scale(&closestFace->normal, closestFace->distanceToOrigin, &planePos);
+        Vector3 planePos = closestFace->normal * closestFace->distanceToOrigin;
         calculateContact(&simplex, closestFace, &planePos, out);
 
         return true;

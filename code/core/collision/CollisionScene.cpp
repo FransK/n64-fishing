@@ -230,7 +230,7 @@ void CollisionScene::collide(Collider *a, Collider *b)
 void CollisionScene::correctOverlap(Collider *object, EpaResult *result, float ratio, float friction, float bounce)
 {
     Vector3 position = object->actor->getPosition();
-    Vector3::addScaled(&position, &result->normal, result->penetration * ratio, &position);
+    position += result->normal * result->penetration * ratio;
     object->actor->setPosition(position);
 
     correctVelocity(object, result, ratio, friction, bounce);
@@ -239,15 +239,13 @@ void CollisionScene::correctOverlap(Collider *object, EpaResult *result, float r
 void CollisionScene::correctVelocity(Collider *object, EpaResult *result, float ratio, float friction, float bounce)
 {
     Vector3 velocity = object->actor->getVelocity();
-    float velocityDot = Vector3::dot(&velocity, &result->normal);
+    float velocityDot = dot(velocity, result->normal);
 
     if ((velocityDot < 0) == (ratio < 0))
     {
-        struct Vector3 tangentVelocity;
-
-        Vector3::addScaled(&velocity, &result->normal, -velocityDot, &tangentVelocity);
-        Vector3::scale(&tangentVelocity, 1.0f - friction, &tangentVelocity);
-        Vector3::addScaled(&tangentVelocity, &result->normal, velocityDot * -bounce, &velocity);
+        Vector3 tangentVelocity = velocity + result->normal * -velocityDot;
+        tangentVelocity *= (1.0f - friction);
+        velocity = tangentVelocity + result->normal * velocityDot * -bounce;
         object->actor->setVelocity(velocity);
     }
 }

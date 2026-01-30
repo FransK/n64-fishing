@@ -13,7 +13,7 @@ Vector3 *Simplex::addPoint(Vector3 *aPoint, Vector3 *bPoint)
     int index = nPoints;
 
     objectAPoint[index] = *aPoint;
-    Vector3::sub(&objectAPoint[index], bPoint, &points[index]);
+    points[index] = objectAPoint[index] - *bPoint;
     ++nPoints;
 
     return &points[index];
@@ -21,41 +21,34 @@ Vector3 *Simplex::addPoint(Vector3 *aPoint, Vector3 *bPoint)
 
 int Simplex::check(Vector3 *nextDirection)
 {
-    Vector3 *lastAdded = &points[nPoints - 1];
-    Vector3 aToOrigin;
-    Vector3::negate(lastAdded, &aToOrigin);
+    Vector3 &lastAdded = points[nPoints - 1];
+    Vector3 aToOrigin = -lastAdded;
 
     if (nPoints == 2)
     {
-        Vector3 lastAddedToOther;
-        Vector3::sub(&points[0], lastAdded, &lastAddedToOther);
-        Vector3::tripleProduct(&lastAddedToOther, &aToOrigin, &lastAddedToOther, nextDirection);
+        Vector3 lastAddedToOther = points[0] - lastAdded;
+        *nextDirection = tripleProduct(lastAddedToOther, aToOrigin, lastAddedToOther);
 
-        if (Vector3::magSqrd(nextDirection) <= 0.0000001f)
+        if (nextDirection->magSqrd() <= 0.0000001f)
         {
-            Vector3::perp(&lastAddedToOther, nextDirection);
+            *nextDirection = perp(lastAddedToOther);
         }
 
         return 0;
     }
     else if (nPoints == 3)
     {
-        Vector3 normal;
-        Vector3 ab;
-        Vector3::sub(&points[1], lastAdded, &ab);
-        Vector3 ac;
-        Vector3::sub(&points[0], lastAdded, &ac);
+        Vector3 ab = points[1] - lastAdded;
+        Vector3 ac = points[0] - lastAdded;
 
-        Vector3::cross(&ab, &ac, &normal);
+        Vector3 normal = cross(ab, ac);
+        Vector3 dirCheck = cross(ab, normal);
 
-        Vector3 dirCheck;
-        Vector3::cross(&ab, &normal, &dirCheck);
-
-        if (Vector3::dot(&dirCheck, &aToOrigin) > 0.0f)
+        if (dot(dirCheck, aToOrigin) > 0.0f)
         {
-            Vector3::tripleProduct(&ab, &aToOrigin, &ab, nextDirection);
+            *nextDirection = tripleProduct(ab, aToOrigin, ab);
 
-            if (Vector3::magSqrd(nextDirection) <= 0.0000001f)
+            if (nextDirection->magSqrd() <= 0.0000001f)
             {
                 *nextDirection = normal;
             }
@@ -69,13 +62,13 @@ int Simplex::check(Vector3 *nextDirection)
             return 0;
         }
 
-        Vector3::cross(&normal, &ac, &dirCheck);
+        dirCheck = cross(normal, ac);
 
-        if (Vector3::dot(&dirCheck, &aToOrigin) > 0.0f)
+        if (dot(dirCheck, aToOrigin) > 0.0f)
         {
-            Vector3::tripleProduct(&ac, &aToOrigin, &ac, nextDirection);
+            *nextDirection = tripleProduct(ac, aToOrigin, ac);
 
-            if (Vector3::magSqrd(nextDirection) <= 0.0000001f)
+            if (nextDirection->magSqrd() <= 0.0000001f)
             {
                 *nextDirection = normal;
             }
@@ -87,7 +80,7 @@ int Simplex::check(Vector3 *nextDirection)
             return 0;
         }
 
-        if (Vector3::dot(&normal, &aToOrigin) > 0.0f)
+        if (dot(normal, aToOrigin) > 0.0f)
         {
             *nextDirection = normal;
             return 0;
@@ -98,7 +91,7 @@ int Simplex::check(Vector3 *nextDirection)
         movePoint(3, 0);
         movePoint(0, 1);
         movePoint(1, 3);
-        Vector3::negate(&normal, nextDirection);
+        *nextDirection = -normal;
     }
     else if (nPoints == 4)
     {
@@ -106,17 +99,15 @@ int Simplex::check(Vector3 *nextDirection)
         int lastInFrontIndex = -1;
         int isFrontCount = 0;
 
-        struct Vector3 normals[3];
+        Vector3 normals[3];
 
         for (int i = 0; i < 3; ++i)
         {
-            struct Vector3 firstEdge;
-            struct Vector3 secondEdge;
-            Vector3::sub(lastAdded, &points[i], &firstEdge);
-            Vector3::sub(i == 2 ? &points[0] : &points[i + 1], &points[i], &secondEdge);
-            Vector3::cross(&firstEdge, &secondEdge, &normals[i]);
+            Vector3 firstEdge = lastAdded - points[i];
+            Vector3 secondEdge = (i == 2 ? points[0] : points[i + 1]) - points[i];
+            normals[i] = cross(firstEdge, secondEdge);
 
-            if (Vector3::dot(&aToOrigin, &normals[i]) > 0.0f)
+            if (dot(aToOrigin, normals[i]) > 0.0f)
             {
                 ++isFrontCount;
                 lastInFrontIndex = i;
@@ -164,14 +155,13 @@ int Simplex::check(Vector3 *nextDirection)
             movePoint(1, 3);
             nPoints = 2;
 
-            struct Vector3 ab;
-            Vector3::sub(&points[0], &points[1], &ab);
+            Vector3 ab = points[0] - points[1];
 
-            Vector3::tripleProduct(&ab, &aToOrigin, &ab, nextDirection);
+            *nextDirection = tripleProduct(ab, aToOrigin, ab);
 
-            if (Vector3::magSqrd(nextDirection) <= 0.0000001f)
+            if (nextDirection->magSqrd() <= 0.0000001f)
             {
-                Vector3::perp(&ab, nextDirection);
+                *nextDirection = perp(ab);
             }
         }
         else
@@ -199,38 +189,38 @@ int GJK::checkForOverlap(Simplex *simplex, Collider *a, Collider *b, const Vecto
     Vector3 bPoint;
     Vector3 nextDirection;
 
-    if (Vector3::isZero(firstDirection))
+    if (firstDirection->isZero())
     {
-        a->minkowskiSumWorld(&Math::Vec3Right, &aPoint);
-        Vector3::negate(&Math::Vec3Right, &nextDirection);
+        aPoint = a->minkowskiSumWorld(Math::Vec3Right);
+        nextDirection = -Math::Vec3Right;
 
-        b->minkowskiSumWorld(&nextDirection, &bPoint);
+        bPoint = b->minkowskiSumWorld(nextDirection);
         simplex->addPoint(&aPoint, &bPoint);
     }
     else
     {
-        a->minkowskiSumWorld(firstDirection, &aPoint);
-        Vector3::negate(firstDirection, &nextDirection);
+        aPoint = a->minkowskiSumWorld(*firstDirection);
+        nextDirection = -*firstDirection;
 
-        b->minkowskiSumWorld(&nextDirection, &bPoint);
+        bPoint = b->minkowskiSumWorld(nextDirection);
         simplex->addPoint(&aPoint, &bPoint);
     }
 
     for (int iteration = 0; iteration < MaxGJKIterations; ++iteration)
     {
         Vector3 reverseDirection;
-        Vector3::negate(&nextDirection, &reverseDirection);
-        a->minkowskiSumWorld(&nextDirection, &aPoint);
-        b->minkowskiSumWorld(&reverseDirection, &bPoint);
+        reverseDirection = -nextDirection;
+        aPoint = a->minkowskiSumWorld(nextDirection);
+        bPoint = b->minkowskiSumWorld(reverseDirection);
 
-        struct Vector3 *addedPoint = simplex->addPoint(&aPoint, &bPoint);
+        Vector3 *addedPoint = simplex->addPoint(&aPoint, &bPoint);
 
         if (!addedPoint) // Too many points
         {
             return 0;
         }
 
-        if (Vector3::dot(addedPoint, &nextDirection) <= 0.0f)
+        if (dot(*addedPoint, nextDirection) <= 0.0f)
         {
             return 0;
         }
