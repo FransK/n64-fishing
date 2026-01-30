@@ -356,7 +356,6 @@ void ExpandingSimplex::triangleCheckRotate(int triangleIndex, int heapIndex)
 
 void EpaResult::calculateContact(ExpandingSimplex *simplex, SimplexTriangle *closestFace, Vector3 *planePos, EpaResult *result)
 {
-
     Vector3 *a = &simplex->points[closestFace->indexData.indices[0]];
     Vector3 *b = &simplex->points[closestFace->indexData.indices[1]];
     Vector3 *c = &simplex->points[closestFace->indexData.indices[2]];
