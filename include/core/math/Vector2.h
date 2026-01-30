@@ -1,27 +1,133 @@
 #pragma once
 
 #include <cmath>
+#include <type_traits>
+#include <utility>
 
 namespace Math
 {
-    struct Vector2
+    struct __attribute__((packed)) Vector2
     {
         float x, y;
 
-        static void norm(Vector2 *in, Vector2 *out)
+        float &operator[](int index) { return (&x)[index]; }
+        const float &operator[](int index) const { return (&x)[index]; }
+
+        template <typename T,
+                  typename = std::enable_if_t<std::is_base_of<Vector2, std::decay_t<T>>::value>>
+        Vector2 operator+=(T &&other)
         {
-            float len2 = in->x * in->x + in->y * in->y;
-            if (len2 < 1e-20)
+            x += other.x;
+            y += other.y;
+            return *this;
+        }
+
+        template <typename T,
+                  typename = std::enable_if_t<std::is_base_of<Vector2, std::decay_t<T>>::value>>
+        Vector2 operator-=(T &&other)
+        {
+            x -= other.x;
+            y -= other.y;
+            return *this;
+        }
+
+        Vector2 operator*=(float scalar)
+        {
+            x *= scalar;
+            y *= scalar;
+            return *this;
+        }
+
+        Vector2 operator-() const
+        {
+            Vector2 result;
+            result.x = -x;
+            result.y = -y;
+            return result;
+        }
+
+        bool isZero() const
+        {
+            return x == 0.0f && y == 0.0f;
+        }
+
+        float magSqrd() const
+        {
+            return x * x + y * y;
+        }
+
+        friend Vector2 operator+(Vector2 lhs, const Vector2 &rhs)
+        {
+            lhs += rhs;
+            return lhs;
+        }
+
+        friend Vector2 operator-(Vector2 lhs, const Vector2 &rhs)
+        {
+            lhs -= rhs;
+            return lhs;
+        }
+
+        friend Vector2 operator*(Vector2 lhs, float scalar)
+        {
+            lhs.x *= scalar;
+            lhs.y *= scalar;
+            return lhs;
+        }
+
+        friend float dot(const Vector2 &a, const Vector2 &b)
+        {
+            return a.x * b.x + a.y * b.y;
+        }
+
+        friend Vector2 normalize(const Vector2 &in)
+        {
+            Vector2 result;
+            const float len2 = in.x * in.x + in.y * in.y;
+
+            if (len2 < 1e-20f)
             {
-                out->x = 0.0f;
-                out->y = 0.0f;
-                return;
+                result.x = 0.0f;
+                result.y = 0.0f;
+                return result;
             }
 
-            float invLen = 1.0f / sqrtf(len2);
+            const float invLen = 1.0f / sqrtf(len2);
 
-            out->x = in->x * invLen;
-            out->y = in->y * invLen;
+            result.x = in.x * invLen;
+            result.y = in.y * invLen;
+            return result;
+        }
+
+        friend Vector2 normAndScale(const Vector2 &in, float scale)
+        {
+            Vector2 result;
+            const float x = in.x;
+            const float y = in.y;
+
+            const float len2 = x * x + y * y;
+
+            if (len2 <= 1e-20f)
+            {
+                result.x = 0.0f;
+                result.y = 0.0f;
+                return result;
+            }
+
+            const float invLen = 1.0f / sqrtf(len2);
+            const float s = scale * invLen;
+
+            result.x = x * s;
+            result.y = y * s;
+            return result;
+        }
+
+        friend Vector2 addScaled(const Vector2 &lhs, const Vector2 &dir, float scale)
+        {
+            Vector2 result;
+            result.x = lhs.x + dir.x * scale;
+            result.y = lhs.y + dir.y * scale;
+            return result;
         }
     };
 

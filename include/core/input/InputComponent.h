@@ -60,8 +60,7 @@ public:
             if (abs(inputState.move.x) > MIN_MOVE_INPUT || abs(inputState.move.y) > MIN_MOVE_INPUT)
             {
                 // Normalize rotation vector
-                Vector2 normMove{};
-                Vector2::norm(&inputState.move, &normMove);
+                Vector2 normMove = normalize(inputState.move);
                 // Start walking
                 player.getPlayerState()->changeState(PlayerStateEnum::STATE_WALKING, player, collScene);
                 player.setRotation({normMove.x, normMove.y});

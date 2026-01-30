@@ -11,8 +11,19 @@ namespace Math
         Vector3 normal;
         float d;
 
-        static void calculateBarycentricCoords(Vector3 *a, Vector3 *b, Vector3 *c, Vector3 *point, Vector3 *output);
-        static void evaluateBarycentricCoords(Vector3 *a, Vector3 *b, Vector3 *c, Vector3 *bary, Vector3 *output);
-        static float calculateLerp(Vector3 *a, Vector3 *b, Vector3 *point);
+        friend float distanceToPlane(const Plane &plane, const Vector3 &point)
+        {
+            return dot(plane.normal, point) + plane.d;
+        }
+
+        friend Vector3 projectOntoPlane(const Plane &plane, const Vector3 &point)
+        {
+            float dist = distanceToPlane(plane, point);
+            return point - plane.normal * dist;
+        }
     };
+
+    Vector3 calculateBarycentricCoords(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Vector3 &point);
+    Vector3 evaluateBarycentricCoords(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Vector3 &baryCoords);
+    float calculateLerp(const Vector3 &a, const Vector3 &b, const Vector3 &point);
 }

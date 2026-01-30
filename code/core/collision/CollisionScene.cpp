@@ -136,7 +136,7 @@ void CollisionScene::runCollision()
                 Collider *b = activeColliders[activeObjects[activeIndex]];
 
                 // === AABB === //
-                if (Box3D::hasOverlap(a->boundingBox, b->boundingBox))
+                if (hasOverlap(a->boundingBox, b->boundingBox))
                 {
                     // === Check Collider Shapes == //
                     collide(a, b);

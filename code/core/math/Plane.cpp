@@ -2,11 +2,13 @@
 
 using namespace Math;
 
-void Plane::calculateBarycentricCoords(Vector3 *a, Vector3 *b, Vector3 *c, Vector3 *point, Vector3 *output)
+Vector3 Math::calculateBarycentricCoords(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Vector3 &point)
 {
-    Vector3 v0 = *b - *a;
-    Vector3 v1 = *c - *a;
-    Vector3 v2 = *point - *a;
+    Vector3 output;
+
+    Vector3 v0 = b - a;
+    Vector3 v1 = c - a;
+    Vector3 v2 = point - a;
 
     float d00 = dot(v0, v0);
     float d01 = dot(v0, v1);
@@ -20,36 +22,39 @@ void Plane::calculateBarycentricCoords(Vector3 *a, Vector3 *b, Vector3 *c, Vecto
         if (d00 > d11)
         {
             // b is other point
-            output->y = calculateLerp(a, b, point);
-            output->x = 1.0f - output->y;
-            output->z = 0.0f;
+            output.y = calculateLerp(a, b, point);
+            output.x = 1.0f - output.y;
+            output.z = 0.0f;
         }
         else
         {
             // c is other point
-            output->z = calculateLerp(a, c, point);
-            output->x = 1.0f - output->z;
-            output->z = 0.0f;
+            output.z = calculateLerp(a, c, point);
+            output.x = 1.0f - output.z;
+            output.z = 0.0f;
         }
-        return;
+        return output;
     }
 
     float denomInv = 1.0f / (d00 * d11 - d01 * d01);
-    output->y = (d11 * d20 - d01 * d21) * denomInv;
-    output->z = (d00 * d21 - d01 * d20) * denomInv;
-    output->x = 1.0f - output->y - output->z;
+    output.y = (d11 * d20 - d01 * d21) * denomInv;
+    output.z = (d00 * d21 - d01 * d20) * denomInv;
+    output.x = 1.0f - output.y - output.z;
+
+    return output;
 }
 
-void Plane::evaluateBarycentricCoords(Vector3 *a, Vector3 *b, Vector3 *c, Vector3 *bary, Vector3 *output)
+Vector3 Math::evaluateBarycentricCoords(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Vector3 &bary)
 {
-    *output = *a * bary->x;
-    *output += *b * bary->y;
-    *output += *c * bary->z;
+    Vector3 output = a * bary.x;
+    output += b * bary.y;
+    output += c * bary.z;
+    return output;
 }
 
-float Plane::calculateLerp(Vector3 *a, Vector3 *b, Vector3 *point)
+float Math::calculateLerp(const Vector3 &a, const Vector3 &b, const Vector3 &point)
 {
-    Vector3 v0 = *b - *a;
+    Vector3 v0 = b - a;
 
     float denom = v0.magSqrd();
 
@@ -58,7 +63,7 @@ float Plane::calculateLerp(Vector3 *a, Vector3 *b, Vector3 *point)
         return 0.5f;
     }
 
-    Vector3 pointOffset = *point - *a;
+    Vector3 pointOffset = point - a;
 
     return dot(pointOffset, v0) / denom;
 }

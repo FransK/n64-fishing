@@ -356,26 +356,13 @@ void ExpandingSimplex::triangleCheckRotate(int triangleIndex, int heapIndex)
 
 void EpaResult::calculateContact(ExpandingSimplex *simplex, SimplexTriangle *closestFace, Vector3 *planePos, EpaResult *result)
 {
-    Vector3 baryCoords;
 
     Vector3 *a = &simplex->points[closestFace->indexData.indices[0]];
     Vector3 *b = &simplex->points[closestFace->indexData.indices[1]];
     Vector3 *c = &simplex->points[closestFace->indexData.indices[2]];
 
-    Plane::calculateBarycentricCoords(
-        a,
-        b,
-        c,
-        planePos,
-        &baryCoords);
-
-    Plane::evaluateBarycentricCoords(
-        a,
-        b,
-        c,
-        &baryCoords,
-        &result->contactA);
-
+    Vector3 baryCoords = Math::calculateBarycentricCoords(*a, *b, *c, *planePos);
+    result->contactA = Math::evaluateBarycentricCoords(*a, *b, *c, baryCoords);
     result->contactB = result->contactA + result->normal * result->penetration;
 }
 

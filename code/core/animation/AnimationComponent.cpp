@@ -53,8 +53,7 @@ void AnimationComponent::draw(const Vector3 &position, const Vector2 &rotation) 
     // Rotate the complex by 90 degrees to align with T3D's coordinate system
     Math::Vector2 adjustedRotation = {-rotation.y, rotation.x};
 
-    Math::Quaternion mathQuat;
-    Math::axisComplex({0.0f, 1.0f, 0.0f}, &adjustedRotation, &mathQuat);
+    Math::Quaternion mathQuat = Math::axisComplex({0.0f, 1.0f, 0.0f}, adjustedRotation);
 
     T3DVec3 scale = {{PLAYER_SCALE, PLAYER_SCALE, PLAYER_SCALE}};
     T3DQuat quat = {{mathQuat.x, mathQuat.y, mathQuat.z, mathQuat.w}};
