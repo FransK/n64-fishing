@@ -4,20 +4,21 @@
 #include <t3d/t3d.h>
 #include <vector>
 
+#include "Config.h"
 #include "GlobalSettingsInterface.h"
 
 #include "adapters/T3d.h"
 #include "animation/AnimationComponent.h"
+#include "animation/PlayerAnimatable.h"
 #include "collision/CollisionScene.h"
 #include "debug/Overlay.h"
 #include "input/InputComponent.h"
 #include "input/InputComponentVariant.h"
 
-#include "Camera.h"
-#include "Config.h"
-#include "Player.h"
-#include "PlayerAi.h"
-#include "PlayerState.h"
+#include "scene/Camera.h"
+#include "scene/Player.h"
+#include "scene/PlayerAi.h"
+#include "scene/PlayerState.h"
 
 using Collision::CollisionScene;
 
@@ -39,7 +40,7 @@ class Scene
 {
 public:
     Scene();
-    ~Scene() = default;
+    ~Scene();
 
     long ticksActorUpdate{0};
     long ticksCollisionUpdate{0};
@@ -51,6 +52,8 @@ public:
     void reset();
 
 private:
+    using PlayerAnimationComponent = AnimationComponent<PlayerAnimatable>;
+
     enum struct State : uint8_t
     {
         INTRO = 0,
@@ -63,7 +66,7 @@ private:
     std::vector<Player> mPlayers;
     std::vector<PlayerAi> mAIPlayers;
     std::vector<InputComponentVariant> mInputComponents;
-    std::vector<AnimationComponent> mAnimationComponents;
+    std::vector<PlayerAnimationComponent> mAnimationComponents;
     std::shared_ptr<CollisionScene> mCollisionScene;
 
     std::vector<bool> mWinners;

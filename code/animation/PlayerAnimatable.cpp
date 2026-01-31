@@ -1,7 +1,8 @@
-#include "animation/AnimationComponent.h"
-#include "math/Quaternion.h"
+#include "PlayerAnimatable.h"
 
-AnimationComponent::AnimationComponent(T3DModel *model, color_t primColor)
+#include "Quaternion.h"
+
+PlayerAnimatable::PlayerAnimatable(T3DModel *model, color_t primColor)
     : Observer<PlayerState>([this](const PlayerState &state)
                             { this->onPlayerStateChange(state); }),
       mModel(model),
@@ -42,13 +43,13 @@ AnimationComponent::AnimationComponent(T3DModel *model, color_t primColor)
     mDplPlayer = Adapters::RspqBlockAdapter(rspq_block_end());
 }
 
-void AnimationComponent::update(float deltaTime)
+void PlayerAnimatable::update(float deltaTime)
 {
     t3d_anim_update(mActiveAnim, deltaTime);
     t3d_skeleton_update(mSkeleton.get());
 }
 
-void AnimationComponent::draw(const Vector3 &position, const Vector2 &rotation) const
+void PlayerAnimatable::draw(const Vector3 &position, const Vector2 &rotation) const
 {
     // Rotate the complex by 90 degrees to align with T3D's coordinate system
     Math::Vector2 adjustedRotation = {-rotation.y, rotation.x};
@@ -66,7 +67,7 @@ void AnimationComponent::draw(const Vector3 &position, const Vector2 &rotation) 
     rspq_block_run(mDplPlayer.get());
 }
 
-void AnimationComponent::onPlayerStateChange(const PlayerState &state)
+void PlayerAnimatable::onPlayerStateChange(const PlayerState &state)
 {
     switch (state.getState())
     {
@@ -91,7 +92,7 @@ void AnimationComponent::onPlayerStateChange(const PlayerState &state)
     }
 }
 
-void AnimationComponent::playAnimation(Anim anim)
+void PlayerAnimatable::playAnimation(Anim anim)
 {
     t3d_anim_set_playing(mAnimIdle.get(), anim == Anim::IDLE);
     t3d_anim_set_playing(mAnimRun.get(), anim == Anim::RUN);
@@ -120,14 +121,4 @@ void AnimationComponent::playAnimation(Anim anim)
         mActiveAnim = mAnimCast.get();
         return;
     }
-}
-
-void update(AnimationComponent &component, float deltaTime)
-{
-    component.update(deltaTime);
-}
-
-void draw(const AnimationComponent &component, const Vector3 &position, const Vector2 &rotation)
-{
-    component.draw(position, rotation);
 }

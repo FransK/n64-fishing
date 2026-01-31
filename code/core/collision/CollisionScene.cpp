@@ -17,10 +17,11 @@ using namespace Math;
 
 void CollisionScene::add(Collider &&object, bool isActive)
 {
-    colliders.push_back(std::make_shared<Collider>(std::move(object)));
+    auto objectPtr = std::make_shared<Collider>(std::move(object));
+    colliders.push_back(objectPtr);
     if (isActive)
     {
-        activeColliders.push_back(std::make_shared<Collider>(std::move(object)));
+        activeColliders.push_back(objectPtr);
     }
 }
 

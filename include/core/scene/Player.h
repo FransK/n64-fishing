@@ -13,7 +13,7 @@ using namespace Math;
 class Player : public Actor
 {
 public:
-    Player(Collision::CollisionScene *scene, int8_t playerNumber);
+    Player(std::shared_ptr<Collision::CollisionScene> scene, int8_t playerNumber);
     ~Player();
     Player(const Player &) = delete;
     Player &operator=(const Player &) = delete;

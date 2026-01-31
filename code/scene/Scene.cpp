@@ -3,18 +3,18 @@
 #include <variant>
 #include "timer.h"
 
-#include "ActorFlags.h"
+#include "Config.h"
 #include "GameSettings.h"
 #include "GlobalSettingsInterface.h"
 
 #include "Scene.h"
-#include "Config.h"
 #include "debug/DebugDraw.h"
 #include "debug/Overlay.h"
 #include "input/AIInputStrategy.h"
 #include "input/PlayerInputStrategy.h"
 #include "input/InputComponentUpdate.h"
 #include "math/Vector2.h"
+#include "scene/ActorFlags.h"
 
 bool showFPS = false;
 bool debugOverlay = false;
@@ -81,7 +81,7 @@ Scene::Scene()
 
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mPlayers.emplace_back(mCollisionScene.get(), i);
+        mPlayers.emplace_back(mCollisionScene, i);
         mPlayers.back().setPosition(initialPositions[i]);
         mPlayers.back().setRotation(initialRotations[i]);
 
@@ -99,13 +99,21 @@ Scene::Scene()
         }
 
         mAnimationComponents.emplace_back(mPlayerModel.getModel(), COLORS[i]);
-        mPlayers.back().getPlayerState()->attach(&mAnimationComponents.back());
+        mPlayers.back().getPlayerState()->attach(&mAnimationComponents.back().getAnimatable());
         mWinners.push_back(false);
     }
 
     // === Initialize Game State === //
     mState = State::INTRO;
     mStateTime = INTRO_TIME;
+}
+
+Scene::~Scene()
+{
+    for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
+    {
+        mPlayers.back().getPlayerState()->detachAll();
+    }
 }
 
 void Scene::updateFixed(float deltaTime)

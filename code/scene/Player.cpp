@@ -14,10 +14,10 @@
 
 using namespace Math;
 
-Player::Player(Collision::CollisionScene *scene, int8_t playerNumber)
+Player::Player(std::shared_ptr<Collision::CollisionScene> scene, int8_t playerNumber)
     : mAttackActor(std::make_unique<Actor>()),
       mPlayerState(std::make_unique<PlayerState>()),
-      mScene(std::shared_ptr<Collision::CollisionScene>(scene)),
+      mScene(std::move(scene)),
       mPlayerNumber(playerNumber)
 {
     setFlag(ActorFlags::IS_PLAYER);

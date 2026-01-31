@@ -18,6 +18,11 @@ public:
         return mObservers.erase(observer) > 0U;
     }
 
+    void detachAll()
+    {
+        mObservers.clear();
+    }
+
     void notify()
     {
         for (auto *observer : mObservers)

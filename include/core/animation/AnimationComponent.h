@@ -7,48 +7,23 @@
 #include "math/Vector3.h"
 #include "PlayerState.h"
 
-#include "Anim.h"
-
 using namespace Math;
 
-/*
-Animation Component
--
-Encapsulates both animation and rendering
-*/
-class AnimationComponent : public Observer<PlayerState>
+template <typename AnimatableT>
+class AnimationComponent
 {
 public:
-    AnimationComponent(T3DModel *model, color_t primColor);
-    ~AnimationComponent() = default;
+    template <typename... Args>
+    explicit AnimationComponent(Args &&...args) : mAnimatable(std::forward<Args>(args)...){};
 
-    AnimationComponent(const AnimationComponent &) = delete;
-    AnimationComponent &operator=(const AnimationComponent &) = delete;
-    AnimationComponent(AnimationComponent &&) = default;
-    AnimationComponent &operator=(AnimationComponent &&) = default;
-
-    uint32_t getVertCount() const { return mModel->totalVertCount; }
-    void update(float deltaTime);
-    void draw(const Vector3 &position, const Vector2 &rotation) const;
+    AnimatableT &getAnimatable() { return mAnimatable; }
+    uint32_t getVertCount() const { return mAnimatable.getVertCount(); }
+    void update(float deltaTime) { mAnimatable.update(deltaTime); }
+    void draw(const Vector3 &position, const Vector2 &rotation) const
+    {
+        mAnimatable.draw(position, rotation);
+    }
 
 private:
-    T3DModel *mModel{};
-    Adapters::Mat4FPAdapter mModelMatFP;
-    Adapters::RspqBlockAdapter mDplPlayer;
-
-    Adapters::SkeletonAdapter mSkeleton;
-    Adapters::AnimAdapter mAnimIdle;
-    Adapters::AnimAdapter mAnimPunch;
-    Adapters::AnimAdapter mAnimReceiveHit;
-    Adapters::AnimAdapter mAnimRun;
-    Adapters::AnimAdapter mAnimCast;
-    T3DAnim *mActiveAnim{};
-
-    color_t mPrimColor{};
-
-    void onPlayerStateChange(const PlayerState &state);
-    void playAnimation(Anim anim);
+    AnimatableT mAnimatable;
 };
-
-void update(AnimationComponent &comp, float deltaTime);
-void draw(const AnimationComponent &comp, const Vector3 &position, const Vector2 &rotation);
