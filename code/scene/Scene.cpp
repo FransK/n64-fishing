@@ -91,11 +91,15 @@ Scene::Scene()
 
         if (i < playerCount)
         {
-            mInputComponents.emplace_back(PlayerInputStrategy((joypad_port_t)i));
+            mInputComponents.emplace_back(
+                std::in_place_type<InputComponent<PlayerInputStrategy, PlayerUpdateStrategy>>,
+                PlayerInputStrategy((joypad_port_t)i), PlayerUpdateStrategy(mPlayers.back()));
         }
         else
         {
-            mInputComponents.emplace_back(AIInputStrategy(&mAIPlayers[i]));
+            mInputComponents.emplace_back(
+                std::in_place_type<InputComponent<AIInputStrategy, PlayerUpdateStrategy>>,
+                AIInputStrategy(&mAIPlayers[i]), PlayerUpdateStrategy(mPlayers.back()));
         }
 
         mAnimationComponents.emplace_back(mPlayerModel.getModel(), COLORS[i]);
@@ -158,10 +162,7 @@ void Scene::updateFixed(float deltaTime)
 
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        std::visit(InputComponentUpdate{deltaTime,
-                                        mPlayers[i],
-                                        *mCollisionScene},
-                   mInputComponents[i]);
+        std::visit(InputComponentUpdate{deltaTime}, mInputComponents[i]);
     }
 
     ticksCollisionUpdate = get_ticks();

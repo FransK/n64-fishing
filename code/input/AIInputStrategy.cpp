@@ -1,6 +1,6 @@
 #include "AIInputStrategy.h"
 
-InputState AIInputStrategy::update()
+PlayerInputState AIInputStrategy::getInputState()
 {
     return mAi->getInputState();
 }

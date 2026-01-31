@@ -1,11 +1,7 @@
 #pragma once
 
-#include <t3d/t3danim.h>
-
-#include "adapters/T3d.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
-#include "PlayerState.h"
 
 using namespace Math;
 

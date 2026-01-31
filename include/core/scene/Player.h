@@ -2,11 +2,13 @@
 
 #include <cstdint>
 #include <memory>
-#include "animation/AnimationComponent.h"
+
+#include <t3d/t3d.h>
+
 #include "collision/CollisionScene.h"
 #include "collision/Collider.h"
-#include "Actor.h"
-#include "PlayerState.h"
+#include "scene/Actor.h"
+#include "scene/PlayerState.h"
 
 using namespace Math;
 
@@ -23,8 +25,9 @@ public:
     void drawBillboard(T3DViewport &viewport) const;
     void reset(Vector3 const &position, Vector2 const &rotation);
 
-    PlayerState *getPlayerState() const { return mPlayerState.get(); }
     Actor *getAttackActor() const { return mAttackActor.get(); }
+    PlayerState *getPlayerState() const { return mPlayerState.get(); }
+    Collision::CollisionScene *getScene() const { return mScene.get(); }
     int8_t getPlayerNumber() const { return mPlayerNumber; }
 
 private:

@@ -2,7 +2,7 @@
 
 #include <functional>
 #include <libdragon.h>
-#include "input/InputState.h"
+#include "input/PlayerInputState.h"
 #include "scene/PlayerAi.h"
 
 class AIInputStrategy
@@ -10,7 +10,7 @@ class AIInputStrategy
 public:
     explicit AIInputStrategy(PlayerAi *ai) : mAi(ai) {}
 
-    InputState update();
+    PlayerInputState getInputState();
 
 private:
     PlayerAi *mAi;

@@ -1,6 +1,7 @@
 #include "PlayerAnimatable.h"
 
-#include "Quaternion.h"
+#include "common/Observer.h"
+#include "math/Quaternion.h"
 
 PlayerAnimatable::PlayerAnimatable(T3DModel *model, color_t primColor)
     : Observer<PlayerState>([this](const PlayerState &state)

@@ -2,15 +2,14 @@
 
 #include <string>
 
-#include "ActorFlags.h"
 #include "Config.h"
 #include "math/Quaternion.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
-#include "PlayerConsts.h"
-#include "PlayerColliders.h"
-
-#include "Fish.h"
+#include "scene/ActorFlags.h"
+#include "scene/Fish.h"
+#include "scene/PlayerConsts.h"
+#include "scene/PlayerColliders.h"
 
 using namespace Math;
 

@@ -4,7 +4,8 @@
 #include "InputComponent.h"
 #include "AIInputStrategy.h"
 #include "PlayerInputStrategy.h"
+#include "PlayerUpdateStrategy.h"
 
 using InputComponentVariant = std::variant<
-    InputComponent<PlayerInputStrategy>,
-    InputComponent<AIInputStrategy>>;
+    InputComponent<PlayerInputStrategy, PlayerUpdateStrategy>,
+    InputComponent<AIInputStrategy, PlayerUpdateStrategy>>;

@@ -3,7 +3,7 @@
 #include <vector>
 #include "math/Vector2.h"
 #include "math/Vector3.h"
-#include "input/InputState.h"
+#include "input/PlayerInputState.h"
 #include "Player.h"
 
 enum struct AIBehavior : uint8_t
@@ -21,7 +21,7 @@ public:
     void reset();
     void setBehavior(AIBehavior behavior) { mBehavior = behavior; }
     void update(float deltaTime, Player *allPlayers, std::vector<bool> &winners);
-    InputState getInputState() const { return mInputState; }
+    PlayerInputState getInputState() const { return mInputState; }
 
 private:
     AIBehavior mBehavior{AIBehavior::BEHAVE_FISHERMAN};
@@ -30,7 +30,7 @@ private:
     const Player *mTarget{};
     float mDelayActionTimer{0.0f};
     float mDelayCatchTimer{0.8f};
-    InputState mInputState{};
+    PlayerInputState mInputState{};
 
     void updateIdle(float deltaTime, Player *allPlayers, std::vector<bool> &winners);
     void updateMovementTarget();
