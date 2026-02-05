@@ -13,15 +13,25 @@ void PlayerState::changeState(const PlayerStateEnum &newState, Player &player, C
         return;
     }
 
-    if (mState == PlayerStateEnum::STATE_ATTACKING)
+    switch (mState)
     {
+    case PlayerStateEnum::STATE_IDLE:
+    case PlayerStateEnum::STATE_WALKING:
+    case PlayerStateEnum::STATE_CASTING:
+        break;
+    case PlayerStateEnum::STATE_FISHING:
+        if (mActionSuccess)
+        {
+            mFishCaught += 1;
+            mActionSuccess = false;
+        }
+        break;
+    case PlayerStateEnum::STATE_STUNNED:
+        player.clearFlag(ActorFlags::IS_STUNNED);
+        break;
+    case PlayerStateEnum::STATE_ATTACKING:
         collScene.deactivate(player.getAttackActor()->getEntityId());
-    }
-
-    if (mState == PlayerStateEnum::STATE_FISHING && mActionSuccess)
-    {
-        mFishCaught += 1;
-        mActionSuccess = false;
+        break;
     }
 
     mState = newState;
@@ -78,7 +88,6 @@ void PlayerState::update(float deltaTime, Player &player, Collision::CollisionSc
     if (mState != PlayerStateEnum::STATE_STUNNED &&
         player.hasFlag(ActorFlags::IS_STUNNED))
     {
-        player.clearFlag(ActorFlags::IS_STUNNED);
         changeState(PlayerStateEnum::STATE_STUNNED, player, collScene);
         return;
     }
