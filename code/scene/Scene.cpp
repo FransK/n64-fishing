@@ -10,7 +10,6 @@
 #include "Scene.h"
 #include "debug/DebugDraw.h"
 #include "debug/Overlay.h"
-#include "input/AIInputStrategy.h"
 #include "input/PlayerInputStrategy.h"
 #include "math/Vector2.h"
 #include "scene/ActorFlags.h"
@@ -108,8 +107,8 @@ Scene::Scene()
         else
         {
             mInputComponents.emplace_back(
-                std::in_place_type<InputComponent<AIInputStrategy>>,
-                AIInputStrategy(&mAIPlayers[i]));
+                std::in_place_type<InputComponent<PlayerAi *>>,
+                &mAIPlayers[i]);
         }
 
         mAnimationComponents.emplace_back(mPlayerModel.getModel(), COLORS[i]);

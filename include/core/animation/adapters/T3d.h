@@ -7,6 +7,38 @@
 
 namespace Adapters
 {
+    class SpriteAdapter
+    {
+    public:
+        SpriteAdapter() = default;
+        explicit SpriteAdapter(const char *path)
+            : mSprite(sprite_load(path)) {}
+
+        SpriteAdapter(const SpriteAdapter &) = delete;
+        SpriteAdapter &operator=(const SpriteAdapter &) = delete;
+        SpriteAdapter(SpriteAdapter &&other) noexcept : mSprite(std::move(other.mSprite)) {}
+        SpriteAdapter &operator=(SpriteAdapter &&other) noexcept
+        {
+            mSprite = std::move(other.mSprite);
+            return *this;
+        }
+
+        sprite_t *get() const noexcept { return mSprite.get(); }
+        explicit operator bool() const noexcept { return mSprite != nullptr; }
+
+    private:
+        struct Deleter
+        {
+            void operator()(sprite_t *p) const noexcept
+            {
+                if (p)
+                    sprite_free(p);
+            }
+        };
+
+        std::unique_ptr<sprite_t, Deleter> mSprite;
+    };
+
     class ModelAdapter
     {
     public:

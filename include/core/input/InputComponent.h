@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 /*
 concept InputStrategyT = requires(T a)
 {
@@ -17,7 +19,14 @@ public:
 
     auto inputState() const
     {
-        return mInputStrategy.inputState();
+        if constexpr (std::is_pointer_v<InputStrategyT>)
+        {
+            return mInputStrategy->inputState();
+        }
+        else
+        {
+            return mInputStrategy.inputState();
+        }
     }
 
 private:

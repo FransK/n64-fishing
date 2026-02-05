@@ -31,5 +31,3 @@ private:
 
 GlobalSettingsInterface *getGlobalSettingsInterface();
 void setGlobalSettingsInterface(GlobalSettingsInterface *globalSettings);
-
-extern GlobalSettingsInterface *globalSettingsInstance;

@@ -2,10 +2,9 @@
 
 #include <variant>
 #include "InputComponent.h"
-#include "AIInputStrategy.h"
 #include "PlayerInputStrategy.h"
-#include "Player.h"
+#include "scene/PlayerAi.h"
 
 using InputComponentVariant = std::variant<
     InputComponent<PlayerInputStrategy>,
-    InputComponent<AIInputStrategy>>;
+    InputComponent<PlayerAi *>>;

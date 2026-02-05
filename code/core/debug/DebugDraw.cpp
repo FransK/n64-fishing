@@ -3,6 +3,7 @@
 
 #include <t3d/t3d.h>
 
+#include "animation/adapters/T3d.h"
 #include "math/Box3d.h"
 
 #include "Config.h"
@@ -20,7 +21,7 @@ namespace
 
     std::vector<Line> lines{};
 
-    sprite_t *font{};
+    Adapters::SpriteAdapter font{};
 
     void debugDrawLine(uint16_t *fb, int px0, int py0, int px1, int py1, uint16_t color)
     {
@@ -55,7 +56,7 @@ namespace
 
 void Debug::init()
 {
-    font = sprite_load(FS_BASE_PATH "font.ia4.sprite");
+    font = Adapters::SpriteAdapter(FS_BASE_PATH "font.ia4.sprite");
     lines = {};
 }
 
@@ -63,7 +64,7 @@ void Debug::destroy()
 {
     lines.clear();
     lines.shrink_to_fit();
-    sprite_free(font);
+    font = {};
 }
 
 void Debug::drawLine(const T3DVec3 &a, const T3DVec3 &b, color_t color)
@@ -165,7 +166,7 @@ void Debug::printStart()
     rdpq_mode_alphacompare(1);
     rdpq_set_prim_color(RGBA32(0xFF, 0xFF, 0xFF, 0xFF));
 
-    rdpq_sprite_upload(TILE0, font, NULL);
+    rdpq_sprite_upload(TILE0, font.get(), NULL);
 }
 
 float Debug::print(float x, float y, const char *str)
