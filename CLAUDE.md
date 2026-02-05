@@ -63,3 +63,7 @@ Uses custom GJK/EPA implementation with Minkowski sums. Two pruning passes: sing
 - **Function names**: camelCase (e.g., `getGlobalSettingsInterface()`, `updateFixed()`, `drawBillboard()`)
 - **Variable names**: camelCase
 - **Parameter names**: camelCase
+
+## Code Style
+
+- **Prefer `auto`**: Use `auto` for variable declarations where the type is clear from context or initialization

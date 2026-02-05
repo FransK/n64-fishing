@@ -6,6 +6,7 @@ DEBUG = 1	# Enable printf debugging
 BUILD_DIR = build
 ASSETS_DIR = assets
 GAME_DIR = code
+LIB_DIR = lib
 FILESYSTEM_DIR = filesystem
 
 SRC = main.cpp \
@@ -13,12 +14,14 @@ SRC = main.cpp \
 	$(wildcard $(GAME_DIR)/**/*.c) \
 	$(wildcard $(GAME_DIR)/*.cpp) \
 	$(wildcard $(GAME_DIR)/**/*.cpp) \
-	$(wildcard $(GAME_DIR)/**/**/*.cpp)
+	$(wildcard $(GAME_DIR)/**/**/*.cpp) \
+	$(wildcard $(LIB_DIR)/*.cpp) \
+	$(wildcard $(LIB_DIR)/source/*.cpp)
 
 include $(N64_INST)/include/n64.mk
 include $(N64_INST)/include/t3d.mk
 
-N64_CXXFLAGS += -std=gnu++17 -fno-exceptions -Iinclude $(foreach dir,$(shell find include -type d),-I$(dir))
+N64_CXXFLAGS += -std=gnu++17 -fno-exceptions -Iinclude -Ilib/include $(foreach dir,$(shell find include -type d),-I$(dir))
 
 N64_ROM_SAVETYPE = eeprom4k
 ifeq ($(strip $(FINAL)),1)
@@ -35,6 +38,7 @@ SOUND_LIST  = $(wildcard $(ASSETS_DIR)/*.wav)
 SOUND2_LIST  = $(wildcard $(ASSETS_DIR)/*.mp3)
 MUSIC_LIST  = $(wildcard $(ASSETS_DIR)/*.xm)
 DESC_LIST  = $(wildcard $(ASSETS_DIR)/*.txt)
+JSON_LIST  = $(wildcard $(ASSETS_DIR)/*.json)
 ASSETS_LIST += $(subst $(ASSETS_DIR),$(FILESYSTEM_DIR),$(IMAGE_LIST:%.png=%.sprite))
 ASSETS_LIST += $(subst $(ASSETS_DIR),$(FILESYSTEM_DIR),$(FONT_LIST:%.ttf=%.font64))
 ASSETS_LIST += $(subst $(ASSETS_DIR),$(FILESYSTEM_DIR),$(MODEL_LIST:%.glb=%.t3dm))
@@ -42,6 +46,7 @@ ASSETS_LIST += $(subst $(ASSETS_DIR),$(FILESYSTEM_DIR),$(SOUND_LIST:%.wav=%.wav6
 ASSETS_LIST += $(subst $(ASSETS_DIR),$(FILESYSTEM_DIR),$(SOUND2_LIST:%.mp3=%.wav64))
 ASSETS_LIST += $(subst $(ASSETS_DIR),$(FILESYSTEM_DIR),$(MUSIC_LIST:%.xm=%.xm64))
 ASSETS_LIST += $(subst $(ASSETS_DIR),$(FILESYSTEM_DIR),$(DESC_LIST:%.txt=%.desc))
+ASSETS_LIST += $(subst $(ASSETS_DIR),$(FILESYSTEM_DIR),$(JSON_LIST:%.json=%.json))
 
 ifeq ($(strip $(DEBUG)), 1)
 	N64_CFLAGS := $(filter-out -O%,$(N64_CFLAGS)) -g3 -Og -DDEBUG=$(strip $(DEBUG))
@@ -50,16 +55,16 @@ ifeq ($(strip $(DEBUG)), 1)
 endif
 
 # Debug: Print compiler info
-$(info N64_CC = $(N64_CC))
-$(info N64_CXX = $(N64_CXX))
-$(info N64_LD = $(N64_LD))
-$(info N64_INST = $(N64_INST))
-$(info CFLAGS = $(CFLAGS))
-$(info CXXFLAGS = $(CXXFLAGS))
-$(info N64_CXXFLAGS = $(N64_CXXFLAGS))
-$(info N64_LDFLAGS = $(N64_LDFLAGS))
-$(info DEBUG_RAW='$(DEBUG)')
-$(info DEBUG_STRIPPED='$(strip $(DEBUG))')
+# $(info N64_CC = $(N64_CC))
+# $(info N64_CXX = $(N64_CXX))
+# $(info N64_LD = $(N64_LD))
+# $(info N64_INST = $(N64_INST))
+# $(info CFLAGS = $(CFLAGS))
+# $(info CXXFLAGS = $(CXXFLAGS))
+# $(info N64_CXXFLAGS = $(N64_CXXFLAGS))
+# $(info N64_LDFLAGS = $(N64_LDFLAGS))
+# $(info DEBUG_RAW='$(DEBUG)')
+# $(info DEBUG_STRIPPED='$(strip $(DEBUG))')
 
 $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -98,6 +103,11 @@ $(FILESYSTEM_DIR)/%.xm64: $(ASSETS_DIR)/%.xm
 	@mkdir -p $(dir $@)
 	@echo "    [XM] $@"
 	$(N64_AUDIOCONV) $(AUDIOCONV_FLAGS) -o $(dir $@) "$<"
+
+$(FILESYSTEM_DIR)/%.json: $(ASSETS_DIR)/%.json
+	@mkdir -p $(dir $@)
+	@echo "    [JSON] $@"
+	cp "$<" "$@"
 
 N_ELF_EXTERNS := $(BUILD_DIR)/$(ROMNAME).externs
 $(BUILD_DIR)/$(ROMNAME).dfs: $(ASSETS_LIST)

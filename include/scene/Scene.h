@@ -14,6 +14,7 @@
 #include "debug/Overlay.h"
 #include "input/InputComponent.h"
 #include "input/InputComponentVariant.h"
+#include "services/AssetData.h"
 
 #include "scene/Camera.h"
 #include "scene/Player.h"
@@ -68,6 +69,7 @@ private:
     std::vector<InputComponentVariant> mInputComponents;
     std::vector<PlayerAnimationComponent> mAnimationComponents;
     std::shared_ptr<CollisionScene> mCollisionScene;
+    std::vector<Services::PlayerData> mInitialPlayerData;
 
     std::vector<bool> mWinners;
     int mCurrTopScore{0};

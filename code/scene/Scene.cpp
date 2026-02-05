@@ -15,6 +15,8 @@
 #include "input/InputComponentUpdate.h"
 #include "math/Vector2.h"
 #include "scene/ActorFlags.h"
+#include "services/AssetReader.h"
+#include "services/JsonAssetDataStrategy.h"
 
 bool showFPS = false;
 bool debugOverlay = false;
@@ -58,16 +60,22 @@ Scene::Scene()
     t3d_vec3_norm(&mLightDirVec);
 
     // === Initialize the players and components === //
-    Vector3 initialPositions[Core::MAX_PLAYERS] = {
-        {-25, 0.0f, 0},
-        {0, 0.0f, -25},
-        {25, 0.0f, 0},
-        {0, 0.0f, 25}};
-    Vector2 initialRotations[Core::MAX_PLAYERS] = {
-        {1, 0},
-        {0, -1},
-        {-1, 0},
-        {0, 1}};
+
+    // Load player data from asset files
+    Services::AssetReader assetReader(std::make_unique<Services::JsonAssetDataStrategy>());
+    auto assetList = assetReader.loadAssetList(std::string(FS_BASE) + "s1_assetlist.json");
+
+    if (assetList)
+    {
+        for (const auto &assetId : assetList->assets)
+        {
+            auto playerData = assetReader.loadPlayerData(std::string(FS_BASE) + assetId + ".json");
+            if (playerData)
+            {
+                mInitialPlayerData.push_back(*playerData);
+            }
+        }
+    }
 
     mInputComponents.reserve(Core::MAX_PLAYERS);
     mAnimationComponents.reserve(Core::MAX_PLAYERS);
@@ -82,8 +90,11 @@ Scene::Scene()
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
         mPlayers.emplace_back(mCollisionScene, i);
-        mPlayers.back().setPosition(initialPositions[i]);
-        mPlayers.back().setRotation(initialRotations[i]);
+        if (i < mInitialPlayerData.size())
+        {
+            mPlayers.back().setPosition(mInitialPlayerData[i].position);
+            mPlayers.back().setRotation(mInitialPlayerData[i].rotation);
+        }
 
         AIBehavior behavior = (i == Core::MAX_PLAYERS - 1) ? AIBehavior::BEHAVE_BULLY : AIBehavior::BEHAVE_FISHERMAN;
         mAIPlayers.emplace_back(&mPlayers.back());
@@ -330,21 +341,13 @@ const CollisionScene &Scene::getCollScene()
 
 void Scene::reset()
 {
-    // Reset player positions and rotations
-    Vector3 initialPositions[Core::MAX_PLAYERS] = {
-        {-25, 0.0f, 0},
-        {0, 0.0f, -25},
-        {25, 0.0f, 0},
-        {0, 0.0f, 25}};
-    Vector2 initialRotations[Core::MAX_PLAYERS] = {
-        {1, 0},
-        {0, -1},
-        {-1, 0},
-        {0, 1}};
-
+    // Reset player positions and rotations using loaded data
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mPlayers[i].reset(initialPositions[i], initialRotations[i]);
+        if (i < mInitialPlayerData.size())
+        {
+            mPlayers[i].reset(mInitialPlayerData[i].position, mInitialPlayerData[i].rotation);
+        }
         mAIPlayers[i].reset();
         mWinners[i] = false;
     }

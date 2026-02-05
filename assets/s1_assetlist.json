@@ -1,0 +1,9 @@
+{
+    "scene": "s1",
+    "assets": [
+        "player-a1b2c3d4",
+        "player-e5f6g7h8",
+        "player-i9j0k1l2",
+        "player-m3n4o5p6"
+    ]
+}
