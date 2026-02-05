@@ -67,3 +67,4 @@ Uses custom GJK/EPA implementation with Minkowski sums. Two pruning passes: sing
 ## Code Style
 
 - **Prefer `auto`**: Use `auto` for variable declarations where the type is clear from context or initialization
+- **Prefer RAII types**: Use standard RAII types where available (e.g., `std::ifstream` over `fopen`, smart pointers over raw `new`/`delete`)

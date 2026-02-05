@@ -1,8 +1,7 @@
 #include "services/AssetReader.h"
 
-#include <cstdio>
+#include <fstream>
 #include <sstream>
-#include <vector>
 
 namespace Services
 {
@@ -13,43 +12,27 @@ namespace Services
 
     std::optional<AssetListData> AssetReader::loadAssetList(const std::string &path)
     {
-        FILE *file = fopen(path.c_str(), "r");
+        std::ifstream file(path);
         if (!file)
         {
             return std::nullopt;
         }
 
-        fseek(file, 0, SEEK_END);
-        long size = ftell(file);
-        fseek(file, 0, SEEK_SET);
-
-        std::vector<char> buffer(size + 1);
-        fread(buffer.data(), 1, size, file);
-        buffer[size] = '\0';
-        fclose(file);
-
-        std::istringstream stream(buffer.data());
-        return mStrategy->parseAssetList(stream);
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        return mStrategy->parseAssetList(buffer);
     }
 
     std::optional<PlayerData> AssetReader::loadPlayerData(const std::string &path)
     {
-        FILE *file = fopen(path.c_str(), "r");
+        std::ifstream file(path);
         if (!file)
         {
             return std::nullopt;
         }
 
-        fseek(file, 0, SEEK_END);
-        long size = ftell(file);
-        fseek(file, 0, SEEK_SET);
-
-        std::vector<char> buffer(size + 1);
-        fread(buffer.data(), 1, size, file);
-        buffer[size] = '\0';
-        fclose(file);
-
-        std::istringstream stream(buffer.data());
-        return mStrategy->parsePlayerData(stream);
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        return mStrategy->parsePlayerData(buffer);
     }
 }
