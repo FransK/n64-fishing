@@ -155,8 +155,6 @@ void Scene::updateFixed(float deltaTime)
             getGlobalSettingsInterface()->setGlobalSettingValue(static_cast<size_t>(GameSettingsKeys::EXIT_GAME), true);
         }
         return;
-    default:
-        return;
     }
 
     // === Update Inputs and AI === //

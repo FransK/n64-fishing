@@ -133,8 +133,6 @@ void Player::update(const PlayerInputState &inputState, float deltaTime)
 
         changeState(PlayerStateEnum::STATE_IDLE);
         break;
-    default:
-        break;
     }
 }
 

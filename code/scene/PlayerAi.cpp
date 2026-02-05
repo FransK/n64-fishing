@@ -59,8 +59,6 @@ void PlayerAi::update(float deltaTime, Player *allPlayers, Containers::vector<bo
         break;
     case PlayerStateEnum::STATE_CASTING:
     case PlayerStateEnum::STATE_STUNNED:
-    default:
-        // Do nothing, wait for action to complete
         break;
     }
 }
