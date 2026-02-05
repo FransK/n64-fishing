@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Component.h"
-#include <vector>
+#include "containers/Vector.h"
 
 namespace Core
 {
-    using ComponentVector = std::vector<Component>;
+    using ComponentVector = Containers::vector<Component>;
 }

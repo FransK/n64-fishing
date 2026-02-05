@@ -16,7 +16,7 @@ void PlayerAi::reset()
     };
 }
 
-void PlayerAi::update(float deltaTime, Player *allPlayers, std::vector<bool> &winners)
+void PlayerAi::update(float deltaTime, Player *allPlayers, Containers::vector<bool> &winners)
 {
     // Reset input state
     mInputState = {
@@ -63,7 +63,7 @@ void PlayerAi::update(float deltaTime, Player *allPlayers, std::vector<bool> &wi
     }
 }
 
-void PlayerAi::updateIdle(float deltaTime, Player *allPlayers, std::vector<bool> &winners)
+void PlayerAi::updateIdle(float deltaTime, Player *allPlayers, Containers::vector<bool> &winners)
 {
     switch (mBehavior)
     {
@@ -127,7 +127,7 @@ void PlayerAi::moveToTarget()
     };
 }
 
-Player *PlayerAi::findWinnerTarget(Player *allPlayers, std::vector<bool> &winners) const
+Player *PlayerAi::findWinnerTarget(Player *allPlayers, Containers::vector<bool> &winners) const
 {
     for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {

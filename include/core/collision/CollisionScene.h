@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <vector>
+#include "containers/Vector.h"
 
 #include "Collider.h"
 #include "Epa.h"
@@ -20,8 +20,8 @@ namespace Collision
         void debugDraw();
 
     private:
-        std::vector<std::shared_ptr<Collider>> colliders{};       // TODO make unique
-        std::vector<std::shared_ptr<Collider>> activeColliders{}; // TODO make unique
+        Containers::vector<std::shared_ptr<Collider>> colliders{};       // TODO make unique
+        Containers::vector<std::shared_ptr<Collider>> activeColliders{}; // TODO make unique
 
         void runCollision();
         void constrainToWorld(Collider *object);

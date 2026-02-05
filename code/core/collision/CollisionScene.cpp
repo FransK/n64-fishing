@@ -1,7 +1,7 @@
 #include "CollisionScene.h"
 
 #include <algorithm>
-#include <vector>
+#include "containers/Vector.h"
 
 #include "debug/DebugDraw.h"
 #include "math/Vector3.h"
@@ -109,7 +109,7 @@ void CollisionScene::runCollision()
 {
     // === Sweep and Prune === //
     int edgeCount = activeColliders.size() * 2;
-    std::vector<ColliderEdge> colliderEdges(edgeCount);
+    Containers::vector<ColliderEdge> colliderEdges(edgeCount);
     ColliderEdge *currEdge = &colliderEdges[0];
 
     // Prune along x axis by looking at min and max x of each BB
@@ -131,7 +131,7 @@ void CollisionScene::runCollision()
     // Sort by x position of each edge
     std::sort(colliderEdges.begin(), colliderEdges.end());
 
-    std::vector<uint16_t> activeObjects(activeColliders.size());
+    Containers::vector<uint16_t> activeObjects(activeColliders.size());
     int activeObjectCount = 0;
 
     for (int edgeIndex = 0; edgeIndex < edgeCount; edgeIndex++)
