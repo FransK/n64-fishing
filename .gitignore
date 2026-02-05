@@ -1,6 +1,7 @@
 .vscode/
 build/
 filesystem/
+scripts/
 *.z64
 *.eeprom
 *.pak
