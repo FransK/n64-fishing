@@ -112,6 +112,7 @@ Scene::Scene()
 
         mAnimationComponents.emplace_back(mPlayerModel.getModel(), COLORS[i]);
         mPlayers.back().attach(&mAnimationComponents.back().getAnimatable());
+        mPlayers.back().attach(mCollisionScene.get());
         mWinners.push_back(false);
     }
 

@@ -12,7 +12,7 @@ class Player;
 
 namespace Collision
 {
-    class CollisionScene : Observer<Player>
+    class CollisionScene : public Observer<Player>
     {
     public:
         CollisionScene() : Observer<Player>([this](const Player &player)
