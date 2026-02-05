@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <t3d/t3d.h>
-#include <vector>
+#include "containers/Vector.h"
 
 #include "Config.h"
 #include "GlobalSettingsInterface.h"
@@ -64,14 +64,14 @@ private:
 
     float mStateTime{};
 
-    std::vector<Player> mPlayers;
-    std::vector<PlayerAi> mAIPlayers;
-    std::vector<InputComponentVariant> mInputComponents;
-    std::vector<PlayerAnimationComponent> mAnimationComponents;
-    std::shared_ptr<CollisionScene> mCollisionScene;
-    std::vector<Services::PlayerData> mInitialPlayerData;
+    Containers::vector<Player> mPlayers;
+    Containers::vector<PlayerAi> mAIPlayers;
+    Containers::vector<InputComponentVariant> mInputComponents;
+    Containers::vector<PlayerAnimationComponent> mAnimationComponents;
+    std::shared_ptr<CollisionScene> mCollisionScene; // TODO Scene should own the CollisionScene, not share it
+    Containers::vector<Services::PlayerData> mInitialPlayerData;
 
-    std::vector<bool> mWinners;
+    Containers::vector<bool> mWinners;
     int mCurrTopScore{0};
 
     Adapters::ModelAdapter mPlayerModel;

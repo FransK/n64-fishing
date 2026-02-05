@@ -16,7 +16,7 @@ using namespace Math;
 class Player : public Actor
 {
 public:
-    Player(std::shared_ptr<Collision::CollisionScene> scene, int8_t playerNumber);
+    Player(std::shared_ptr<Collision::CollisionScene> scene, int8_t playerNumber); // TODO remove shared (player shouldn't own collision scene)
     ~Player();
     Player(const Player &) = delete;
     Player &operator=(const Player &) = delete;

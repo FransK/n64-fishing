@@ -13,7 +13,7 @@
 
 using namespace Math;
 
-Player::Player(std::shared_ptr<Collision::CollisionScene> scene, int8_t playerNumber)
+Player::Player(std::shared_ptr<Collision::CollisionScene> scene, int8_t playerNumber) // TODO Player should not own CollisionScene
     : mAttackActor(std::make_unique<Actor>()),
       mPlayerState(std::make_unique<PlayerState>()),
       mScene(std::move(scene)),

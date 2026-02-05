@@ -69,6 +69,8 @@ int main()
 
     while (1)
     {
+        world->loadNextScene();
+
         resetGameSettings(globalSettings);
 
         float accumulator = 0;
@@ -101,5 +103,6 @@ int main()
         }
 
         world->reset();
+        world->unloadCurrentScene();
     }
 }

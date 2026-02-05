@@ -20,8 +20,8 @@ namespace Collision
         void debugDraw();
 
     private:
-        std::vector<std::shared_ptr<Collider>> colliders{};
-        std::vector<std::shared_ptr<Collider>> activeColliders{};
+        std::vector<std::shared_ptr<Collider>> colliders{};       // TODO make unique
+        std::vector<std::shared_ptr<Collider>> activeColliders{}; // TODO make unique
 
         void runCollision();
         void constrainToWorld(Collider *object);
