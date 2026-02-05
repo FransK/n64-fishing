@@ -16,7 +16,6 @@ namespace
         T3DVec3 a{};
         T3DVec3 b{};
         uint16_t color;
-        uint16_t _padding;
     };
 
     std::vector<Line> lines{};
@@ -139,7 +138,7 @@ void Debug::draw(uint16_t *fb)
 
     float maxX = Core::SCREEN_WIDTH;
     float maxY = Core::SCREEN_HEIGHT;
-    for (auto &line : lines)
+    for (const auto &line : lines)
     {
         if (line.a.x < 0 && line.b.x < 0)
             continue;
@@ -175,7 +174,6 @@ float Debug::print(float x, float y, const char *str)
 {
     int width = 8;
     int height = 8;
-    int s = 0;
 
     while (*str)
     {
@@ -184,7 +182,7 @@ float Debug::print(float x, float y, const char *str)
         {
             if (c >= 'a' && c <= 'z')
                 c &= ~0x20;
-            s = (c - 33) * width;
+            int s = (c - 33) * width;
             rdpq_texture_rectangle_raw(TILE0, x, y, x + width, y + height, s, 0, 1, 1);
         }
         ++str;

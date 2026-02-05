@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cassert>
 #include <cmath>
 #include <type_traits>
 #include <utility>
@@ -9,12 +11,28 @@
 
 namespace Math
 {
-    struct __attribute__((packed)) Quaternion
+    struct Quaternion
     {
-        float x, y, z, w;
+        union {
+            std::array<float, 4> data;
+            struct {
+                float x, y, z, w;
+            };
+        };
 
-        float &operator[](int index) { return (&x)[index]; }
-        const float &operator[](int index) const { return (&x)[index]; }
+        constexpr Quaternion() : data({0.0f, 0.0f, 0.0f, 0.0f}) {}
+        constexpr Quaternion(float x, float y, float z, float w) : data({x, y, z, w}) {}
+
+        constexpr float &operator[](size_t index)
+        {
+            assert(index < 4);
+            return data[index];
+        }
+        constexpr const float &operator[](size_t index) const
+        {
+            assert(index < 4);
+            return data[index];
+        }
 
         template <typename T,
                   typename = std::enable_if_t<std::is_base_of<Quaternion, std::decay_t<T>>::value>>

@@ -42,7 +42,7 @@ namespace Adapters
     class ModelAdapter
     {
     public:
-        explicit ModelAdapter(std::string path)
+        explicit ModelAdapter(const std::string &path)
             : mModel(t3d_model_load(path.c_str())) {}
 
         ModelAdapter(const ModelAdapter &) = delete;
@@ -74,7 +74,7 @@ namespace Adapters
     {
     public:
         Mat4FPAdapter()
-            : mMat((T3DMat4FP *)malloc_uncached(sizeof(T3DMat4FP))) {}
+            : mMat(static_cast<T3DMat4FP *>(malloc_uncached(sizeof(T3DMat4FP)))) {}
 
         Mat4FPAdapter(const Mat4FPAdapter &) = delete;
         Mat4FPAdapter &operator=(const Mat4FPAdapter &) = delete;
@@ -183,10 +183,7 @@ namespace Adapters
     {
     public:
         SkeletonAdapter() = default;
-        explicit SkeletonAdapter(T3DModel *model)
-        {
-            mSkeleton = t3d_skeleton_create(model);
-        }
+        explicit SkeletonAdapter(T3DModel *model) : mSkeleton(t3d_skeleton_create(model)) {}
 
         ~SkeletonAdapter()
         {
@@ -221,10 +218,7 @@ namespace Adapters
     {
     public:
         AnimAdapter() = default;
-        AnimAdapter(T3DModel *model, const char *name)
-        {
-            mAnim = t3d_anim_create(model, name);
-        }
+        AnimAdapter(T3DModel *model, const char *name) : mAnim(t3d_anim_create(model, name)) {}
 
         ~AnimAdapter()
         {

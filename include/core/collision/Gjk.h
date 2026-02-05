@@ -22,7 +22,7 @@ namespace Collision
         Simplex() : nPoints(0) {}
 
         /* Add the point in the Minkowski difference space (A - B) */
-        Math::Vector3 *addPoint(Math::Vector3 *aPoint, Math::Vector3 *bPoint);
+        Math::Vector3 *addPoint(const Math::Vector3 *aPoint, const Math::Vector3 *bPoint);
 
         void movePoint(int to, int from);
         int check(Math::Vector3 *nextDirection);

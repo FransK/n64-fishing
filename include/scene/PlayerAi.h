@@ -16,7 +16,7 @@ enum struct AIBehavior : uint8_t
 class PlayerAi
 {
 public:
-    PlayerAi(Player *player) : mPlayer(player) {} // TODO: Should not be holding raw pointer here
+    explicit PlayerAi(Player *player) : mPlayer(player) {} // TODO: Should not be holding raw pointer here
 
     void reset();
     void setBehavior(AIBehavior behavior) { mBehavior = behavior; }
@@ -32,9 +32,9 @@ private:
     float mDelayCatchTimer{0.8f};
     PlayerInputState mInputState{};
 
-    void updateIdle(float deltaTime, Player *allPlayers, Containers::vector<bool> &winners);
+    void updateIdle(float deltaTime, Player *allPlayers, const Containers::vector<bool> &winners);
     void updateMovementTarget();
     void moveToTarget();
-    Player *findWinnerTarget(Player *allPlayers, Containers::vector<bool> &winners) const;
+    Player *findWinnerTarget(Player *allPlayers, const Containers::vector<bool> &winners) const;
     Math::Vector3 findClosestFish() const;
 };

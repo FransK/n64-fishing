@@ -16,6 +16,6 @@ enum class GameSettingsKeys
     WINNING_PLAYERS
 };
 
-size_t setPlayers(bool *enabledconts, std::array<Core::PlayerJoypad, JOYPAD_PORT_COUNT> &playerJoypads);
+size_t setPlayers(const bool *enabledconts, std::array<Core::PlayerJoypad, JOYPAD_PORT_COUNT> &playerJoypads);
 
 void resetGameSettings(GlobalSettingsInterface *gameSettings);

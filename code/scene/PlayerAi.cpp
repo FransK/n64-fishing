@@ -63,7 +63,7 @@ void PlayerAi::update(float deltaTime, Player *allPlayers, Containers::vector<bo
     }
 }
 
-void PlayerAi::updateIdle(float deltaTime, Player *allPlayers, Containers::vector<bool> &winners)
+void PlayerAi::updateIdle(float deltaTime, Player *allPlayers, const Containers::vector<bool> &winners)
 {
     switch (mBehavior)
     {
@@ -127,7 +127,7 @@ void PlayerAi::moveToTarget()
     };
 }
 
-Player *PlayerAi::findWinnerTarget(Player *allPlayers, Containers::vector<bool> &winners) const
+Player *PlayerAi::findWinnerTarget(Player *allPlayers, const Containers::vector<bool> &winners) const
 {
     for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {

@@ -68,7 +68,7 @@ namespace Collision
         unsigned char triangleHeap[MaxSimplexTriangles];
         short flags;
 
-        ExpandingSimplex(const Simplex *startingSimplex, int flags);
+        ExpandingSimplex(const Simplex *startingSimplex, int flags_);
 
         void addPoint(const Math::Vector3 *aPoint, const Math::Vector3 *pointDiff);
         void addTriangle(const SimplexTriangleIndexData *data);

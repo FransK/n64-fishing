@@ -15,7 +15,7 @@ void ExpandingSimplex::triangleInit(SimplexTriangle *triangle, const SimplexTria
 
 bool ExpandingSimplex::triangleCheckEdge(SimplexTriangle *triangle, int index)
 {
-    Vector3 &pointA = points[triangle->indexData.indices[index]];
+    const Vector3 &pointA = points[triangle->indexData.indices[index]];
 
     Vector3 edge = points[triangle->indexData.indices[NextFace(index)]] - pointA;
     Vector3 toOrigin = -pointA;
@@ -74,13 +74,13 @@ void ExpandingSimplex::triangleDetermineDistance(SimplexTriangle *triangle)
     triangle->distanceToOrigin = dot(triangle->normal, points[triangle->indexData.indices[0]]);
 }
 
-ExpandingSimplex::ExpandingSimplex(const Simplex *startingSimplex, int flags)
+ExpandingSimplex::ExpandingSimplex(const Simplex *startingSimplex, int flags_)
 {
     assert(startingSimplex->nPoints == 4);
 
     triangleCount = 0;
     pointCount = 0;
-    flags = flags;
+    flags = flags_;
 
     for (int i = 0; i < 4; ++i)
     {
@@ -134,7 +134,7 @@ void ExpandingSimplex::expand(int newPointIndex, int faceToRemoveIndex)
         return;
     }
 
-    SimplexTriangle *faceToRemove = &triangles[faceToRemoveIndex];
+    const SimplexTriangle *faceToRemove = &triangles[faceToRemoveIndex];
     SimplexTriangleIndexData existing = faceToRemove->indexData;
 
     unsigned char triangleIndices[3];
@@ -338,9 +338,9 @@ void ExpandingSimplex::triangleCheckRotate(int triangleIndex, int heapIndex)
 {
     SimplexTriangle *triangle = &triangles[triangleIndex];
     SimplexTriangle *adjacent = &triangles[triangle->indexData.adjacentFaces[0]];
-    Vector3 *oppositePoint = &points[adjacent->indexData.indices[triangle->indexData.oppositePoints[0]]];
+    const Vector3 *oppositePoint = &points[adjacent->indexData.indices[triangle->indexData.oppositePoints[0]]];
 
-    Vector3 *firstPoint = &points[triangle->indexData.indices[0]];
+    const Vector3 *firstPoint = &points[triangle->indexData.indices[0]];
 
     Vector3 offset = *oppositePoint - *firstPoint;
 

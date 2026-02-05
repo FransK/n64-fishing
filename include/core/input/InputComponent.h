@@ -12,7 +12,7 @@ template <typename InputStrategyT>
 class InputComponent
 {
 public:
-    InputComponent(InputStrategyT inputStrategy)
+    explicit InputComponent(InputStrategyT inputStrategy)
         : mInputStrategy(std::move(inputStrategy))
     {
     }

@@ -18,6 +18,11 @@ and provides a basic game loop.
     The program main
 ==============================*/
 
+static void advance_rng()
+{
+    (void)rand(); // Explicitly discard return value
+}
+
 int main()
 {
     if constexpr (Core::DEBUG_LOG)
@@ -51,12 +56,12 @@ int main()
     uint32_t seed;
     getentropy(&seed, sizeof(seed));
     srand(seed);
-    register_VI_handler((void (*)(void))rand);
+    register_VI_handler(advance_rng);
 
     // Load game
     GlobalSettingsInterface *globalSettings = getGlobalSettingsInterface();
 
-    bool joinedPlayers[Core::MAX_PLAYERS] = {true, false, false, false};
+    const bool joinedPlayers[Core::MAX_PLAYERS] = {true, false, false, false};
     std::array<Core::PlayerJoypad, JOYPAD_PORT_COUNT> playerJoypads{};
     size_t playerCount = setPlayers(joinedPlayers, playerJoypads);
 

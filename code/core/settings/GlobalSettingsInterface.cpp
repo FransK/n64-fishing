@@ -17,8 +17,3 @@ GlobalSettingsInterface *getGlobalSettingsInterface()
 
     return instance;
 }
-
-void setGlobalSettingsInterface(GlobalSettingsInterface *globalSettings)
-{
-    instance = globalSettings;
-}

@@ -1,6 +1,6 @@
 #include "GameSettings.h"
 
-size_t setPlayers(bool *enabledconts, std::array<Core::PlayerJoypad, JOYPAD_PORT_COUNT> &playerJoypads)
+size_t setPlayers(const bool *enabledconts, std::array<Core::PlayerJoypad, JOYPAD_PORT_COUNT> &playerJoypads)
 {
     size_t plynum = 0;
 

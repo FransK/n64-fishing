@@ -15,12 +15,6 @@ namespace Math
         {
             return dot(plane.normal, point) + plane.d;
         }
-
-        friend Vector3 projectOntoPlane(const Plane &plane, const Vector3 &point)
-        {
-            float dist = distanceToPlane(plane, point);
-            return point - plane.normal * dist;
-        }
     };
 
     Vector3 calculateBarycentricCoords(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Vector3 &point);

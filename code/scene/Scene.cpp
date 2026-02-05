@@ -320,7 +320,7 @@ void Scene::update(float deltaTime)
     if (debugOverlay)
     {
         mDebugOverlay.draw(*this, vertices, deltaTime);
-        Debug::draw((uint16_t *)mCurrentFB->buffer);
+        Debug::draw(static_cast<uint16_t *>(mCurrentFB->buffer));
     }
     else if (showFPS)
     {

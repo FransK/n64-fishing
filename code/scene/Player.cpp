@@ -192,8 +192,7 @@ void Player::changeState(const PlayerStateEnum &newState)
         setVelocity({0.0f, 0.0f, 0.0f});
         break;
     case PlayerStateEnum::STATE_FISHING:
-        // mStateTimer = Fish::GetNewTimer();
-        mStateTimer = 4.0f; // Temporary fixed timer
+        mStateTimer = Fish::GetNewTimer();
         setVelocity({0.0f, 0.0f, 0.0f});
         break;
     case PlayerStateEnum::STATE_STUNNED:

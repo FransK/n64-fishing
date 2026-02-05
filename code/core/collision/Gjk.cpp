@@ -3,7 +3,7 @@
 using namespace Collision;
 using namespace Math;
 
-Vector3 *Simplex::addPoint(Vector3 *aPoint, Vector3 *bPoint)
+Vector3 *Simplex::addPoint(const Vector3 *aPoint, const Vector3 *bPoint)
 {
     if (nPoints == MaxSimplexSize)
     {
@@ -22,7 +22,7 @@ Vector3 *Simplex::addPoint(Vector3 *aPoint, Vector3 *bPoint)
 
 int Simplex::check(Vector3 *nextDirection)
 {
-    Vector3 &lastAdded = points[nPoints - 1];
+    const Vector3 &lastAdded = points[nPoints - 1];
     Vector3 aToOrigin = -lastAdded;
 
     if (nPoints == 2)

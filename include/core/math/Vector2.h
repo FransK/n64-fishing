@@ -1,17 +1,35 @@
 #pragma once
 
+#include <array>
+#include <cassert>
 #include <cmath>
 #include <type_traits>
 #include <utility>
 
 namespace Math
 {
-    struct __attribute__((packed)) Vector2
+    struct Vector2
     {
-        float x, y;
+        union {
+            std::array<float, 2> data;
+            struct {
+                float x, y;
+            };
+        };
 
-        float &operator[](int index) { return (&x)[index]; }
-        const float &operator[](int index) const { return (&x)[index]; }
+        constexpr Vector2() : data({0.0f, 0.0f}) {}
+        constexpr Vector2(float x, float y) : data({x, y}) {}
+
+        constexpr float &operator[](size_t index)
+        {
+            assert(index < 2);
+            return data[index];
+        }
+        constexpr const float &operator[](size_t index) const
+        {
+            assert(index < 2);
+            return data[index];
+        }
 
         template <typename T,
                   typename = std::enable_if_t<std::is_base_of<Vector2, std::decay_t<T>>::value>>
