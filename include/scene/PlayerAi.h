@@ -25,7 +25,7 @@ public:
 
 private:
     AIBehavior mBehavior{AIBehavior::BEHAVE_FISHERMAN};
-    Vector3 mMovementTarget{};
+    Math::Vector3 mMovementTarget{};
     const Player *mPlayer{}; // TODO
     const Player *mTarget{}; // TODO
     float mDelayActionTimer{0.0f};
@@ -36,5 +36,5 @@ private:
     void updateMovementTarget();
     void moveToTarget();
     Player *findWinnerTarget(Player *allPlayers, Containers::vector<bool> &winners) const;
-    Vector3 findClosestFish() const;
+    Math::Vector3 findClosestFish() const;
 };

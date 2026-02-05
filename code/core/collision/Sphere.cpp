@@ -3,6 +3,7 @@
 #include "Sphere.h"
 
 using namespace Collision;
+using namespace Math;
 
 Vector3 Sphere::MinkowskiSum(const ColliderTypeData &data, const Vector3 &direction)
 {

@@ -3,8 +3,6 @@
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 
-using namespace Math;
-
 template <typename AnimatableT>
 class AnimationComponent
 {
@@ -15,7 +13,7 @@ public:
     AnimatableT &getAnimatable() { return mAnimatable; }
     uint32_t getVertCount() const { return mAnimatable.getVertCount(); }
     void update(float deltaTime) { mAnimatable.update(deltaTime); }
-    void draw(const Vector3 &position, const Vector2 &rotation) const
+    void draw(const Math::Vector3 &position, const Math::Vector2 &rotation) const
     {
         mAnimatable.draw(position, rotation);
     }

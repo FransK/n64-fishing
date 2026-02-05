@@ -9,8 +9,6 @@
 
 #include "ColliderType.h"
 
-using namespace Math;
-
 namespace Collision
 {
     constexpr float GRAVITY_CONSTANT = -10.f * 64.f;
@@ -31,9 +29,9 @@ namespace Collision
     {
         int entityId{};
         Actor *actor{}; // TODO - Non-owning; lifetime managed by Player
-        Vector3 center{};
+        Math::Vector3 center{};
         ColliderType type{};
-        Box3D boundingBox{};
+        Math::Box3D boundingBox{};
         float scale{};
         bool hasGravity{true};
         bool isTrigger{false};
@@ -47,6 +45,6 @@ namespace Collision
         void constrainPosition();
         bool hasFlag(ColliderFlags flag) const { return (flags & static_cast<uint32_t>(flag)) != 0; }
         void setFlag(ColliderFlags flag) { flags |= static_cast<uint32_t>(flag); }
-        Vector3 minkowskiSumWorld(const Vector3 &direction);
+        Math::Vector3 minkowskiSumWorld(const Math::Vector3 &direction);
     };
 }

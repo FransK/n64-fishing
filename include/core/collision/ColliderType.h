@@ -5,12 +5,10 @@
 
 #include "ColliderTypeData.h"
 
-using namespace Math;
-
 namespace Collision
 {
-    typedef Box3D (*BoundingBoxCalculator)(const ColliderTypeData &data, const Vector2 &rotation);
-    typedef Vector3 (*MinkowskiSum)(const ColliderTypeData &data, const Vector3 &direction);
+    typedef Math::Box3D (*BoundingBoxCalculator)(const ColliderTypeData &data, const Math::Vector2 &rotation);
+    typedef Math::Vector3 (*MinkowskiSum)(const ColliderTypeData &data, const Math::Vector3 &direction);
 
     struct ColliderType
     {

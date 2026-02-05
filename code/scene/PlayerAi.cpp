@@ -3,6 +3,8 @@
 #include "Config.h"
 #include "Collider.h"
 
+using namespace Math;
+
 void PlayerAi::reset()
 {
     mMovementTarget = {};

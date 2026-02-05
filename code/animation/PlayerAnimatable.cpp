@@ -3,6 +3,8 @@
 #include "common/Observer.h"
 #include "math/Quaternion.h"
 
+using namespace Math;
+
 PlayerAnimatable::PlayerAnimatable(T3DModel *model, color_t primColor)
     : Observer<Player>([this](const Player &player)
                        { this->onPlayerStateChange(player); }),

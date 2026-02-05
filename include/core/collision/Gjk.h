@@ -8,8 +8,6 @@
 #include "Collider.h"
 #include "ColliderTypeData.h"
 
-using namespace Math;
-
 namespace Collision
 {
     constexpr uint16_t MaxSimplexSize = 4;
@@ -17,22 +15,22 @@ namespace Collision
 
     struct Simplex
     {
-        Vector3 points[MaxSimplexSize];
-        Vector3 objectAPoint[MaxSimplexSize];
+        Math::Vector3 points[MaxSimplexSize];
+        Math::Vector3 objectAPoint[MaxSimplexSize];
         int16_t nPoints;
 
         Simplex() : nPoints(0) {}
 
         /* Add the point in the Minkowski difference space (A - B) */
-        Vector3 *addPoint(Vector3 *aPoint, Vector3 *bPoint);
+        Math::Vector3 *addPoint(Math::Vector3 *aPoint, Math::Vector3 *bPoint);
 
         void movePoint(int to, int from);
-        int check(Vector3 *nextDirection);
+        int check(Math::Vector3 *nextDirection);
     };
 
     class GJK
     {
     public:
-        static int checkForOverlap(Simplex *simplex, const std::unique_ptr<Collider> &a, const std::unique_ptr<Collider> &b, const Vector3 *firstDirection);
+        static int checkForOverlap(Simplex *simplex, const std::unique_ptr<Collider> &a, const std::unique_ptr<Collider> &b, const Math::Vector3 *firstDirection);
     };
 }

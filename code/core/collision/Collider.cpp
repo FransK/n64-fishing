@@ -1,6 +1,7 @@
 #include "Collider.h"
 
 using namespace Collision;
+using namespace Math;
 
 void Collider::update(float timeStep)
 {

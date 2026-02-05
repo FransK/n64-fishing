@@ -1,6 +1,7 @@
 #include "Gjk.h"
 
 using namespace Collision;
+using namespace Math;
 
 Vector3 *Simplex::addPoint(Vector3 *aPoint, Vector3 *bPoint)
 {

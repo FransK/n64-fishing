@@ -32,7 +32,7 @@ public:
 
     void drawBillboard(T3DViewport &viewport) const;
     void changeState(const PlayerStateEnum &newState);
-    void reset(Vector3 const &position, Vector2 const &rotation);
+    void reset(Math::Vector3 const &position, Math::Vector2 const &rotation);
     void update(const PlayerInputState &inputState, float deltaTime);
 
     bool canCatch() const { return mActionState == PlayerStateEnum::STATE_FISHING && mStateTimer < CATCH_TIMER; }

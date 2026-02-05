@@ -54,6 +54,8 @@ namespace
     }
 }
 
+using namespace Math;
+
 void Debug::init()
 {
     font = Adapters::SpriteAdapter(FS_BASE_PATH "font.ia4.sprite");

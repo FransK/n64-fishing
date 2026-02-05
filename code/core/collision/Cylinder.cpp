@@ -3,6 +3,7 @@
 #include "Cylinder.h"
 
 using namespace Collision;
+using namespace Math;
 
 constexpr float SQRT_1_2 = 0.707106781f;
 

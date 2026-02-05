@@ -7,8 +7,6 @@
 #include "Collider.h"
 #include "Gjk.h"
 
-using namespace Math;
-
 namespace Collision
 {
     constexpr uint16_t MaxIterations = 10;
@@ -52,7 +50,7 @@ namespace Collision
     {
         SimplexTriangleIndexData indexData{};
         float distanceToOrigin{};
-        Vector3 normal{};
+        Math::Vector3 normal{};
     };
 
     enum struct SimplexFlags
@@ -62,8 +60,8 @@ namespace Collision
 
     struct ExpandingSimplex
     {
-        Vector3 points[MaxSimplexPoints];
-        Vector3 aPoints[MaxSimplexPoints];
+        Math::Vector3 points[MaxSimplexPoints];
+        Math::Vector3 aPoints[MaxSimplexPoints];
         SimplexTriangle triangles[MaxSimplexTriangles];
         short pointCount;
         short triangleCount;
@@ -72,7 +70,7 @@ namespace Collision
 
         ExpandingSimplex(const Simplex *startingSimplex, int flags);
 
-        void addPoint(const Vector3 *aPoint, const Vector3 *pointDiff);
+        void addPoint(const Math::Vector3 *aPoint, const Math::Vector3 *pointDiff);
         void addTriangle(const SimplexTriangleIndexData *data);
         SimplexTriangle *closestFace();
         void expand(int newPointIndex, int faceToRemoveIndex);
@@ -95,12 +93,12 @@ namespace Collision
 
     struct EpaResult
     {
-        Vector3 contactA;
-        Vector3 contactB;
-        Vector3 normal; // points from A to B
+        Math::Vector3 contactA;
+        Math::Vector3 contactB;
+        Math::Vector3 normal; // points from A to B
         float penetration;
 
         static bool solve(const Simplex *startingSimplex, const std::unique_ptr<Collider> &a, const std::unique_ptr<Collider> &b, EpaResult *out);
-        static void calculateContact(struct ExpandingSimplex *simplex, struct SimplexTriangle *closestFace, struct Vector3 *planePos, struct EpaResult *result);
+        static void calculateContact(struct ExpandingSimplex *simplex, struct SimplexTriangle *closestFace, struct Math::Vector3 *planePos, struct EpaResult *result);
     };
 }

@@ -5,6 +5,7 @@
 #include "math/Plane.h"
 
 using namespace Collision;
+using namespace Math;
 
 void ExpandingSimplex::triangleInit(SimplexTriangle *triangle, const SimplexTriangleIndexData *data)
 {
