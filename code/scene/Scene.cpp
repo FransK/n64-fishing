@@ -25,8 +25,7 @@ const std::string playerPath = std::string(FS_BASE) + "player3.t3dm";
 const std::string mapPath = std::string(FS_BASE) + "map.t3dm";
 
 Scene::Scene()
-    : mCollisionScene(std::make_shared<CollisionScene>()),
-      mPlayerModel(playerPath),
+    : mPlayerModel(playerPath),
       mMapModel(mapPath),
       mFontBillboard(FS_BASE_PATH "squarewave.font64", Core::FONT_BILLBOARD),
       mFontText(FS_BASE_PATH "squarewave.font64", Core::FONT_TEXT)
@@ -112,7 +111,7 @@ Scene::Scene()
         }
 
         mAnimationComponents.emplace_back(mPlayerModel.getModel(), COLORS[i]);
-        mPlayers.back().getPlayerState()->attach(&mAnimationComponents.back().getAnimatable());
+        mPlayers.back().attach(&mAnimationComponents.back().getAnimatable());
         mWinners.push_back(false);
     }
 
@@ -125,7 +124,7 @@ Scene::~Scene()
 {
     for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mPlayers.back().getPlayerState()->detachAll();
+        mPlayers[i].detachAll();
     }
 }
 
@@ -187,12 +186,12 @@ void Scene::updateFixed(float deltaTime)
     mCurrTopScore = 0;
     for (auto &player : mPlayers)
     {
-        mCurrTopScore = std::max(mCurrTopScore, player.getPlayerState()->getFishCaught());
+        mCurrTopScore = std::max(mCurrTopScore, player.getFishCaught());
     }
 
     for (int i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        mWinners[i] = mPlayers[i].getPlayerState()->getFishCaught() >= mCurrTopScore;
+        mWinners[i] = mPlayers[i].getFishCaught() >= mCurrTopScore;
     }
 }
 
@@ -282,7 +281,7 @@ void Scene::update(float deltaTime)
                          Core::SCORE_X + i * Core::SCORE_X_SPACING,
                          Core::SCORE_Y,
                          "%d",
-                         mPlayers[i].getPlayerState()->getFishCaught());
+                         mPlayers[i].getFishCaught());
     }
 
     if (mState == State::GAME_OVER)
@@ -297,7 +296,7 @@ void Scene::update(float deltaTime)
         std::string message{};
         for (int i = 0; i < Core::MAX_PLAYERS; i++)
         {
-            mWinners[i] = mPlayers[i].getPlayerState()->getFishCaught() >= mCurrTopScore;
+            mWinners[i] = mPlayers[i].getFishCaught() >= mCurrTopScore;
             if (mWinners[i])
             {
                 using WinningPlayersArray = std::array<bool, Core::MAX_PLAYERS>;

@@ -5,6 +5,7 @@
 
 #include "debug/DebugDraw.h"
 #include "math/Vector3.h"
+#include "scene/Player.h"
 
 #include "ActorFlags.h"
 #include "Player.h"
@@ -15,31 +16,33 @@
 using namespace Collision;
 using namespace Math;
 
-void CollisionScene::add(Collider &&object, bool isActive)
+void CollisionScene::add(std::unique_ptr<Collider> object, bool isActive)
 {
-    auto objectPtr = std::make_shared<Collider>(std::move(object));
-    colliders.push_back(objectPtr);
     if (isActive)
     {
-        activeColliders.push_back(objectPtr);
+        mActiveColliders.push_back(std::move(object));
+    }
+    else
+    {
+        mInactiveColliders.push_back(std::move(object));
     }
 }
 
 void CollisionScene::remove(int entityId)
 {
-    for (auto iter = activeColliders.begin(); iter != activeColliders.end(); ++iter)
+    for (auto iter = mActiveColliders.begin(); iter != mActiveColliders.end(); ++iter)
     {
         if ((*iter)->entityId == entityId)
         {
-            activeColliders.erase(iter);
-            break;
+            mActiveColliders.erase(iter);
+            return;
         }
     }
-    for (auto iter = colliders.begin(); iter != colliders.end(); ++iter)
+    for (auto iter = mInactiveColliders.begin(); iter != mInactiveColliders.end(); ++iter)
     {
         if ((*iter)->entityId == entityId)
         {
-            colliders.erase(iter);
+            mInactiveColliders.erase(iter);
             return;
         }
     }
@@ -47,40 +50,34 @@ void CollisionScene::remove(int entityId)
 
 void CollisionScene::activate(int entityId)
 {
-    for (auto c : activeColliders)
-    {
-        if (c->entityId == entityId)
-        {
-            return;
-        }
-    }
+    auto it = std::find_if(mInactiveColliders.begin(), mInactiveColliders.end(),
+                           [entityId](const auto &c)
+                           { return c->entityId == entityId; });
 
-    for (auto c : colliders)
+    if (it != mInactiveColliders.end())
     {
-        if (c->entityId == entityId)
-        {
-            activeColliders.push_back(c);
-            return;
-        }
+        mActiveColliders.push_back(std::move(*it));
+        mInactiveColliders.erase(it);
     }
 }
 
 void CollisionScene::deactivate(int entityId)
 {
-    for (auto iter = activeColliders.begin(); iter != activeColliders.end(); ++iter)
+    auto it = std::find_if(mActiveColliders.begin(), mActiveColliders.end(),
+                           [entityId](const auto &c)
+                           { return c->entityId == entityId; });
+
+    if (it != mActiveColliders.end())
     {
-        if ((*iter)->entityId == entityId)
-        {
-            activeColliders.erase(iter);
-            return;
-        }
+        mInactiveColliders.push_back(std::move(*it));
+        mActiveColliders.erase(it);
     }
 }
 
 void CollisionScene::update(float fixedTimeStep)
 {
     /* Integrate objects */
-    for (auto c : activeColliders)
+    for (const auto &c : mActiveColliders)
     {
         c->update(fixedTimeStep);
         c->recalcBB();
@@ -90,16 +87,16 @@ void CollisionScene::update(float fixedTimeStep)
     runCollision();
 
     /* Clamp to world */
-    for (auto c : activeColliders)
+    for (const auto &c : mActiveColliders)
     {
-        constrainToWorld(c.get());
+        constrainToWorld(c);
         c->constrainPosition();
     }
 }
 
-void CollisionScene::debugDraw()
+void CollisionScene::debugDraw() const
 {
-    for (auto c : activeColliders)
+    for (const auto &c : mActiveColliders)
     {
         Debug::drawBox(c->boundingBox);
     }
@@ -108,22 +105,22 @@ void CollisionScene::debugDraw()
 void CollisionScene::runCollision()
 {
     // === Sweep and Prune === //
-    int edgeCount = activeColliders.size() * 2;
+    int edgeCount = mActiveColliders.size() * 2;
     Containers::vector<ColliderEdge> colliderEdges(edgeCount);
     ColliderEdge *currEdge = &colliderEdges[0];
 
     // Prune along x axis by looking at min and max x of each BB
-    for (size_t i = 0; i < activeColliders.size(); i++)
+    for (size_t i = 0; i < mActiveColliders.size(); i++)
     {
         currEdge->isStartEdge = 1;
         currEdge->objectIndex = i;
-        currEdge->x = (short)(activeColliders[i]->boundingBox.min.x);
+        currEdge->x = (short)(mActiveColliders[i]->boundingBox.min.x);
 
         currEdge += 1;
 
         currEdge->isStartEdge = 0;
         currEdge->objectIndex = i;
-        currEdge->x = (short)(activeColliders[i]->boundingBox.max.x);
+        currEdge->x = (short)(mActiveColliders[i]->boundingBox.max.x);
 
         currEdge += 1;
     }
@@ -131,7 +128,7 @@ void CollisionScene::runCollision()
     // Sort by x position of each edge
     std::sort(colliderEdges.begin(), colliderEdges.end());
 
-    Containers::vector<uint16_t> activeObjects(activeColliders.size());
+    Containers::vector<uint16_t> activeObjects(mActiveColliders.size());
     int activeObjectCount = 0;
 
     for (int edgeIndex = 0; edgeIndex < edgeCount; edgeIndex++)
@@ -140,10 +137,10 @@ void CollisionScene::runCollision()
 
         if (edge.isStartEdge)
         {
-            Collider *a = activeColliders[edge.objectIndex].get();
+            const std::unique_ptr<Collider> &a = mActiveColliders[edge.objectIndex];
             for (int activeIndex = 0; activeIndex < activeObjectCount; activeIndex++)
             {
-                Collider *b = activeColliders[activeObjects[activeIndex]].get();
+                const std::unique_ptr<Collider> &b = mActiveColliders[activeObjects[activeIndex]];
 
                 // === AABB === //
                 if (hasOverlap(a->boundingBox, b->boundingBox))
@@ -179,7 +176,7 @@ void CollisionScene::runCollision()
     }
 }
 
-void CollisionScene::collide(Collider *a, Collider *b)
+void CollisionScene::collide(const std::unique_ptr<Collider> &a, const std::unique_ptr<Collider> &b)
 {
     if (!(a->collisionLayers & b->collisionLayers))
     {
@@ -237,7 +234,7 @@ void CollisionScene::collide(Collider *a, Collider *b)
     correctOverlap(a, &result, 0.6f, friction, bounce);
 }
 
-void CollisionScene::correctOverlap(Collider *object, EpaResult *result, float ratio, float friction, float bounce)
+void CollisionScene::correctOverlap(const std::unique_ptr<Collider> &object, EpaResult *result, float ratio, float friction, float bounce)
 {
     Vector3 position = object->actor->getPosition();
     position += result->normal * result->penetration * ratio;
@@ -246,7 +243,7 @@ void CollisionScene::correctOverlap(Collider *object, EpaResult *result, float r
     correctVelocity(object, result, ratio, friction, bounce);
 }
 
-void CollisionScene::correctVelocity(Collider *object, EpaResult *result, float ratio, float friction, float bounce)
+void CollisionScene::correctVelocity(const std::unique_ptr<Collider> &object, EpaResult *result, float ratio, float friction, float bounce)
 {
     Vector3 velocity = object->actor->getVelocity();
     float velocityDot = dot(velocity, result->normal);
@@ -260,7 +257,7 @@ void CollisionScene::correctVelocity(Collider *object, EpaResult *result, float 
     }
 }
 
-void CollisionScene::constrainToWorld(Collider *object)
+void CollisionScene::constrainToWorld(const std::unique_ptr<Collider> &object)
 {
     if (object->isTrigger)
     {
@@ -278,5 +275,34 @@ void CollisionScene::constrainToWorld(Collider *object)
         result.normal = Vec3Up;
         result.penetration = position.y;
         correctOverlap(object, &result, -1.0f, object->type.friction, object->type.bounce);
+    }
+}
+
+void CollisionScene::onPlayerStateChange(const Player &player)
+{
+    switch (player.lastActionState())
+    {
+    case PlayerStateEnum::STATE_ATTACKING:
+        deactivate(player.attackActorEntityId());
+        break;
+    case PlayerStateEnum::STATE_IDLE:
+    case PlayerStateEnum::STATE_WALKING:
+    case PlayerStateEnum::STATE_STUNNED:
+    case PlayerStateEnum::STATE_CASTING:
+    case PlayerStateEnum::STATE_FISHING:
+        break;
+    }
+
+    switch (player.actionState())
+    {
+    case PlayerStateEnum::STATE_ATTACKING:
+        activate(player.attackActorEntityId());
+        break;
+    case PlayerStateEnum::STATE_IDLE:
+    case PlayerStateEnum::STATE_WALKING:
+    case PlayerStateEnum::STATE_STUNNED:
+    case PlayerStateEnum::STATE_CASTING:
+    case PlayerStateEnum::STATE_FISHING:
+        break;
     }
 }

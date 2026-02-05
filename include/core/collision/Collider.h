@@ -30,7 +30,7 @@ namespace Collision
     struct Collider
     {
         int entityId{};
-        Actor *actor{};  // Non-owning; lifetime managed by Player
+        Actor *actor{}; // TODO - Non-owning; lifetime managed by Player
         Vector3 center{};
         ColliderType type{};
         Box3D boundingBox{};

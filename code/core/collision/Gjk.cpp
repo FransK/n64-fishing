@@ -183,7 +183,7 @@ void Simplex::movePoint(int to, int from)
     objectAPoint[to] = objectAPoint[from];
 }
 
-int GJK::checkForOverlap(Simplex *simplex, Collider *a, Collider *b, const Vector3 *firstDirection)
+int GJK::checkForOverlap(Simplex *simplex, const std::unique_ptr<Collider> &a, const std::unique_ptr<Collider> &b, const Vector3 *firstDirection)
 {
     Vector3 aPoint;
     Vector3 bPoint;

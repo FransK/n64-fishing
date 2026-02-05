@@ -4,11 +4,11 @@
 
 #include "adapters/T3d.h"
 #include "common/Observer.h"
-#include "scene/PlayerState.h"
+#include "scene/Player.h"
 
 constexpr float PLAYER_SCALE = 0.125f;
 
-class PlayerAnimatable : public Observer<PlayerState>
+class PlayerAnimatable : public Observer<Player>
 {
 public:
     PlayerAnimatable(T3DModel *model, color_t primColor);
@@ -40,6 +40,6 @@ private:
 
     color_t mPrimColor{};
 
-    void onPlayerStateChange(const PlayerState &state);
+    void onPlayerStateChange(const Player &state);
     void playAnimation(Anim anim);
 };

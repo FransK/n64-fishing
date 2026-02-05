@@ -33,7 +33,7 @@ namespace Debug
 
 void Debug::Overlay::draw(Scene &scene, uint32_t vertCount, float deltaTime)
 {
-    auto collScene = scene.getCollScene();
+    const auto &collScene = scene.getCollScene();
     uint64_t newTicksSelf = get_ticks();
 
     collScene.debugDraw();

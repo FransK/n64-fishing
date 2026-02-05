@@ -365,7 +365,7 @@ void EpaResult::calculateContact(ExpandingSimplex *simplex, SimplexTriangle *clo
     result->contactB = result->contactA + result->normal * result->penetration;
 }
 
-bool EpaResult::solve(const Simplex *startingSimplex, Collider *a, Collider *b, EpaResult *out)
+bool EpaResult::solve(const Simplex *startingSimplex, const std::unique_ptr<Collider> &a, const std::unique_ptr<Collider> &b, EpaResult *out)
 {
     ExpandingSimplex simplex(startingSimplex, 0);
     SimplexTriangle *closestFace = 0;

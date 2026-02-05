@@ -4,8 +4,8 @@
 #include "math/Quaternion.h"
 
 PlayerAnimatable::PlayerAnimatable(T3DModel *model, color_t primColor)
-    : Observer<PlayerState>([this](const PlayerState &state)
-                            { this->onPlayerStateChange(state); }),
+    : Observer<Player>([this](const Player &player)
+                       { this->onPlayerStateChange(player); }),
       mModel(model),
       mSkeleton(model),
       mAnimIdle(model, "Idle"),
@@ -68,9 +68,9 @@ void PlayerAnimatable::draw(const Vector3 &position, const Vector2 &rotation) co
     rspq_block_run(mDplPlayer.get());
 }
 
-void PlayerAnimatable::onPlayerStateChange(const PlayerState &state)
+void PlayerAnimatable::onPlayerStateChange(const Player &player)
 {
-    switch (state.getState())
+    switch (player.actionState())
     {
     case PlayerStateEnum::STATE_IDLE:
         playAnimation(Anim::IDLE);

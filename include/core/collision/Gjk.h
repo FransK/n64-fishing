@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 #include "math/Vector3.h"
 
@@ -32,6 +33,6 @@ namespace Collision
     class GJK
     {
     public:
-        static int checkForOverlap(Simplex *simplex, Collider *a, Collider *b, const Vector3 *firstDirection);
+        static int checkForOverlap(Simplex *simplex, const std::unique_ptr<Collider> &a, const std::unique_ptr<Collider> &b, const Vector3 *firstDirection);
     };
 }

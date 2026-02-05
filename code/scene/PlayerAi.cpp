@@ -31,7 +31,7 @@ void PlayerAi::update(float deltaTime, Player *allPlayers, Containers::vector<bo
         return;
     }
 
-    PlayerStateEnum state = mPlayer->getPlayerState()->getState();
+    PlayerStateEnum state = mPlayer->actionState();
 
     switch (state)
     {
@@ -45,7 +45,7 @@ void PlayerAi::update(float deltaTime, Player *allPlayers, Containers::vector<bo
         break;
     case PlayerStateEnum::STATE_FISHING:
         // Check fishing status
-        if (mPlayer->getPlayerState()->getStateTimer() < CATCH_TIMER - mDelayCatchTimer)
+        if (mPlayer->getStateTimer() < CATCH_TIMER - mDelayCatchTimer)
         {
             mInputState.fish = true;
             mDelayActionTimer = 2.0f;

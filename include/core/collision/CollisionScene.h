@@ -6,27 +6,41 @@
 #include "Collider.h"
 #include "Epa.h"
 
+#include "common/Observer.h"
+
+class Player;
+
 namespace Collision
 {
-    class CollisionScene
+    class CollisionScene : Observer<Player>
     {
     public:
-        void add(Collider &&object, bool isActive = true);
+        CollisionScene() : Observer<Player>([this](const Player &player)
+                                            { this->onPlayerStateChange(player); }) {};
+        ~CollisionScene() = default;
+        CollisionScene(const CollisionScene &) = delete;
+        CollisionScene &operator=(const CollisionScene &) = delete;
+        CollisionScene(CollisionScene &&) = delete;
+        CollisionScene &operator=(CollisionScene &&) = delete;
+
+        void add(std::unique_ptr<Collider> collider, bool isActive = true);
         void remove(int entityId);
         void activate(int entityId);
         void deactivate(int entityId);
 
         void update(float fixedTimeStep);
-        void debugDraw();
+        void debugDraw() const;
 
     private:
-        Containers::vector<std::shared_ptr<Collider>> colliders{};       // TODO make unique
-        Containers::vector<std::shared_ptr<Collider>> activeColliders{}; // TODO make unique
+        Containers::vector<std::unique_ptr<Collider>> mInactiveColliders{};
+        Containers::vector<std::unique_ptr<Collider>> mActiveColliders{};
 
         void runCollision();
-        void constrainToWorld(Collider *object);
-        void collide(Collider *a, Collider *b);
-        void correctOverlap(Collider *object, EpaResult *result, float ratio, float friction, float bounce);
-        void correctVelocity(Collider *object, EpaResult *result, float ratio, float friction, float bounce);
+        void constrainToWorld(const std::unique_ptr<Collider> &object);
+        void collide(const std::unique_ptr<Collider> &a, const std::unique_ptr<Collider> &b);
+        void correctOverlap(const std::unique_ptr<Collider> &object, EpaResult *result, float ratio, float friction, float bounce);
+        void correctVelocity(const std::unique_ptr<Collider> &object, EpaResult *result, float ratio, float friction, float bounce);
+
+        void onPlayerStateChange(const Player &player);
     };
 }

@@ -19,7 +19,6 @@
 #include "scene/Camera.h"
 #include "scene/Player.h"
 #include "scene/PlayerAi.h"
-#include "scene/PlayerState.h"
 
 using Collision::CollisionScene;
 
@@ -64,11 +63,11 @@ private:
 
     float mStateTime{};
 
-    Containers::vector<Player> mPlayers;
-    Containers::vector<PlayerAi> mAIPlayers;
-    Containers::vector<InputComponentVariant> mInputComponents;
-    Containers::vector<PlayerAnimationComponent> mAnimationComponents;
-    std::shared_ptr<CollisionScene> mCollisionScene; // TODO Scene should own the CollisionScene, not share it
+    Containers::vector<Player> mPlayers{};
+    Containers::vector<PlayerAi> mAIPlayers{};
+    Containers::vector<InputComponentVariant> mInputComponents{};
+    Containers::vector<PlayerAnimationComponent> mAnimationComponents{};
+    std::unique_ptr<CollisionScene> mCollisionScene{std::make_unique<CollisionScene>()};
     Containers::vector<Services::PlayerData> mInitialPlayerData;
 
     Containers::vector<bool> mWinners;

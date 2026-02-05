@@ -100,7 +100,7 @@ namespace Collision
         Vector3 normal; // points from A to B
         float penetration;
 
-        static bool solve(const Simplex *startingSimplex, Collider *a, Collider *b, EpaResult *out);
+        static bool solve(const Simplex *startingSimplex, const std::unique_ptr<Collider> &a, const std::unique_ptr<Collider> &b, EpaResult *out);
         static void calculateContact(struct ExpandingSimplex *simplex, struct SimplexTriangle *closestFace, struct Vector3 *planePos, struct EpaResult *result);
     };
 }

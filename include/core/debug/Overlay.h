@@ -4,9 +4,7 @@
  */
 #pragma once
 
-#include <t3d/t3dmath.h>
-#include <vector>
-#include <functional>
+#include <cstdint>
 
 class Scene;
 
