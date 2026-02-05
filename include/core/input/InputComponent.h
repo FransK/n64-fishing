@@ -1,24 +1,25 @@
 #pragma once
 
-template <typename InputStrategyT, typename UpdateStrategyT>
+/*
+concept InputStrategyT = requires(T a)
+{
+    { a.inputState() } -> InputStateType;
+}
+*/
+template <typename InputStrategyT>
 class InputComponent
 {
 public:
-    InputComponent(InputStrategyT inputStrategy, UpdateStrategyT updateStrategy)
-        : mInputStrategy(std::move(inputStrategy)),
-          mUpdateStrategy(std::move(updateStrategy))
+    InputComponent(InputStrategyT inputStrategy)
+        : mInputStrategy(std::move(inputStrategy))
     {
     }
 
-    void update(float deltaTime);
+    auto inputState() const
+    {
+        return mInputStrategy.inputState();
+    }
 
 private:
     InputStrategyT mInputStrategy{};
-    UpdateStrategyT mUpdateStrategy{};
 };
-
-template <typename InputStrategyT, typename UpdateStrategyT>
-void InputComponent<InputStrategyT, UpdateStrategyT>::update(float deltaTime)
-{
-    mUpdateStrategy.update(mInputStrategy.getInputState(), deltaTime);
-}

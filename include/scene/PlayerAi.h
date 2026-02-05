@@ -21,7 +21,7 @@ public:
     void reset();
     void setBehavior(AIBehavior behavior) { mBehavior = behavior; }
     void update(float deltaTime, Player *allPlayers, std::vector<bool> &winners);
-    PlayerInputState getInputState() const { return mInputState; }
+    PlayerInputState inputState() const { return mInputState; }
 
 private:
     AIBehavior mBehavior{AIBehavior::BEHAVE_FISHERMAN};

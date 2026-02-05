@@ -7,6 +7,7 @@
 
 #include "collision/CollisionScene.h"
 #include "collision/Collider.h"
+#include "input/PlayerInputState.h"
 #include "scene/Actor.h"
 #include "scene/PlayerState.h"
 
@@ -24,6 +25,7 @@ public:
 
     void drawBillboard(T3DViewport &viewport) const;
     void reset(Vector3 const &position, Vector2 const &rotation);
+    void update(const PlayerInputState &inputState, float deltaTime);
 
     Actor *getAttackActor() const { return mAttackActor.get(); }
     PlayerState *getPlayerState() const { return mPlayerState.get(); }

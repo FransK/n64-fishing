@@ -12,7 +12,6 @@
 #include "debug/Overlay.h"
 #include "input/AIInputStrategy.h"
 #include "input/PlayerInputStrategy.h"
-#include "input/InputComponentUpdate.h"
 #include "math/Vector2.h"
 #include "scene/ActorFlags.h"
 #include "services/AssetReader.h"
@@ -103,14 +102,14 @@ Scene::Scene()
         if (i < playerCount)
         {
             mInputComponents.emplace_back(
-                std::in_place_type<InputComponent<PlayerInputStrategy, PlayerUpdateStrategy>>,
-                PlayerInputStrategy((joypad_port_t)i), PlayerUpdateStrategy(mPlayers.back()));
+                std::in_place_type<InputComponent<PlayerInputStrategy>>,
+                PlayerInputStrategy((joypad_port_t)i));
         }
         else
         {
             mInputComponents.emplace_back(
-                std::in_place_type<InputComponent<AIInputStrategy, PlayerUpdateStrategy>>,
-                AIInputStrategy(&mAIPlayers[i]), PlayerUpdateStrategy(mPlayers.back()));
+                std::in_place_type<InputComponent<AIInputStrategy>>,
+                AIInputStrategy(&mAIPlayers[i]));
         }
 
         mAnimationComponents.emplace_back(mPlayerModel.getModel(), COLORS[i]);
@@ -171,9 +170,11 @@ void Scene::updateFixed(float deltaTime)
         mAIPlayers[i].update(deltaTime, &mPlayers.front(), mWinners);
     }
 
-    for (size_t i = 0; i < Core::MAX_PLAYERS; i++)
+    for (auto i = 0; i < Core::MAX_PLAYERS; i++)
     {
-        std::visit(InputComponentUpdate{deltaTime}, mInputComponents[i]);
+        auto inputState = std::visit([](const auto &inputComponent)
+                                     { return inputComponent.inputState(); }, mInputComponents[i]);
+        mPlayers[i].update(inputState, deltaTime);
     }
 
     ticksCollisionUpdate = get_ticks();

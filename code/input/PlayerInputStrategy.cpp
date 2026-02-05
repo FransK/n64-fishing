@@ -1,6 +1,6 @@
 #include "PlayerInputStrategy.h"
 
-PlayerInputState PlayerInputStrategy::getInputState()
+PlayerInputState PlayerInputStrategy::inputState() const
 {
     auto btn = joypad_get_buttons_pressed(mPort);
     auto inputs = joypad_get_inputs(mPort);

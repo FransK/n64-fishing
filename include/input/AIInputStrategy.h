@@ -10,7 +10,7 @@ class AIInputStrategy
 public:
     explicit AIInputStrategy(PlayerAi *ai) : mAi(ai) {}
 
-    PlayerInputState getInputState();
+    PlayerInputState inputState() const;
 
 private:
     PlayerAi *mAi;
