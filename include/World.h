@@ -16,6 +16,8 @@ public:
     ~World();
     World(const World &other) = delete;
     World &operator=(const World &other) = delete;
+    World(World &&other) = delete;
+    World &operator=(World &&other) = delete;
 
     void fixedloop(float deltatime);
     void loop(float deltatime);

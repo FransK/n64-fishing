@@ -19,9 +19,7 @@ PlayerAnimatable::PlayerAnimatable(T3DModel *model, color_t primColor)
 {
     // Model Credits: Quaternius (CC0) https://quaternius.com/
     mAnimIdle.attach(mSkeleton);
-
     mAnimRun.attach(mSkeleton);
-    t3d_anim_set_playing(mAnimRun.get(), false);
 
     mAnimPunch.attach(mSkeleton);
     t3d_anim_set_looping(mAnimPunch.get(), false);
@@ -97,12 +95,6 @@ void PlayerAnimatable::onPlayerStateChange(const Player &player)
 
 void PlayerAnimatable::playAnimation(Anim anim)
 {
-    t3d_anim_set_playing(mAnimIdle.get(), anim == Anim::IDLE);
-    t3d_anim_set_playing(mAnimRun.get(), anim == Anim::RUN);
-    t3d_anim_set_playing(mAnimPunch.get(), anim == Anim::SHOVE);
-    t3d_anim_set_playing(mAnimReceiveHit.get(), anim == Anim::RECEIVE_SHOVE);
-    t3d_anim_set_playing(mAnimCast.get(), anim == Anim::CAST);
-
     switch (anim)
     {
     case Anim::IDLE:
@@ -113,14 +105,17 @@ void PlayerAnimatable::playAnimation(Anim anim)
         return;
     case Anim::SHOVE:
         t3d_anim_set_time(mAnimPunch.get(), 0.0f);
+        t3d_anim_set_playing(mAnimPunch.get(), true);
         mActiveAnim = mAnimPunch.get();
         return;
     case Anim::RECEIVE_SHOVE:
         t3d_anim_set_time(mAnimReceiveHit.get(), 0.0f);
+        t3d_anim_set_playing(mAnimReceiveHit.get(), true);
         mActiveAnim = mAnimReceiveHit.get();
         return;
     case Anim::CAST:
         t3d_anim_set_time(mAnimCast.get(), 0.0f);
+        t3d_anim_set_playing(mAnimCast.get(), true);
         mActiveAnim = mAnimCast.get();
         return;
     }
