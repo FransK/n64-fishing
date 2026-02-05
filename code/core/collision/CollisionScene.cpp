@@ -94,11 +94,11 @@ void CollisionScene::update(float fixedTimeStep)
     }
 }
 
-void CollisionScene::debugDraw() const
+void CollisionScene::debugDraw(const Debug::DebugDraw &drawer) const
 {
     for (const auto &c : mActiveColliders)
     {
-        Debug::drawBox(c->boundingBox);
+        drawer.drawBox(c->boundingBox);
     }
 }
 

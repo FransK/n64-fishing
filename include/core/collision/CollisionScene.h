@@ -7,6 +7,7 @@
 #include "Epa.h"
 
 #include "common/Observer.h"
+#include "debug/DebugDraw.h"
 
 class Player;
 
@@ -29,7 +30,7 @@ namespace Collision
         void deactivate(int entityId);
 
         void update(float fixedTimeStep);
-        void debugDraw() const;
+        void debugDraw(const Debug::DebugDraw &drawer) const;
 
     private:
         Containers::vector<std::unique_ptr<Collider>> mInactiveColliders{};

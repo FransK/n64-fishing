@@ -30,8 +30,6 @@ Scene::Scene()
       mFontBillboard(FS_BASE_PATH "squarewave.font64", Core::FONT_BILLBOARD),
       mFontText(FS_BASE_PATH "squarewave.font64", Core::FONT_TEXT)
 {
-    Debug::init();
-
     t3d_mat4fp_from_srt_euler(mMapMatFP.get(), (float[3]){PLAYER_SCALE, 1.0f, PLAYER_SCALE}, (float[3]){0, 0, 0}, (float[3]){0, 0, 0});
 
     rspq_block_begin();
@@ -319,13 +317,13 @@ void Scene::update(float deltaTime)
     // Debug UI
     if (debugOverlay)
     {
-        mDebugOverlay.draw(*this, vertices, deltaTime);
-        Debug::draw(static_cast<uint16_t *>(mCurrentFB->buffer));
+        mDebugOverlay.draw(*this, vertices, deltaTime, mDebugDrawer);
+        mDebugDrawer.draw(static_cast<uint16_t *>(mCurrentFB->buffer));
     }
     else if (showFPS)
     {
-        Debug::printStart();
-        Debug::printf(24, 220, "FPS %.2f", display_get_fps());
+        mDebugDrawer.printStart();
+        mDebugDrawer.printf(24, 220, "FPS %.2f", display_get_fps());
     }
 
     // === Detach and show === //

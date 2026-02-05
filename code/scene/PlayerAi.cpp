@@ -18,7 +18,7 @@ void PlayerAi::reset()
     };
 }
 
-void PlayerAi::update(float deltaTime, Player *allPlayers, Containers::vector<bool> &winners)
+void PlayerAi::update(float deltaTime, Player *allPlayers, const Containers::vector<bool> &winners)
 {
     // Reset input state
     mInputState = {

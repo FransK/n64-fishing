@@ -88,5 +88,6 @@ private:
     Camera mCamera{};
     T3DVec3 mLightDirVec{};
 
+    Debug::DebugDraw mDebugDrawer{};
     Debug::Overlay mDebugOverlay{};
 };

@@ -29,67 +29,67 @@ namespace Debug
     bool showCollMesh = false;
     bool showCollSpheres = false;
     bool actorDebug = false;
-}
 
-void Debug::Overlay::draw(Scene &scene, uint32_t vertCount, float deltaTime)
-{
-    const auto &collScene = scene.getCollScene();
-    uint64_t newTicksSelf = get_ticks();
-
-    collScene.debugDraw();
-
-    float posX = 24;
-    float posY = 24;
-
-    Debug::printStart();
-    Debug::printf(posX + barWidth + 2, 14, "FPS %.2f", display_get_fps());
-    Debug::printf(posX + barWidth + 2, 34, "Buffers %.2d", display_get_num_buffers());
-
-    heap_stats_t heap_stats;
-    sys_get_heap_stats(&heap_stats);
-
-    rdpq_set_prim_color(COLOR_ACTOR_UPDATE);
-    posX = Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksActorUpdate) / 1000.0) + 8;
-    rdpq_set_prim_color(COLOR_COLL);
-    posX = Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksCollisionUpdate) / 1000.0) + 8;
-    rdpq_set_prim_color(COLOR_CULL);
-    posX = Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksAnimationUpdate) / 1000.0) + 8;
-    rdpq_set_prim_color(COLOR_DEBUG);
-    posX = Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(ticksSelf) / 1000.0) + 8;
-
-    posX = 24 + barWidth - 50;
-    posX = Debug::printf(posX, posY, "V:%d", vertCount) + 8;
-    Debug::printf(posX, posY, "H:%d", heap_stats.used / 1024);
-
-    // Performance graph
-    posX = 24;
-    posY = 16;
-
-    float timeActorUpdate = usToWidth(TICKS_TO_US(scene.ticksActorUpdate));
-    float timeColl = usToWidth(TICKS_TO_US(scene.ticksCollisionUpdate));
-    float timeCull = usToWidth(TICKS_TO_US(scene.ticksAnimationUpdate));
-    float timeSelf = usToWidth(TICKS_TO_US(ticksSelf));
-
-    rdpq_set_mode_fill({0, 0, 0, 0xFF});
-    rdpq_fill_rectangle(posX - 1, posY - 1, posX + (barWidth / 2), posY + barHeight + 1);
-    rdpq_set_mode_fill({0x33, 0x33, 0x33, 0xFF});
-    rdpq_fill_rectangle(posX - 1 + (barWidth / 2), posY - 1, posX + barWidth + 1, posY + barHeight + 1);
-
-    rdpq_set_fill_color(COLOR_ACTOR_UPDATE);
-    rdpq_fill_rectangle(posX, posY, posX + timeActorUpdate, posY + barHeight);
-    posX += timeActorUpdate;
-    rdpq_set_fill_color(COLOR_COLL);
-    rdpq_fill_rectangle(posX, posY, posX + timeColl, posY + barHeight);
-    posX += timeColl;
-    rdpq_set_fill_color(COLOR_CULL);
-    rdpq_fill_rectangle(posX, posY, posX + timeCull, posY + barHeight);
-    posX += timeCull;
-    rdpq_set_fill_color(COLOR_DEBUG);
-    rdpq_fill_rectangle(posX, posY, posX + timeSelf, posY + barHeight);
-
-    newTicksSelf = get_ticks() - newTicksSelf;
-    if (newTicksSelf < TICKS_FROM_MS(2))
+    void Overlay::draw(Scene &scene, uint32_t vertCount, float deltaTime, const DebugDraw &drawer) const
     {
-        ticksSelf = newTicksSelf;
+        const auto &collScene = scene.getCollScene();
+        uint64_t newTicksSelf = get_ticks();
+
+        collScene.debugDraw(drawer);
+
+        float posX = 24;
+        float posY = 24;
+
+        drawer.printStart();
+        drawer.printf(posX + barWidth + 2, 14, "FPS %.2f", display_get_fps());
+        drawer.printf(posX + barWidth + 2, 34, "Buffers %.2d", display_get_num_buffers());
+
+        heap_stats_t heap_stats;
+        sys_get_heap_stats(&heap_stats);
+
+        rdpq_set_prim_color(COLOR_ACTOR_UPDATE);
+        posX = drawer.printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksActorUpdate) / 1000.0) + 8;
+        rdpq_set_prim_color(COLOR_COLL);
+        posX = drawer.printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksCollisionUpdate) / 1000.0) + 8;
+        rdpq_set_prim_color(COLOR_CULL);
+        posX = drawer.printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksAnimationUpdate) / 1000.0) + 8;
+        rdpq_set_prim_color(COLOR_DEBUG);
+        posX = drawer.printf(posX, posY, "%.2f", (double)TICKS_TO_US(ticksSelf) / 1000.0) + 8;
+
+        posX = 24 + barWidth - 50;
+        posX = drawer.printf(posX, posY, "V:%d", vertCount) + 8;
+        drawer.printf(posX, posY, "H:%d", heap_stats.used / 1024);
+
+        // Performance graph
+        posX = 24;
+        posY = 16;
+
+        float timeActorUpdate = usToWidth(TICKS_TO_US(scene.ticksActorUpdate));
+        float timeColl = usToWidth(TICKS_TO_US(scene.ticksCollisionUpdate));
+        float timeCull = usToWidth(TICKS_TO_US(scene.ticksAnimationUpdate));
+        float timeSelf = usToWidth(TICKS_TO_US(ticksSelf));
+
+        rdpq_set_mode_fill({0, 0, 0, 0xFF});
+        rdpq_fill_rectangle(posX - 1, posY - 1, posX + (barWidth / 2), posY + barHeight + 1);
+        rdpq_set_mode_fill({0x33, 0x33, 0x33, 0xFF});
+        rdpq_fill_rectangle(posX - 1 + (barWidth / 2), posY - 1, posX + barWidth + 1, posY + barHeight + 1);
+
+        rdpq_set_fill_color(COLOR_ACTOR_UPDATE);
+        rdpq_fill_rectangle(posX, posY, posX + timeActorUpdate, posY + barHeight);
+        posX += timeActorUpdate;
+        rdpq_set_fill_color(COLOR_COLL);
+        rdpq_fill_rectangle(posX, posY, posX + timeColl, posY + barHeight);
+        posX += timeColl;
+        rdpq_set_fill_color(COLOR_CULL);
+        rdpq_fill_rectangle(posX, posY, posX + timeCull, posY + barHeight);
+        posX += timeCull;
+        rdpq_set_fill_color(COLOR_DEBUG);
+        rdpq_fill_rectangle(posX, posY, posX + timeSelf, posY + barHeight);
+
+        newTicksSelf = get_ticks() - newTicksSelf;
+        if (newTicksSelf < TICKS_FROM_MS(2))
+        {
+            ticksSelf = newTicksSelf;
+        }
     }
 }

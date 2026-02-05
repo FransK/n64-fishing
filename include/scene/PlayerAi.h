@@ -20,7 +20,7 @@ public:
 
     void reset();
     void setBehavior(AIBehavior behavior) { mBehavior = behavior; }
-    void update(float deltaTime, Player *allPlayers, Containers::vector<bool> &winners);
+    void update(float deltaTime, Player *allPlayers, const Containers::vector<bool> &winners);
     PlayerInputState inputState() const { return mInputState; }
 
 private:
